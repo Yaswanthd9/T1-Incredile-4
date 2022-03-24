@@ -24,5 +24,16 @@ basic_eda(heart_2020_cleaned)
 
 heart <- rename (heart_2020_cleaned)
 
-# Change character variables to binary 
+# Looking at data for Sex
+
+plot (as.factor(heart$Sex))
+ # from the plot we see that there are slightly more females than males 
+
+# Subsetting the two sexes 
+female<- subset(heart, Sex=="Female")
+male <- subset (heart, Sex=="Male")
+
+ 
+ 
+
 
