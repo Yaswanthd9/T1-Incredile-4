@@ -1,0 +1,5 @@
+"0","library(lattice)
+pairs(bike_final)
+"
+"2","Error in pairs(bike_final) : object 'bike_final' not found
+"

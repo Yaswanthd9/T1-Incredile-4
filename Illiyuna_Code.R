@@ -4,6 +4,7 @@ library (dplyr)
 library (funModeling)
 library(ezids)
 library (ggplot2)
+library(ggcorrplot)
 
 # Load the Data and Rename dataframe 
 ```{r}
@@ -82,7 +83,12 @@ heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 ```
 
-
+#Correlation Plots of all variables
+```{r}
+ model.matrix(~0+., data=heart) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
+```
 
 ## Which gender is more likely to get heart disease? 
 
@@ -93,7 +99,6 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for Heart Disease and Sex")
 addmargins(contable)
-
 ```
 
 
@@ -109,18 +114,13 @@ barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", besid
 
 We can see that men are more likely to have heart disease than women in our data. 
 
+# Heart Disease & BMI
+
+```{r}
+
+```
 
 
-sex_new <- heart$Sex %>%
-            group_by (heart$HeartDisease) %>%
-            summarize(count = n()) %>%  # count records by species
-            mutate(pct = count/sum(count)) # find percent of total
-            
-ggplot(sex_new, aes(heart$HeartDisease, pct, fill = heart$HeartDisease)) + 
-  geom_bar(stat='identity') + 
-  geom_text(aes(label=scales::percent(pct)), position = position_stack(vjust = .5)) +
-  scale_y_continuous(labels = scales::percent)
-            
 
 
 

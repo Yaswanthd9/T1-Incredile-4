@@ -1,6 +1,0 @@
-"1",""
-"1","
-"
-"2","Warning:"
-"2"," `guides(<scale> = FALSE)` is deprecated. Please use `guides(<scale> = ""none"")` instead.
-"

@@ -1,0 +1,6 @@
+"0","heart %>%"
+"0","  group_by(HeartDisease) %>%"
+"0","  summarise_at(vars(""BMI"", "
+"0","                    ""PhysicalHealth"", "
+"0","                    ""MentalHealth"","
+"0","                    ""SleepTime""), mean)"

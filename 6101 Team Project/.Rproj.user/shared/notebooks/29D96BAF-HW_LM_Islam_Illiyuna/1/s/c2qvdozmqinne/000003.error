@@ -1,0 +1,1 @@
+{"frames":[{"func":"pairs(bike_final)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in pairs(bike_final) : object 'bike_final' not found\n"}
