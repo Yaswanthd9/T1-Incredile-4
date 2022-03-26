@@ -59,17 +59,17 @@ heart$SkinCancer<-as.factor(heart$SkinCancer)
 
 #performing chi^2 test
 ```{r}
-lok1=table(heart$HeartDisease,heart$Asthma)
-chi_1=chisq.test(lok1)
+hea_as=table(heart$HeartDisease,heart$Asthma)
+chi_1=chisq.test(hea_as)
 chi_1
-lok2=table(heart$HeartDisease,heart$Diabetic)
-chi_2=chisq.test(lok2)
+hea_dia=table(heart$HeartDisease,heart$Diabetic)
+chi_2=chisq.test(hea_dia)
 chi_2
-lok3=table(heart$HeartDisease,heart$KidneyDisease)
-chi_3=chisq.test(lok3)
+hea_kid=table(heart$HeartDisease,heart$KidneyDisease)
+chi_3=chisq.test(hea_kid)
 chi_3
-lok4=table(heart$HeartDisease,heart$SkinCancer)
-chi_4=chisq.test(lok4)
+hea_skin=table(heart$HeartDisease,heart$SkinCancer)
+chi_4=chisq.test(hea_skin)
 chi_4
 ```
 For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. Every secondary illness(Diabetic,Asthma, Kidney disease and skin cancer) is dependent on heart disease.
