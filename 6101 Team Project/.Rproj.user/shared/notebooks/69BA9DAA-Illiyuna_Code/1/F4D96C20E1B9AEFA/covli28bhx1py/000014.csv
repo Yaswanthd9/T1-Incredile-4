@@ -1,0 +1,4 @@
+"0","model.matrix(~0+., data=diseases) %>%"
+"0","      cor.test(diseases)"
+"2","Error in cor.test.default(., diseases) : 'y' must be a numeric vector
+"

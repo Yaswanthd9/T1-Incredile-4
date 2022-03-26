@@ -1,0 +1,2 @@
+"0","heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== ""No, borderline diabetes"" , ""Yes"")"
+"0","heart$Diabetic[heart$Diabetic== ""Yes (during pregnancy)""] <- ""No""  "

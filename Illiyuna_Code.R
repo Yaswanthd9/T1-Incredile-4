@@ -5,6 +5,7 @@ library (funModeling)
 library(ezids)
 library (ggplot2)
 library(ggcorrplot)
+library(corrr)
 
 # Load the Data and Rename dataframe 
 ```{r}
@@ -56,7 +57,6 @@ freq(heart)
 ```
 
 
-```
 # Changing Diabetes bordeline and pregnancy categories to Yes/No
 ```{r}
 heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
@@ -81,6 +81,8 @@ heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
 heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
 heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+
+heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
 #Correlation Plots of all variables
@@ -89,6 +91,8 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
      cor(use="pairwise.complete.obs") %>% 
    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 ```
+
+Need bigger screen to see this corrplot properly 
 
 ## Which gender is more likely to get heart disease? 
 
@@ -114,15 +118,36 @@ barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", besid
 
 We can see that men are more likely to have heart disease than women in our data. 
 
-# Heart Disease & BMI
+# Heart Disease & Secondary illnesses 
 
 ```{r}
+diseases <- data.frame (heart$HeartDisease,
+                        heart$Stroke,
+                        heart$Diabetic,
+                        heart$Asthma, 
+                        heart$KidneyDisease,
+                        heart$SkinCancer)
+
+# Rename columns
+
+names(diseases) <- c ('heart_disease',
+                      'stroke',
+                      'diabetic',
+                      'asthma',
+                      'kidney_disease',
+                      'skin_cancer')
+
 
 ```
 
+# Correlation matrix among diseases 
 
+```{r}
+model.matrix(~0+., data=diseases) %>%
+      cor (use="pairwise.complete.obs")
+     ggcorrplot(show.diag = F, type="lower", lab=TRUE, lab_size=1)
 
-
+```
 
 
 
