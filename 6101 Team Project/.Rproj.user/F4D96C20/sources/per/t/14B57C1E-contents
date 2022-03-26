@@ -1,0 +1,241 @@
+---
+title: "Intro to DS - Hypothesis Tests, T-test, 2-sample T-test, ANOVA, Chi-squared"
+author: "Illiyuna Islam: 6101 Intro to DS"
+# date: "today"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+# HW Assignment - Hypothesis Testing 
+
+This exercise uses the same graduate school admissions dataset from last homework. The dataset is LogRegAdmit.csv.  
+The variables in the dataset are:  
+
+* `admit`: 0 or 1 (False or True)
+* `gre`: gre score
+* `gpa`: grade point average at undergraduate level
+* `rank`: the ranking of the applicant’s undergraduate institute, 1, 2, 3, or 4
+
+
+## Grad School Admissions
+
+
+### Question 1
+
+**Same as last homework, import the dataset as Adata, and make sure the data type for the variables are set properly for categorical variables.**
+
+```{r, results = 'markup'}
+
+Adata <- data.frame(read.csv(file= "LogRegAdmit.csv"))
+
+admit <-as.factor(Adata$admit)
+gre   <-as.factor(Adata$gre)
+gpa   <-as.factor(Adata$gpa)
+rank  <-as.factor(Adata$rank)
+
+is.factor(admit)
+is.factor(gre)
+is.factor(gpa)
+is.factor(rank)
+
+```
+Here, we have turned all the variables into categorical variables and then used the is.factor function to double check and thus received a TRUE in all cases. 
+
+### Question 2
+
+**Use the `outlierKD2()` function, remove the outliers for gre and gpa. Save the resulting dataframe as Adata2. You will need to do this in two steps, removing outliers for one variable at a time. How many NA values are in gre and in gpa with the resulting dataframe *Adata2*? **
+
+```{r, results = 'markup'}
+Adata2 <- ezids::outlierKD2 (Adata,gre,rm=TRUE, boxplt=FALSE, histogram=FALSE, qqplt=FALSE)
+Adata2 <- ezids::outlierKD2 (Adata2,gpa,rm=TRUE, boxplt=FALSE, histogram=FALSE, qqplt=FALSE)
+
+summary (Adata2)
+```
+
+From our summary output, we can see that GRE has 4 NAs while GPA has 1 NA value. 
+
+### Question 3
+
+**Like last time, separate the two subsets again, for admitted and rejected. **
+
+```{r}
+# Subsettting  
+
+admitted <- subset(Adata2, admit==1)
+rejected <- subset(Adata2, admit==0)
+
+```
+
+
+### Question 4
+
+**We were a little careless last time. Let us check for normality on the numerical variables. Let us use histogram (use `ggplot()`) and QQ-plot (use `qqnorm()`) to check the quantitative variables for the admitted and rejected subsets. Make a brief comment on the results. **
+
+```{r, results = 'markup'}
+par(mfrow=c(2,2))
+qqnorm(admitted$gre, main= " Q-Q Plot of Admitted GRE")
+qqline (admitted$gre, col= "red")
+
+qqnorm(admitted$gpa, main= " Q-Q Plot of Admitted GPA")
+qqline (admitted$gpa, col= "red")
+
+qqnorm(rejected$gre, main= " Q-Q Plot of Rejected GRE")
+qqline (rejected$gre, col= "red")
+
+qqnorm(rejected$gpa, main= " Q-Q Plot of Rejected Gpa")
+qqline (rejected$gpa, col= "red")
+```
+
+Looking at the qq plots, we can see that the subgroups are approximately normal but they are heavy tailed at the higher values. For the case of admitted GRE and GPA, there is a lower concentration of 
+points at the lower end. For the case of rejected GRE and GPA, the lower tail curves slightly away from the straight line, indicating skewness.  Lets take a look at the histograms below. 
+
+```{r}
+par(mfrow=c(2,2))
+
+library(ggplot2)
+
+ggplot (admitted, aes(gre)) +
+          geom_histogram(bins= 15, fill="blue") +
+          ggtitle(" Plot of Admitted GRE") 
+```
+
+The histogram for admitted GRE looks multimodal (due to the multiple peaks). 
+
+```{r}
+ggplot (admitted, aes(gpa)) +
+          geom_histogram(bins= 15, fill="blue") +
+          ggtitle(" Plot of Admitted GPA")
+```
+
+The histogram for admitted GPA is definitely left skewed and it could be multimodal since it peaks just after 3.5 and then again at 4.0.  
+
+
+
+```{r}
+ggplot (rejected, aes(gre)) +
+          geom_histogram(bins= 15, fill="pink") +
+          ggtitle(" Plot of Rejected GRE")
+```
+
+The histogram for rejected GRE looks approximately normal with no definite skews. 
+
+
+```{r}
+ggplot (rejected, aes(gpa)) +
+          geom_histogram(bins= 15, fill="pink") +
+          ggtitle(" Plot of Rejected GPA")
+
+```
+
+The histogram for rejected GPA could be right skewed due to the large jump at gpa 4.0. 
+
+Despite some issues, most of the data points for all four subgroups should approximate normality. 
+
+### Question 5
+
+**Does the two subgroups have different gre average and gpa average? Use the standard $\alpha$ = 0.05. What are the p-values for the test on gre and gpa? What are your conclusions from the tests? **
+
+```{r, results = 'markup'}
+# T-test for GRE
+
+t.test(admitted$gre, rejected$gre)
+```
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average for GRE is different between the admitted and rejected populations. 
+
+
+```{r, results = 'markup'}
+
+# T-test for GPA
+
+t.test(admitted$gpa, rejected$gpa)
+
+```
+
+
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis 
+and conclude that the average for GPA is different between the admitted and rejected populations. 
+
+
+### Question 6
+
+**With the dataset Adata2, construct a contingency table between rank and admit. Are these two variables qualitative or quantitative? **
+
+```{r, results = 'markup'}
+contable = table(Adata2$admit, Adata2$rank)
+xkabledply(contable, title="Contingency Table for Admit and School Rank in Adata2")
+
+
+```
+Here, 0 is rejected applicants and 1 means accepted applicants. While the values from 1 through 4 indicate the school rank. 1 being the best and 4 best not as good. 
+Admission is a qualitative variable while school rank is a quantitative variable. 
+ 
+### Question 7
+
+**Find out whether rank is independent of admission, according to the contingency table above. **
+
+```{r, results = 'markup'}
+# Chi-square Test of Independence 
+
+chisq.test(contable)
+
+
+```
+
+For the Chi-square test of independence, the null hypothesis is that rank and admission are independent. However, we see that the p-value is less than the 0.05% significance level, providing strong evidence against the null. Therefore, rank and admission are not independent of each other.
+
+
+### Question 8
+
+**From *Adata2*, test whether students from the four ranks have the same average gre or not. And also test if they have the same average gpa or not. Remember that if they are not all the same, you will need to follow up with a post hoc test. Make brief comments on your results.**
+
+```{r, results = 'markup'}
+gre_aov = aov(gre~factor(rank), data=Adata2)
+summary (gre_aov)
+
+```
+
+From the ANOVA test we see that the p-value is 0.15 (greater than 0.05) indicating that there are significant differences between the GRE scores of different ranks. 
+
+```{r,results = 'markup'}
+tukey_gre <- TukeyHSD(gre_aov)
+tukey_gre 
+```
+ 
+ From the Tukey post hoc test, we see that none of the rank combinations are significant. 
+ 
+ 
+```{r, results = 'markup'}
+ gpa_aov = aov(gpa~factor(rank), data=Adata2)
+summary (gpa_aov)
+```
+From the ANOVA test we see that the p-value is 0.14 (greater than 0.05) indicating that there are significant differences between GPA of different ranks. 
+
+```{r, results = 'markup'}
+tukey_gpa <- TukeyHSD(gpa_aov)
+tukey_gpa
+```
+
+From the Tukey post hoc test, we see that none of the rank combinations are significant. 
+
+
