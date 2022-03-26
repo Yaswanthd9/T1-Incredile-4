@@ -43,9 +43,9 @@ library("corrplot")
 heart_des<-subset(heart,select = c(HeartDisease,Diabetic,Asthma,KidneyDisease,SkinCancer))
 str(heart_des)
 cor_matrix<-cor(heart_des)
-cor(cor_matrix)
+cor_matrix
+corrplot(cor_matrix,method="number",title = "Correlation plot of HeartDisease and all other secondary diseases",mar = c(0,0,1,0))
 ```
-
 
 # Converting desired variables type into categorical variables
 ```{r}
