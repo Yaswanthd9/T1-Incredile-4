@@ -125,7 +125,7 @@ male  <- subset (heart, Sex == "Male")
 ```{r}
 ggplot(male, aes(x=HeartDisease, y=BMI)) + 
     geom_boxplot() +
-    facet_wrap(~HeartDisease, scale="free") +
+    facet_wrap(~HeartDisease, scale="free") + # Share 
     ggtitle("Male Heart Disease by BMI")
 ```   
 # Female Heart Disease by BMI 
@@ -144,7 +144,7 @@ ggplot(female, aes(x=HeartDisease, y=BMI)) +
 
 t.test(female$BMI, male$BMI)
 ```
-The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average BMI is different between the male and female populations. 
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average BMI is different between the male and female populations. A relationship exists. 
 
 # Heart Disease & Secondary illnesses 
 
@@ -176,11 +176,13 @@ model.matrix(~0+., data=diseases) %>%
      ggcorrplot(show.diag = F, type="lower", lab=TRUE, lab_size=1)
 
 ```
+None of them are particularly strong. 
 
-# Chi-test on diseases 
+# Chi-test on diseases to check independence
 
 ```{r}
-chi_asthma=chisq.test(table(heart$HeartDisease,heart$Asthma))
+
+chi_asthma=chisq.test(table(heart$HeartDisease, heart$Asthma))
 chi_asthma
 
 
@@ -198,8 +200,9 @@ chi_skin
 
 chi_stroke=chisq.test(table(heart$HeartDisease,heart$Stroke))
 chi_stroke
+
 ```
-Since the p-values are all less than the 5% seignificance level, we can reject the null and state that there are significant associations between between respondents with heart disease and those that also have one or more secondary illnesses. 
+Since the p-values are all less than the 5% significance level, we can reject the null and state that there are significant associations between between respondents with heart disease and those that also have one or more secondary illnesses. 
 
 Why are all the p-values the same??? 
 
@@ -220,7 +223,6 @@ cor(heart$AlcoholDrinking,heart$HeartDisease)
 cor(heart$HeartDisease,heart$Smoking)
 
 ```
-
 
 
 ```{r}
