@@ -3,7 +3,7 @@
     "path": "~/OneDrive/Grad School/Courses/DS Intro/T1-Incredile-4/Illiyuna_Code.R",
     "project_path": null,
     "type": "r_markdown",
-    "hash": "1416320740",
+    "hash": "537453100",
     "contents": "",
     "dirty": false,
     "created": 1648264669620.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "91,20",
-        "scrollLine": "83"
+        "cursorPosition": "91,0",
+        "scrollLine": "70"
     },
     "folds": "",
-    "lastKnownWriteTime": 1648271314,
+    "lastKnownWriteTime": 1648272862,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1648271314408,
+    "last_content_update": 1648272862211,
     "read_only": false,
     "read_only_alternatives": []
 }

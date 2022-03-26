@@ -54,6 +54,8 @@ On average, people with heart disease have a slightly higher BMI than those who 
 freq(heart)
 ```
 
+
+```
 # Changing Diabetes bordeline and pregnancy categories to Yes/No
 ```{r}
 heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
@@ -87,10 +89,14 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 # Contingency Table for Sex & Heart Disease 
 
 ```{r}
+
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for Heart Disease and Sex")
 addmargins(contable)
+
 ```
+
+
 
 ```{r}
 prop <-prop.table(contable)
@@ -98,13 +104,25 @@ percent <- round(prop*100, 2)
 
 print ("Contingency Table for Heart Disease and Sex in Percentage")
 print (percent)
+barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", beside=T, col=3:2)
 ```
 
 We can see that men are more likely to have heart disease than women in our data. 
 
-```{r}
-ggplot(data= heart, aes(fill=HeartDisease, x=Sex)) + 
-    geom_bar(position = "dodge") 
 
-```
+
+sex_new <- heart$Sex %>%
+            group_by (heart$HeartDisease) %>%
+            summarize(count = n()) %>%  # count records by species
+            mutate(pct = count/sum(count)) # find percent of total
+            
+ggplot(sex_new, aes(heart$HeartDisease, pct, fill = heart$HeartDisease)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(pct)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent)
+            
+
+
+
+
 
