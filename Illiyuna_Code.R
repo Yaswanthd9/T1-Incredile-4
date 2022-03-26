@@ -30,9 +30,12 @@ We can also see that there are no N/A values in our data set. This is not surpri
 ```{r}
 data_integrity(heart)
 ```
+# Description of every variable 
+```{r}
 describe (heart)
-
+```
 # Finding the mean of numerical variables grouped by heart disease
+```{r}
 plot_num(heart)
 
 heart %>%
@@ -41,20 +44,28 @@ heart %>%
                     "PhysicalHealth", 
                     "MentalHealth",
                     "SleepTime"), mean)
+```
+On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. HD people reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3.
 
 # Frequency distributions of all our categorical variables 
-
+```{r}
 freq(heart)
+```
 
-# Changing Diabetes bordeline and pregnancy categories 
+# Changing Diabetes bordeline and pregnancy categories to Yes/No
+```{r}
 heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
-heart$Diabetic <- replace (heart$Diabetic, heart$Diabetic== "Yes(during pregnancy)" , "No")
+heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
+```
 
+
+#Checking if diabetic has been changed 
+```{r}
 describe (heart$Diabetic)
 freq(heart$Diabetic)
-
+```
 # Changing all the categorical variables to numerical dummies 
-
+```{r}
 heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
 heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
 heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
@@ -63,8 +74,8 @@ heart$DiffWalking<-ifelse(heart$DiffWalking=="Yes",1,0)
 heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
 heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
 heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
-
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+```
 
 #Seperate out heart disease
 
