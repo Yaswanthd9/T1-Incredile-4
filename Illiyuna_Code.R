@@ -125,7 +125,7 @@ male  <- subset (heart, Sex == "Male")
 ```{r}
 ggplot(male, aes(x=HeartDisease, y=BMI)) + 
     geom_boxplot() +
-    facet_wrap(~HeartDisease, scale="free") + # Share 
+    facet_wrap(~HeartDisease, scale="free") + 
     ggtitle("Male Heart Disease by BMI")
 ```   
 # Female Heart Disease by BMI 
@@ -144,7 +144,19 @@ ggplot(female, aes(x=HeartDisease, y=BMI)) +
 
 t.test(female$BMI, male$BMI)
 ```
-The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average BMI is different between the male and female populations. A relationship exists. 
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. 
+
+# Is there a difference between the sex with heart disease 
+
+```{r}
+female_HD<- subset(female, HeartDisease==1)
+male_HD<- subset(male, HeartDisease== 1)
+
+t.test(female_HD$BMI, 
+       male_HD$BMI)
+```
+
+We see that there is no difference in average BMI between the men and women who do have heart disease. 
 
 # Heart Disease & Secondary illnesses 
 
