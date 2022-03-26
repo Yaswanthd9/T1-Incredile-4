@@ -3,6 +3,7 @@ library (tidyverse)
 library (dplyr)
 library (funModeling)
 library(ezids)
+library (ggplot2)
 
 # Load the Data and Rename dataframe 
 ```{r}
@@ -81,15 +82,29 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 
 
 
-
 ## Which gender is more likely to get heart disease? 
-# Looking at data for Sex
 
-plot (as.factor(heart$Sex))
+# Contingency Table for Sex & Heart Disease 
 
+```{r}
+contable = table(heart$HeartDisease, heart$Sex)
+xkabledply(contable, title="Contingency Table for Heart Disease and Sex")
+addmargins(contable)
+```
 
-# from the plot we see that there are slightly more females than males in our data.  
+```{r}
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
 
-# Subsetting the two sexes 
-female<- subset(heart, Sex=="Female")
-male <- subset (heart, Sex=="Male")
+print ("Contingency Table for Heart Disease and Sex in Percentage")
+print (percent)
+```
+
+We can see that men are more likely to have heart disease than women in our data. 
+
+```{r}
+ggplot(data= heart, aes(fill=HeartDisease, x=Sex)) + 
+    geom_bar(position = "dodge") 
+
+```
+

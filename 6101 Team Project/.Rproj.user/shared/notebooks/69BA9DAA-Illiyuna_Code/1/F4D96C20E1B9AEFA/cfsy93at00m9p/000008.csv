@@ -1,0 +1,4 @@
+"0","ggplot(data= heart, aes(fill=HeartDisease, x=Sex)) + "
+"0","    geom_bar(position = ""dodge"") +"
+"0","    ylab(""proportion"")"
+"0",""
