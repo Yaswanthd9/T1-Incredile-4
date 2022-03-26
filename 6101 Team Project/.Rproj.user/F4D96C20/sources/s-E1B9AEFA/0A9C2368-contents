@@ -103,11 +103,7 @@ Need bigger screen to see this corrplot properly
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for Heart Disease and Sex")
 addmargins(contable)
-```
 
-
-
-```{r}
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
 
@@ -116,7 +112,38 @@ print (percent)
 barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", beside=T, col=3:2)
 ```
 
-We can see that men are more likely to have heart disease than women in our data. 
+Green (No HD): more women
+Red (HD): More men
+
+# Subset Male & Female 
+```{r}
+female <- subset(heart, Sex== "Female")
+male  <- subset (heart, Sex == "Male")
+```
+# Male Heart Disease Boxplot 
+```{r}
+ggplot(male, aes(x=HeartDisease, y=BMI)) + 
+    geom_boxplot() +
+    facet_wrap(~HeartDisease, scale="free") +
+    ggtitle("Male Heart Disease by BMI")
+```   
+# Female Heart Disease by BMI 
+
+```{r}
+ggplot(female, aes(x=HeartDisease, y=BMI)) + 
+    geom_boxplot() +
+    facet_wrap(~HeartDisease, scale="free") +
+    ggtitle("Female Heart Disease by BMI")
+
+```
+
+# Are there differences between the means of the sexes 
+
+```{r}
+
+t.test(female$BMI, male$BMI)
+```
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average BMI  is different between the male and female populations. 
 
 # Heart Disease & Secondary illnesses 
 
