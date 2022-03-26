@@ -1,0 +1,202 @@
+---
+title: "Intro to DS - Linear Model part I"
+author: "Edwin Lo, GWU Intro to Data Science DATS 6101"
+# date: "today"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+# HW assignment
+
+## Linear model - quantitative regressors 
+
+### Question 1  
+**Import the data, call it `bikeorig.`**  
+The `Date` variable is probably imported as factor level variable. In any case, let us remove `Date`, `Casual.Users`, and `Registered.Users` in the dataset and save it as a new dataframe, call it `bike`. How many variables are in `bike`? 
+How many of them are imported as `int`? Feel free to rename longer variable names into shorter ones for convenience.  
+ 
+```{r, results = 'markup'}
+bikeorig <- read.csv("bikedata.csv")
+
+bike <- subset(bikeorig, select = -c(Date, Casual.Users, Registered.Users))
+ncol(bike)
+str(bike)
+```
+
+The new bike data frame has 11 variables, of which 9 are imported as 'int'. The other two (variables related to Temperature) are imported as 'num'. 
+
+### Question 2    
+**Select only the subset with `Hour` equal 16 only. Call it `bike16`**  
+These are the afternoon rush hour data. How many observations are there?   
+
+```{r, results = 'markup'}
+bike16 <-subset (bike, Hour==16)
+nrow(bike16)
+```
+
+There are 730 observations in the data frame bike16, that only accounts for the rush hour data( i.e Hour=16) 
+
+### Question 3  
+**Before building any models, we should make sure the variables are set up properly.**  
+(This problem is solved for you. Codes are given below.)  
+Which ones should be recorded as categorical? Convert them now before we proceed to the model building.  
+
+Note: After converting, the correlation function `cor()` will not work with categorical/factor variables. 
+I would keep the original `bike16` dataframe as numeric, and use that to 
+find the correlation matrix. 
+Although technically correlation between categorical and numeric variables are not 
+well defined in general, we can still get some useful information if the 
+categorical variable is at least at ordinal level. See future discussion 
+on using "Pearson" vs "Spearman" methods for correlation tests. 
+
+While the `cor()` function does not accept categorical variables (and therefore 
+we cannot use it for `corrplot()`), the `lattice::pairs()` function does not complain 
+about categorical columns. We can still use it to get a visual distribution of 
+data values from it.
+ 
+
+```{r, results = 'markup'}
+bike_final = bike16
+bike_final$Season = factor(bike16$Season)
+bike_final$Holiday = factor(bike16$Holiday)
+bike_final$Day = factor(bike16$Day)
+bike_final$Workday = factor(bike16$Working.Day)
+bike_final$Weather = factor(bike16$Weather)
+str(bike_final)
+```
+
+We decided to convert these variables into categorical (factor):  
+`Season`, `Holiday`, `Day`, `Workday`, and `Weather`.  Notice that 
+the dataframe `bike16` still has all variables numerical, while the df `bike_final` 
+include categorical columns that we just converted. 
+
+### Question 4  
+**Make a `pairs()` plot with all the variables (quantitative and qualitative).**  
+
+```{r, results = 'markup'}
+library(lattice)
+pairs(bike_final)
+
+```
+### Question 5  
+**Make a `corrplot()` with only the numerical variables.**  
+You can either subset the df with only numerical variables first, then create 
+the cor-matrix to plot. Or you can create the cor-matrix from 
+`bike16`, then select select out the portion of the matrix that you want. 
+Use options that shows well the relationships between different variables. 
+
+```{r, results = 'markup'}
+library(corrplot)
+library(dplyr)
+
+bike_cor<- select_if (bike_final, is.numeric)
+
+corrplot(cor(bike_cor),
+            method="number")
+
+
+ 
+```
+
+
+### Question 6   
+**By using numerical variables only, build a linear model with 1 independent variable to predict the `Total Users`.**  
+Choose the variable with the strongest correlation coefficient. Make some short 
+comments on the coefficient values, their p-values, and the multiple R-squared value.  
+
+```{r, results = 'markup'}
+cor.test(bike_cor$Total.Users, bike_cor$Temperature.Feels.F)
+```
+
+From the correlation plot, we see that Total.Users has a correlation coefficient of 0.556 with Temperature.Feels. The p-value is less than 5% allowing us to reject the null hypothesis and conclude that there is a significant linear relationship between Total bike riders and how the temperature feels outside. 
+
+```{r, results = 'markup'}
+model1 <- lm(Total.Users ~ Temperature.Feels.F, data= bike_cor)
+xkabledply(model1, title = paste("Model :", format(formula(model1)) ) )
+plot(model1)
+```
+
+### Question 7   
+**Next, add a second variable to the model.**  
+Choose the variable with the next strongest correlation, but avoid using 
+obviously collinear variables. When you have the model, check 
+the VIF values. If the VIF is higher than 5, discard this model, and try the 
+variable with the next strongest correlation until you find one that works 
+(ideally with vif’s <5, or if you have to, allow vif up to 10). Again, 
+comment on the coefficient values, their p-values, 
+and the multiple R-squared value.  
+
+```{r, results = 'markup'}
+
+model2 <- lm(Total.Users ~ Temperature.Feels.F + Weather.Type, data= bike_cor)
+xkabledply(model2, title = paste("Model :", format(formula(model2)) ) )
+plot(model2)
+
+car::vif (model2)
+```
+
+Since the VIF is less than 5 but greater than 1, we can conclude that weather type and temperature feels are not significantly correlated. 
+
+### Question 8  
+**We will try one more time as in the previous question, to add a third variable in our model.**  
+
+```{r, results = 'markup'}
+
+model3 <- lm(Total.Users ~ Temperature.Feels.F + Weather.Type + Humidity, data= bike_cor)
+xkabledply(model3, title = paste("Model :", format(formula(model3)) ) )
+plot(model3)
+
+```
+
+```{r, results = 'markup'}
+
+car::vif(model3)
+```
+
+The VIF tells us that the variables are moderately but not significantly correlated. 
+
+### Question 9  
+**For the 3-variable model you found, find the confidence intervals of the coefficients.**  
+```{r, results = 'markup'}
+confint(model3)
+```
+
+Since, the intercept's confidence interval does not contain zero, it is not statistically possible for the intercept to be zero. Thus, it is not necessary to rerun the regression by forcing a zero intercept.
+
+
+### Question 10    
+**Use ANOVA to compare the three different models you found.**  
+You have found three different models. Use ANOVA test to compare their residuals. What conclusion can you draw?
+
+```{r, results='markup'}
+anovaRes<- anova(model1,model2,model3) 
+
+anovaRes
+str(anovaRes)
+
+xkabledply(anovaRes, title = "ANOVA comparison between the models")
+```
+
+We can see that the p-value for the F-statistic is less than 5% for Model 2 and Model 3, thereby making them significantly different. 
+
