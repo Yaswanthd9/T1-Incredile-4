@@ -43,8 +43,10 @@ library("corrplot")
 heart_des<-subset(heart,select = c(HeartDisease,Diabetic,Asthma,KidneyDisease,SkinCancer))
 str(heart_des)
 cor_matrix<-cor(heart_des)
-corrplot(cor_matrix,method="number",title = "Correlation plot of heartdisease and secondary illnesses",mar = c(0,0,1,0))
+cor_matrix
+corrplot(cor_matrix,method="number",title = "Correlation plot of HeartDisease and secondary illnesses",mar = c(0,0,1,0))
 ```
+From the above correlation plot and correlation matrix, we can observe the every secondary disease(Diabetic,Asthma, Kidney disease and skin cancer) has a positive linear correlation with HeartDisease. Also every secondary illness is in a positive linear correlation with other one except for SkinCancer and Asthma.
 
 # Converting desired variables type into categorical variables
 ```{r}
