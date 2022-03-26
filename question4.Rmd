@@ -25,6 +25,17 @@ library(ezids)
 project = data.frame(read.csv("heart_2020_cleaned.csv"))
 ```
 
+```{r q03subset}
+smoke <- subset(project,Smoking==1)
+smoke
+smoke0 <- subset(project,Smoking==0)
+smoke0
+drink<- subset(project,AlcoholDrinking==1)
+drink
+drink0 <- subset(project,AlcoholDrinking==0)
+drink0
+```
+
 ```{r init, include=F}
 project$HeartDisease <- as.factor(project$HeartDisease)
 project$Smoking <- as.factor(project$Smoking)
