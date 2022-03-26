@@ -1,0 +1,75 @@
+---
+title: "Test of dependency"
+author: "Lokesh Bokkisam"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r init, include=FALSE}
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+```
+#our aim is to check "are heart deseases and secondary illnesses (Diabetic,Asthma, Kidney disease and skin cancer) have a correlation, or if they are independent
+
+#Import the CSV file to dataframe
+```{r, echo = F}
+heart <- data.frame(read.csv("heart_2020_cleaned.csv"))
+summary(heart)
+```
+# Changing Diabetes bordeline and pregnancy categories to Yes/No
+```{r}
+heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
+heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
+```
+# Changing all the categorical variables to numerical dummies 
+```{r}
+heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
+heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
+heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
+heart$Stroke<-ifelse(heart$Stroke=="Yes",1,0)
+heart$DiffWalking<-ifelse(heart$DiffWalking=="Yes",1,0)
+heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
+heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
+heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
+heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
+```
+#correlation plot for heart disease and other secondary illnesses
+```{r,results='asis'}
+library("corrplot")
+heart_des<-subset(heart,select = c(HeartDisease,Diabetic,Asthma,KidneyDisease,SkinCancer))
+str(heart_des)
+cor_matrix<-cor(heart_des)
+cor(cor_matrix)
+```
+
+
+# Converting desired variables type into categorical variables
+```{r}
+heart$HeartDisease<-as.factor(heart$HeartDisease)
+heart$Diabetic<-as.factor(heart$Diabetic)
+heart$Asthma<-as.factor(heart$Asthma)
+heart$KidneyDisease<-as.factor(heart$KidneyDisease)
+heart$SkinCancer<-as.factor(heart$SkinCancer)
+```
+
+#performing chi^2 test
+```{r}
+lok1=table(heart$HeartDisease,heart$Asthma)
+chi_1=chisq.test(lok1)
+chi_1
+lok2=table(heart$HeartDisease,heart$Diabetic)
+chi_2=chisq.test(lok2)
+chi_2
+lok3=table(heart$HeartDisease,heart$KidneyDisease)
+chi_3=chisq.test(lok3)
+chi_3
+lok4=table(heart$HeartDisease,heart$SkinCancer)
+chi_4=chisq.test(lok4)
+chi_4
+```
+For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. Every secondary illness(Diabetic,Asthma, Kidney disease and skin cancer) is dependent on heart disease.
+
