@@ -207,10 +207,19 @@ Why are all the p-values the same???
 
 ```{r}
 table_SQ3 <- xtabs(~heart$AlcoholDrinking+ heart$Smoking + heart$HeartDisease)
-ftable(addmargins(prop.table(table_SQ3))* 100)
+ftable(prop.table(table_SQ3))* 100
 
 ```
 https://rstudio-pubs-static.s3.amazonaws.com/308591_6dff566d383946c881cb5b6a735a79fd.html
+
+# Correlation coefficient 
+
+```{r}
+cor(heart$AlcoholDrinking,heart$Smoking)
+cor(heart$AlcoholDrinking,heart$HeartDisease)
+cor(heart$HeartDisease,heart$Smoking)
+
+```
 
 
 
