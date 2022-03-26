@@ -2,6 +2,7 @@
 library (tidyverse)
 library (dplyr)
 library (funModeling)
+library(ezids)
 
 # Load the Data and Rename dataframe 
 ```{r}
@@ -64,6 +65,7 @@ heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"
 describe (heart$Diabetic)
 freq(heart$Diabetic)
 ```
+
 # Changing all the categorical variables to numerical dummies 
 ```{r}
 heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
@@ -77,15 +79,14 @@ heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 ```
 
-#Seperate out heart disease
 
 
-# Now that EDA is done, we will be the differences in heart disease bnetween the genders
-# Main Question: 
+
+## Which gender is more likely to get heart disease? 
 # Looking at data for Sex
 
 plot (as.factor(heart$Sex))
-cross_plot(data=heart, input=c("Sex", ), target="HeartDisease")
+
 
 # from the plot we see that there are slightly more females than males in our data.  
 
