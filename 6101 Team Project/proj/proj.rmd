@@ -1,0 +1,62 @@
+---
+title: "Test of dependency"
+author: "Yaswanth Devisetti"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r init, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+```
+
+```{r, echo = F}
+heart <- data.frame(read.csv("heart_2020_cleaned_binary.csv"))
+View(heart)
+```
+
+
+```{r}
+boxplot(heart$HeartDisease~heart$KidneyDisease)
+
+#Ho: Heart Disease on kidneydisease and heart disease on non Kidney Disease
+#two sided test
+#assume non-equal variances.
+var(heart$HeartDisease[heart$KidneyDisease=="0"])
+var(heart$HeartDisease[heart$KidneyDisease=="1"])
+t.test(heart$HeartDisease~heart$KidneyDisease, mu=0, alt="two.sided", conf=0.95, var.eq=FALSE)
+```
+
+```{r}
+#Ho: Heart Disease on kidneydisease and heart disease on non Kidney Disease
+#two sided test
+#assume equal variances.
+boxplot(heart$HeartDisease~heart$Asthma)
+var(heart$HeartDisease[heart$Asthma=="0"])
+var(heart$HeartDisease[heart$Asthma=="1"])
+t.test(heart$HeartDisease~heart$Asthma, mu=0, alt="two.sided", conf=0.95, var.eq=TRUE)
+```
+
+```{r}
+#Ho: Heart Disease on kidneydisease and heart disease on non Kidney Disease
+#two sided test
+#assume equal variances.
+boxplot(heart$HeartDisease~heart$SkinCancer)
+var(heart$HeartDisease[heart$SkinCancer]=="0")
+var(heart$HeartDisease[heart$SkinCancer]=="1")
+t.test(heart$HeartDisease~heart$SkinCancer, mu=0, alt="two.sided", conf=0.95, var.eq=TRUE)
+mean(heart$HeartDisease)
+mean(heart$KidneyDisease)
+
+```
+
+```{r}
+anova_heartdisease = aov(heart$HeartDisease~ heart$KidneyDisease)
+anova_heartdisease
+summary(anova_heartdisease) -> sum_anova_heartdisease
+xkabledply(sum_anova_heartdisease, title = "ANOVA result summary for Neighborhood Groups") 
+```
