@@ -120,6 +120,7 @@ Red (HD): More men
 female <- subset(heart, Sex== "Female")
 male  <- subset (heart, Sex == "Male")
 ```
+
 # Male Heart Disease Boxplot 
 ```{r}
 ggplot(male, aes(x=HeartDisease, y=BMI)) + 
@@ -143,7 +144,7 @@ ggplot(female, aes(x=HeartDisease, y=BMI)) +
 
 t.test(female$BMI, male$BMI)
 ```
-The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average BMI  is different between the male and female populations. 
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the average BMI is different between the male and female populations. 
 
 # Heart Disease & Secondary illnesses 
 
@@ -198,5 +199,22 @@ chi_skin
 chi_stroke=chisq.test(table(heart$HeartDisease,heart$Stroke))
 chi_stroke
 ```
-Since the p-values are all less than the 5% seignificance level, we can reject the null and state that there is a significant difference between between respondents with heart disease and those that also have one or more secondary illnesses. 
+Since the p-values are all less than the 5% seignificance level, we can reject the null and state that there are significant associations between between respondents with heart disease and those that also have one or more secondary illnesses. 
 
+Why are all the p-values the same??? 
+
+# Smokers Vs Drinkers 
+
+```{r}
+table_SQ3 <- xtabs(~heart$AlcoholDrinking+ heart$Smoking + heart$HeartDisease)
+ftable(addmargins(prop.table(table_SQ3))* 100)
+
+```
+https://rstudio-pubs-static.s3.amazonaws.com/308591_6dff566d383946c881cb5b6a735a79fd.html
+
+
+
+```{r}
+chisq.test(heart$Smoking,  heart$HeartDisease)
+chisq.test(heart$AlcoholDrinking,heart$HeartDisease)
+```
