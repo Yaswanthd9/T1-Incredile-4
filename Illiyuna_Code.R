@@ -149,5 +149,27 @@ model.matrix(~0+., data=diseases) %>%
 
 ```
 
+# Chi-test on diseases 
 
+```{r}
+chi_asthma=chisq.test(table(heart$HeartDisease,heart$Asthma))
+chi_asthma
+
+
+chi_diabetic=chisq.test(table(heart$HeartDisease,heart$Diabetic))
+chi_diabetic
+
+
+chi_kidney=chisq.test(table(heart$HeartDisease,heart$KidneyDisease))
+chi_kidney
+
+
+chi_skin=chisq.test(table(heart$HeartDisease,heart$SkinCancer))
+chi_skin
+
+
+chi_stroke=chisq.test(table(heart$HeartDisease,heart$Stroke))
+chi_stroke
+```
+Since the p-values are all less than the 5% seignificance level, we can reject the null and state that there is a significant difference between between respondents with heart disease and those that also have one or more secondary illnesses. 
 

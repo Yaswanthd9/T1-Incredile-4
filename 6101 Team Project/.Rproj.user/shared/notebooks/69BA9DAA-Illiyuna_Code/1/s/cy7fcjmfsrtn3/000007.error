@@ -1,1 +1,0 @@
-{"frames":[],"message":"Error in heart$Asthma - ifelse(heart$Asthma == \"Yes\", 1, 0) : \n  non-numeric argument to binary operator\n"}
