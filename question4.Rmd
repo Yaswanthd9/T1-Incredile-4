@@ -44,8 +44,6 @@ project$AlcoholDrinking <- as.factor(project$AlcoholDrinking)
 ```
 
 ```{r ctable}
-contable = table(project$Smoking, project$AlcoholDrinking)
-contable # the contingency table
 contable1 = table(project$HeartDisease, project$AlcoholDrinking)
 contable1 # the contingency table
 contable2 = table(project$HeartDisease, project$Smoking)
@@ -55,8 +53,6 @@ loadPkg("printr")
 ```
 
 ```{r chisq}
-chitest = chisq.test(contable)
-chitest
 chitest1 = chisq.test(contable1)
 chitest1
 chitest2 = chisq.test(contable2)
