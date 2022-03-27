@@ -47,20 +47,20 @@ na_patient <- subset(heart,HeartDisease==0)
 
 ```{r, results='markup'}
 library(ggplot2)
-ggplot(patient, aes(x=Diabetic)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")
 dia_pa<-subset(patient,Diabetic==1)
 nrow(dia_pa)
-ggplot(na_patient, aes(x=Diabetic)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(na_patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")+ scale_y_continuous(labels = scales::comma)
 dia_pa1<-subset(na_patient,Diabetic==1)
 nrow(dia_pa1)
 ```
 #barplot of HeartDisease vs Asthma
 
 ```{r, results='markup'}
-ggplot(patient, aes(x=Asthma)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1")
 ast_pa<-subset(patient,Asthma==1)
 nrow(ast_pa)
-ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7))+ scale_y_continuous(labels = scales::comma)
+ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1" )+ scale_y_continuous(labels = scales::comma)
 ast_pa1<-subset(na_patient,Asthma==1)
 nrow(ast_pa1)
 ```
@@ -68,10 +68,10 @@ nrow(ast_pa1)
 #barplot of HeartDisease vs KidneyDisease
 
 ```{r, results='markup'}
-ggplot(patient, aes(x=KidneyDisease)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")
 kid_pa<-subset(patient,KidneyDisease==1)
 nrow(kid_pa)
-ggplot(na_patient, aes(x=KidneyDisease)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(na_patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")+ scale_y_continuous(labels =scales::comma)
 kid_pa1<-subset(na_patient,KidneyDisease==1)
 nrow(kid_pa1)
 ```
@@ -79,10 +79,10 @@ nrow(kid_pa1)
 #barplot of HeartDisease vs SkinCancer
 
 ```{r, results='markup'}
-ggplot(patient, aes(x=SkinCancer)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")
 skin_pa<-subset(patient,SkinCancer==1)
 nrow(skin_pa)
-ggplot(na_patient, aes(x=SkinCancer)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(na_patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")+ scale_y_continuous(labels = scales::comma)
 skin_pa1<-subset(na_patient,SkinCancer==1)
 nrow(skin_pa1)
 ```
