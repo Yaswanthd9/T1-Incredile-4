@@ -60,7 +60,7 @@ nrow(dia_pa1)
 ggplot(patient, aes(x=Asthma)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
 ast_pa<-subset(patient,Asthma==1)
 nrow(ast_pa)
-ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7) )
+ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="blue",fill=rgb(0.1,0.4,0.5,0.7))+ scale_y_continuous(labels = scales::comma)
 ast_pa1<-subset(na_patient,Asthma==1)
 nrow(ast_pa1)
 ```
