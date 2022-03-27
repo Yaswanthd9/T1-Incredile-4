@@ -1,0 +1,7 @@
+"0","ggplot(male, aes(x=HeartDisease, y=BMI)) + "
+"0","    geom_boxplot() +"
+"0","    facet_wrap(~HeartDisease, scale=""free"") +"
+"0","    ggtitle(""Male Heart Disease by BMI"")"
+"2","Warning:"
+"2"," Continuous x aesthetic -- did you forget aes(group=...)?
+"
