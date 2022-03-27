@@ -1,0 +1,66 @@
+---
+title: "R - Assignment"
+author: "Kohisha Aruganti"
+date: "March 21 2022"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes a lot of the helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# Once installed, load the library.
+library(ezids)
+```
+
+```{r init, include=F}
+project = data.frame(read.csv("heart_2020_cleaned.csv"))
+```
+
+```{r q03subset}
+smoke <- subset(project,Smoking==1)
+smoke
+smoke0 <- subset(project,Smoking==0)
+smoke0
+drink<- subset(project,AlcoholDrinking==1)
+drink
+drink0 <- subset(project,AlcoholDrinking==0)
+drink0
+```
+
+```{r init, include=F}
+project$HeartDisease <- as.factor(project$HeartDisease)
+project$Smoking <- as.factor(project$Smoking)
+project$AlcoholDrinking <- as.factor(project$AlcoholDrinking)
+
+```
+
+```{r ctable}
+contable = table(project$Smoking, project$AlcoholDrinking)
+contable # the contingency table
+contable1 = table(project$HeartDisease, project$AlcoholDrinking)
+contable1 # the contingency table
+contable2 = table(project$HeartDisease, project$Smoking)
+contable2 # the contingency table
+loadPkg("printr")
+
+```
+
+```{r chisq}
+chitest = chisq.test(contable)
+chitest
+chitest1 = chisq.test(contable1)
+chitest1
+chitest2 = chisq.test(contable2)
+chitest2
+```
+
+
