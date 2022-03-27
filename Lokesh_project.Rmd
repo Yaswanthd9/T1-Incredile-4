@@ -6,17 +6,97 @@ output: html_document
 ---
 
 ```{r init, include=FALSE}
-# some of common options (and the defaults) are: 
 # include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
 library(ezids)
 # knitr::opts_chunk$set(warning = F, results = "markup", message = F)
 knitr::opts_chunk$set(warning = F, results = "hide", message = F)
 options(scientific=T, digits = 3) 
 ```
+#our aim is to check "are heart deseases and secondary illnesses (Diabetic,Asthma, Kidney disease and skin cancer) have a correlation, or if they are independent
 
+#Import the CSV file to dataframe
 ```{r, echo = F}
-heart <- data.frame(read.csv("heart_2020_cleaned_binary.csv"))
+heart <- data.frame(read.csv("heart_2020_cleaned.csv"))
+summary(heart)
 ```
+# Changing Diabetes bordeline and pregnancy categories to Yes/No
+```{r}
+heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
+heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
+```
+# Changing all the categorical variables to numerical dummies 
+```{r}
+heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
+heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
+heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
+heart$Stroke<-ifelse(heart$Stroke=="Yes",1,0)
+heart$DiffWalking<-ifelse(heart$DiffWalking=="Yes",1,0)
+heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
+heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
+heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
+heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
+```
+#Exploratory data analysis for HeartDisease and secondary illnesses
+```{r, results='markup'}
+patient <- subset(heart,HeartDisease==1)
+head(patient)
+na_patient <- subset(heart,HeartDisease==0)
+```
+#barplot of HeartDisease vs Diabetic
+
+```{r, results='markup'}
+library(ggplot2)
+ggplot(patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")
+dia_pa<-subset(patient,Diabetic==1)
+nrow(dia_pa)
+ggplot(na_patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")+ scale_y_continuous(labels = scales::comma)
+dia_pa1<-subset(na_patient,Diabetic==1)
+nrow(dia_pa1)
+```
+#barplot of HeartDisease vs Asthma
+
+```{r, results='markup'}
+ggplot(patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1")
+ast_pa<-subset(patient,Asthma==1)
+nrow(ast_pa)
+ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1" )+ scale_y_continuous(labels = scales::comma)
+ast_pa1<-subset(na_patient,Asthma==1)
+nrow(ast_pa1)
+```
+
+#barplot of HeartDisease vs KidneyDisease
+
+```{r, results='markup'}
+ggplot(patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")
+kid_pa<-subset(patient,KidneyDisease==1)
+nrow(kid_pa)
+ggplot(na_patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")+ scale_y_continuous(labels =scales::comma)
+kid_pa1<-subset(na_patient,KidneyDisease==1)
+nrow(kid_pa1)
+```
+
+#barplot of HeartDisease vs SkinCancer
+
+```{r, results='markup'}
+ggplot(patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")
+skin_pa<-subset(patient,SkinCancer==1)
+nrow(skin_pa)
+ggplot(na_patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")+ scale_y_continuous(labels = scales::comma)
+skin_pa1<-subset(na_patient,SkinCancer==1)
+nrow(skin_pa1)
+```
+#correlation plot for heart disease and other secondary illnesses
+```{r,results='asis'}
+library("corrplot")
+heart_des<-subset(heart,select = c(HeartDisease,Diabetic,Asthma,KidneyDisease,SkinCancer))
+str(heart_des)
+cor_matrix<-cor(heart_des)
+cor_matrix
+corrplot(cor_matrix,method="number",title = "Correlation plot of HeartDisease and secondary illnesses",mar = c(0,0,1,0))
+```
+From the above correlation plot and correlation matrix, we can observe the every secondary disease(Diabetic,Asthma, Kidney disease and skin cancer) has a positive linear correlation with HeartDisease. Also every secondary illness is in a positive linear correlation with other one except for SkinCancer and Asthma.
+
 # Converting desired variables type into categorical variables
 ```{r}
 heart$HeartDisease<-as.factor(heart$HeartDisease)
@@ -28,17 +108,18 @@ heart$SkinCancer<-as.factor(heart$SkinCancer)
 
 #performing chi^2 test
 ```{r}
-lok1=table(heart$HeartDisease,heart$Asthma)
-chi_1=chisq.test(lok1)
+hea_as=table(heart$HeartDisease,heart$Asthma)
+chi_1=chisq.test(hea_as)
 chi_1
-lok2=table(heart$HeartDisease,heart$Diabetic)
-chi_2=chisq.test(lok2)
+hea_dia=table(heart$HeartDisease,heart$Diabetic)
+chi_2=chisq.test(hea_dia)
 chi_2
-lok3=table(heart$HeartDisease,heart$KidneyDisease)
-chi_3=chisq.test(lok3)
+hea_kid=table(heart$HeartDisease,heart$KidneyDisease)
+chi_3=chisq.test(hea_kid)
 chi_3
-lok4=table(heart$HeartDisease,heart$SkinCancer)
-chi_4=chisq.test(lok4)
+hea_skin=table(heart$HeartDisease,heart$SkinCancer)
+chi_4=chisq.test(hea_skin)
 chi_4
 ```
 For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. Every secondary illness(Diabetic,Asthma, Kidney disease and skin cancer) is dependent on heart disease.
+
