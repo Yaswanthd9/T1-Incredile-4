@@ -1,0 +1,2 @@
+"0","female <- subset(heart, Sex== ""Female"")"
+"0","male  <- subset (heart, Sex == ""Male"")"

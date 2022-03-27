@@ -1,0 +1,3 @@
+"0",""
+"0","contable = table(heart$HeartDisease, heart$Sex)"
+"0","xkabledply(contable, title=""Contingency Table for Heart Disease and Sex"")"
