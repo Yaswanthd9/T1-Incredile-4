@@ -102,16 +102,8 @@ cor_matrix<-cor(heart_des)
 cor_matrix
 corrplot(cor_matrix,method="number",title = "Correlation plot of HeartDisease and secondary illnesses",mar = c(0,0,1,0))
 ```
-From the above correlation plot and correlation matrix, we can observe the every secondary disease(Diabetic,Asthma, Kidney disease and skin cancer) has a positive linear correlation with HeartDisease. Also every secondary illness is in a positive linear correlation with other one except for SkinCancer and Asthma.
 
-# Converting desired variables type into categorical variables
-```{r}
-heart$HeartDisease<-as.factor(heart$HeartDisease)
-heart$Diabetic<-as.factor(heart$Diabetic)
-heart$Asthma<-as.factor(heart$Asthma)
-heart$KidneyDisease<-as.factor(heart$KidneyDisease)
-heart$SkinCancer<-as.factor(heart$SkinCancer)
-```
+From the above correlation plot and correlation matrix, we can observe the every secondary disease(Diabetic,Asthma, Kidney disease and skin cancer) has a positive linear correlation with HeartDisease. Also every secondary illness is in a positive linear correlation with other one except for SkinCancer and Asthma.
 
 #performing chi^2 test
 ```{r}
