@@ -17,7 +17,9 @@ options(scientific=T, digits = 3)
 #Import the CSV file to dataframe
 ```{r, echo = F}
 heart <- data.frame(read.csv("heart_2020_cleaned.csv"))
+options(scipen=999)
 summary(heart)
+#str(heart)
 ```
 # Changing Diabetes bordeline and pregnancy categories to Yes/No
 ```{r}
@@ -37,7 +39,12 @@ heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
-#Exploratory data analysis for HeartDisease and secondary illnesses
+#Exploratory data analysis
+```{r, results='markup'}
+ggplot(heart, aes(HeartDisease)) +
+  geom_bar(color="black",fill="aquamarine4")
+```
+
 ```{r, results='markup'}
 patient <- subset(heart,HeartDisease==1)
 head(patient)
