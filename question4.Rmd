@@ -25,7 +25,8 @@ library(ezids)
 project = data.frame(read.csv("heart_2020_cleaned.csv"))
 ```
 
-```{r q03subset}
+
+```{r subset}
 smoke <- subset(project,Smoking==1)
 smoke
 smoke0 <- subset(project,Smoking==0)
@@ -36,14 +37,23 @@ drink0 <- subset(project,AlcoholDrinking==0)
 drink0
 ```
 
-```{r init, include=F}
-project$HeartDisease <- as.factor(project$HeartDisease)
-project$Smoking <- as.factor(project$Smoking)
-project$AlcoholDrinking <- as.factor(project$AlcoholDrinking)
+```{r}
+percent <- xtabs(~project$AlcoholDrinking+ project$Smoking + project$HeartDisease)
+ftable(prop.table(percent))* 100
+
+```
+
+# Correlation coefficient 
+
+```{r}
+cor(project$AlcoholDrinking,project$Smoking)
+cor(project$AlcoholDrinking,project$HeartDisease)
+cor(project$HeartDisease,project$Smoking)
 
 ```
 
 ```{r ctable}
+
 contable1 = table(project$HeartDisease, project$AlcoholDrinking)
 contable1 # the contingency table
 contable2 = table(project$HeartDisease, project$Smoking)
@@ -53,6 +63,7 @@ loadPkg("printr")
 ```
 
 ```{r chisq}
+
 chitest1 = chisq.test(contable1)
 chitest1
 chitest2 = chisq.test(contable2)
