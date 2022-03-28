@@ -10,7 +10,7 @@ library(corrr)
 
 
 # Load the Data and Rename dataframe 
-```{r}
+```{r error=True}
 read.csv("heart_2020_cleaned.csv")
 
 # Renaming data frame 
@@ -229,14 +229,6 @@ Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a 
 
 # Smokers Vs Drinkers 
 
-```{r ctable}
-
-contable1 = table(heart$HeartDisease, heart$AlcoholDrinking)
-contable1 # the contingency table
-contable2 = table(heart$HeartDisease, heart$Smoking)
-contable2 # the contingency table
-loadPkg("printr")
-```
 
 ```{r}
 contable_smoke = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$Smoking)
