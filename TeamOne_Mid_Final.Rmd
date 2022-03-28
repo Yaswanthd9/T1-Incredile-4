@@ -1,4 +1,5 @@
 # Libraries 
+```{r}
 library (tidyverse)
 library (dplyr)
 library (funModeling)
@@ -6,6 +7,7 @@ library(ezids)
 library (ggplot2)
 library(ggcorrplot)
 library(corrr)
+```
 
 # Load the Data and Rename dataframe 
 ```{r}
@@ -81,7 +83,6 @@ heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
 heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
 heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
-
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
@@ -123,6 +124,7 @@ male  <- subset (heart, Sex == "Male")
 
 # Male Heart Disease Boxplot 
 ```{r}
+
 ggplot(male, aes(x=HeartDisease, y=BMI)) + 
     geom_boxplot() +
     facet_wrap(~HeartDisease, scale="free") + 
@@ -160,84 +162,98 @@ We see that there is no difference in average BMI between the men and women who 
 
 # Heart Disease & Secondary Illnesses 
 
-```{r}
-diseases <- data.frame (heart$HeartDisease,
-                        heart$Stroke,
-                        heart$Diabetic,
-                        heart$Asthma, 
-                        heart$KidneyDisease,
-                        heart$SkinCancer)
-
-# Rename columns
-
-names(diseases) <- c ('heart_disease',
-                      'stroke',
-                      'diabetic',
-                      'asthma',
-                      'kidney_disease',
-                      'skin_cancer')
-
-
-```
-
 # Correlation matrix among diseases 
 
 ```{r}
-model.matrix(~0+., data=diseases) %>%
-      cor (use="pairwise.complete.obs")
-     ggcorrplot(show.diag = F, type="lower", lab=TRUE, lab_size=1)
+heart_des<-subset(heart,select = c(HeartDisease,Diabetic,Asthma,KidneyDisease,SkinCancer,Stroke))
+str(heart_des)
+cor_matrix<-cor(heart_des)
+cor_matrix
+corrplot(cor_matrix,method="number",title = "Correlation plot of HeartDisease and secondary illnesses",mar = c(0,0,1,0))
 
 ```
-None of them are particularly strong. 
 
-# Chi-test on diseases to check independence
+From the above correlation plot and correlation matrix, we can observe the every secondary disease(Diabetic,Asthma, Kidney disease and skin cancer) has a positive linear correlation with HeartDisease. Also every secondary illness is in a positive linear correlation with other one except for SkinCancer and Asthma.
 
+
+# Performing chi^2 test
 ```{r}
+hea_as=table(heart$HeartDisease,heart$Asthma)
+chi_1=chisq.test(hea_as)
+chi_1
 
-chi_asthma=chisq.test(table(heart$HeartDisease, heart$Asthma))
-chi_asthma
+hea_dia=table(heart$HeartDisease,heart$Diabetic)
+chi_2=chisq.test(hea_dia)
+chi_2
 
+hea_kid=table(heart$HeartDisease,heart$KidneyDisease)
+chi_3=chisq.test(hea_kid)
+chi_3
 
-chi_diabetic=chisq.test(table(heart$HeartDisease,heart$Diabetic))
-chi_diabetic
+hea_skin=table(heart$HeartDisease,heart$SkinCancer)
+chi_4=chisq.test(hea_skin)
+chi_4
 
-
-chi_kidney=chisq.test(table(heart$HeartDisease,heart$KidneyDisease))
-chi_kidney
-
-
-chi_skin=chisq.test(table(heart$HeartDisease,heart$SkinCancer))
-chi_skin
-
-
-chi_stroke=chisq.test(table(heart$HeartDisease,heart$Stroke))
-chi_stroke
-
+hea_stroke=table(heart$HeartDisease,heart$Stroke)
+chi_5=chisq.test(hea_stroke)
+chi_5
 ```
-Since the p-values are all less than the 5% significance level, we can reject the null and state that there are significant associations between between respondents with heart disease and those that also have one or more secondary illnesses. 
+For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with Heart Disease. 
 
-Why are all the p-values the same??? 
 
 # Smokers Vs Drinkers 
 
 ```{r}
-table_SQ3 <- xtabs(~heart$AlcoholDrinking+ heart$Smoking + heart$HeartDisease)
-ftable(prop.table(table_SQ3))* 100
 
 ```
-https://rstudio-pubs-static.s3.amazonaws.com/308591_6dff566d383946c881cb5b6a735a79fd.html
 
-# Correlation coefficient 
+```{r q03subset}
+smoke <-  subset(heart,Smoking==1)
+smoke
+smoke0 <- subset(heart,Smoking==0)
+smoke0
+drink<-   subset(heart,AlcoholDrinking==1)
+drink
+drink0 <- subset(heart,AlcoholDrinking==0)
+drink0
+```
 
+
+```{r ctable}
+
+contable1 = table(heart$HeartDisease, heart$AlcoholDrinking)
+contable1 # the contingency table
+contable2 = table(heart$HeartDisease, heart$Smoking)
+contable2 # the contingency table
+loadPkg("printr")
+```
 ```{r}
-cor(heart$AlcoholDrinking,heart$Smoking)
-cor(heart$AlcoholDrinking,heart$HeartDisease)
-cor(heart$HeartDisease,heart$Smoking)
+contable_smoke = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$Smoking)
 
+prop <-prop.table(contable_smoke)
+percent <- round(prop*100, 2)
+
+xkabledply(percent, title="Contingency Table for Heart Disease and Smoking in Percentage")
 ```
-
-
 ```{r}
-chisq.test(heart$Smoking,  heart$HeartDisease)
-chisq.test(heart$AlcoholDrinking,heart$HeartDisease)
+
+contable_drink = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$AlcoholDrinking)
+
+prop <-prop.table(contable_drink)
+percent <- round(prop*100, 2)
+
+xkabledply(percent, title="Contingency Table for Heart Disease and Drinking in Percentage")
+
 ```
+
+```{r chisq}
+
+chitest1 = chisq.test(contable1)
+chitest1
+chitest2 = chisq.test(contable2)
+chitest2
+```
+```
+For both the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+Both drinking and smoking have a relationship with Heart Disease. 
