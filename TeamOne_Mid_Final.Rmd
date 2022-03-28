@@ -175,7 +175,12 @@ corrplot(cor_matrix,method="number",title = "Correlation plot of HeartDisease an
 
 From the above correlation plot and correlation matrix, we can observe the every secondary disease(Diabetic,Asthma, Kidney disease and skin cancer) has a positive linear correlation with HeartDisease. Also every secondary illness is in a positive linear correlation with other one except for SkinCancer and Asthma.
 
+```{r}
+model.matrix(~0+., data=diseases) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 
+```
 # Performing chi^2 test
 ```{r}
 hea_as=table(heart$HeartDisease,heart$Asthma)
@@ -228,6 +233,7 @@ contable2 = table(heart$HeartDisease, heart$Smoking)
 contable2 # the contingency table
 loadPkg("printr")
 ```
+
 ```{r}
 contable_smoke = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$Smoking)
 
@@ -236,6 +242,7 @@ percent <- round(prop*100, 2)
 
 xkabledply(percent, title="Contingency Table for Heart Disease and Smoking in Percentage")
 ```
+
 ```{r}
 
 contable_drink = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$AlcoholDrinking)
@@ -249,10 +256,10 @@ xkabledply(percent, title="Contingency Table for Heart Disease and Drinking in P
 
 ```{r chisq}
 
-chitest1 = chisq.test(contable1)
-chitest1
-chitest2 = chisq.test(contable2)
-chitest2
+chisq.test(contable_smoke)
+
+chisq.test(contable_drink)
+
 ```
 ```
 For both the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
