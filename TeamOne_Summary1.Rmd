@@ -108,21 +108,10 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 ```
 
-#Correlation Plot based on Spearman's Rank Test
-
-```{r}
-corrplot.mixed(cor(heart, use = "pairwise.complete.obs", method = "spearman"),
-               title= 'Spearman Correlation Matrix',
-               tl.col = "black", 
-               lower.col = "black",
-               number.cex = .7,
-               tl.cex=1 )
-
-```
 
 ## Gender and Lifestyle
 
-# Contingency Table for Sex & heart Disease 
+# Contingency Table for Sex & Heart Disease 
 
 ```{r}
 
@@ -142,21 +131,23 @@ Looking at the plot, we can see that we have a lot more data for people without 
 
 Why do men have more HD than women? Are the men in our study doing more or less of something? 
 
+
 First lets look at BMI 
 
 # Are there differences between the mean BMI of the sexes?
 
 ```{r}
-# Subset Male & Female 
+# Subset Male & Female with and without Heart Disease
 female <- subset(heart, Sex== "Female")
 male  <- subset (heart, Sex == "Male")
 
 # T-test of BMI between Genders 
 t.test(female$BMI, male$BMI)
 ```
+
 The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. However, we still don't know which population has the higher BMI.  
 
-# Is there a difference between the sex with heart disease 
+# Is there a difference in average BMI between the sexes with heart disease 
 
 ```{r}
 # Subsetting genders based on respondents that have heart disease 
@@ -164,14 +155,15 @@ HD <- subset(heart, HeartDisease==1)
 female_HD<- subset(female, HeartDisease==1)
 male_HD<- subset(male, HeartDisease== 1)
 
-# Checking normality of data 
+# Checking normality of data. Skewed but approxiamately normal  
 qqnorm(female_HD$BMI)
 qqline(female_HD$BMI)
 
 qqnorm(male_HD$BMI)
 qqline(male_HD$BMI)
 
-# Cannot use standard t-test since the variables are not normal. Will use 
+
+#T-Test
 t.test(female_HD$BMI, male_HD$BMI)
                   
  
@@ -179,10 +171,58 @@ t.test(female_HD$BMI, male_HD$BMI)
 
 From the welches,  We see that there is no difference in average BMI between the men and women who do have heart disease. 
 
+Most of our other varaiables in HD are zero. So can't really assess lifelstyle habits.
 
+#Physical Health 
+```{r}
+par(mfrow=c(2,2))
+boxplot(female_HD$PhysicalHealth)
+boxplot(male_HD$PhysicalHealth)
 
+qqnorm(female_HD$PhysicalHealth)
+qqline(female_HD$PhysicalHealth)
 
-# heart Disease & Secondary Illnesses 
+qqnorm(male_HD$PhysicalHealth)
+qqline(male_HD$PhysicalHealth)
+
+t.test(male_HD$PhysicalHealth, 
+       female_HD$PhysicalHealth)
+```
+#Mental Health 
+```{r}
+t.test  (male_HD$MentalHealth, 
+       female_HD$MentalHealth)
+```
+
+# Sleep
+```{r}
+t.test  (male_HD$SleepTime, 
+       female_HD$SleepTime)
+```
+
+# Age, Race, Gen Health
+```{r}
+freq(HD$AgeCategory)
+freq(HD$Race)
+freq(HD$GenHealth)
+
+```
+
+# Liner Regression on Sex 
+```{r}
+reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
+summary (reg_1)
+
+reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
+summary (reg_2)
+
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime +AgeCategory + Race, data=heart)
+summary (reg_3)
+```
+
+Adjusted r-square is increasing so definitely model fit is improving but still not a good fit 
+
+# Heart Disease & Secondary Illnesses 
 
 # Correlation matrix among diseases 
 
