@@ -1,17 +1,8 @@
----
-title: "Key Risk Factors of Heart Disease in 2020"
-author: "Team One"
-date: April 4, 2022
-output: html_document
----
+# Title Info 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
+# Introduction
 
-## R Markdown
-
-# Lets load the appropriate libraries 
+# Libraries 
 
 ```{r}
 library(tidyverse)
@@ -24,10 +15,17 @@ library(corrr)
 ```
 
 
-# Load the Data 
+# Load the Data and Rename dataframe 
 ```{r}
 
-heart <-read.csv("heart_2020_cleaned.csv")
+ heart<-read.csv("heart_2020_cleaned.csv")
+
+# Renaming data frame 
+#heart <- dplyr :: rename (heart_2020_cleaned)
+
+```
+# Lets take a look at our data
+```{r}
 nrow (heart)
 ```
 
