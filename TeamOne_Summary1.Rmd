@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## R Markdown
-
 # Lets load the appropriate libraries 
 
 ```{r}
@@ -21,6 +20,7 @@ library(ezids)
 library(ggplot2)
 library(ggcorrplot)
 library(corrr)
+library(corrplot)
 ```
 
 
@@ -31,7 +31,6 @@ heart <-read.csv("heart_2020_cleaned.csv")
 nrow (heart)
 ```
 
-
 # Descrpitive Statistics  
 ```{r}
 status (heart)
@@ -39,28 +38,25 @@ status (heart)
 
 From the table we can see that Physical and Mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set are not physically active while about 60% of the respondents do not report having mental health issues. 
 
-We can also see that there are no N/A values in our data set. This is not surprising because our source data was cleaned before. 
+We can also see that there are no N/A values in our data set. This is not surprising given that our data was cleaned before being retrieved.  
 
-# Now to see which variables are categorical and which are numerical 
-```{r}
-data_integrity(heart)
-```
 # Description of every variable 
 ```{r error= TRUE}
 describe (heart)
 ```
+
 # Finding the mean of numerical variables grouped by heart disease
 ```{r }
 plot_num(heart)
 
 heart %>%
-  group_by(heartDisease) %>%
+  group_by(HeartDisease) %>%
   summarise_at(vars("BMI", 
                     "PhysicalHealth", 
                     "MentalHealth",
                     "SleepTime"), mean)
 ```
-On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. HD people reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3.
+On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in a 30 day period is slightly higher for people with heart diesease, than for people without. 
 
 # Frequency distributions of all our categorical variables 
 ```{r}
@@ -83,7 +79,7 @@ freq(heart$Diabetic)
 
 # Changing all the categorical variables to numerical dummies 
 ```{r}
-heart$heartDisease<-ifelse(heart$heartDisease=="Yes",1,0)
+heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
 heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
 heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
 heart$Stroke<-ifelse(heart$Stroke=="Yes",1,0)
@@ -102,11 +98,10 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 ```
 
-Need bigger screen to see this corrplot properly 
 
-## Which gender is more likely to get heart disease? 
+## Gender and Lifestyle
 
-# Contingency Table for Sex & heart Disease 
+# Contingency Table for Sex & Heart Disease 
 
 ```{r}
 
@@ -122,56 +117,100 @@ print (percent)
 barplot(with(heart, table(heartDisease, Sex)), main="heart Disease & Sex", beside=T, col=3:2)
 ```
 
-Green (No HD): more women
-Red (HD): More men
-More men tend to have heart disease than women (Look at percentage chart)
+Looking at the plot, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). 
 
-# Subset Male & Female 
+Why do men have more HD than women? Are the men in our study doing more or less of something? 
+
+
+First lets look at BMI 
+
+# Are there differences between the mean BMI of the sexes?
+
 ```{r}
+# Subset Male & Female with and without Heart Disease
 female <- subset(heart, Sex== "Female")
 male  <- subset (heart, Sex == "Male")
-```
 
-# Male heart Disease Boxplot 
-```{r}
-
-ggplot(male, aes(x=heartDisease, y=BMI)) + 
-    geom_boxplot() +
-    facet_wrap(~heartDisease, scale="free") + 
-    ggtitle("Male heart Disease by BMI")
-```   
-# Female heart Disease by BMI 
-
-```{r}
-ggplot(female, aes(x=heartDisease, y=BMI)) + 
-    geom_boxplot() +
-    facet_wrap(~heartDisease, scale="free") +
-    ggtitle("Female heart Disease by BMI")
-
-```
-
-
-
-# Are there differences between the means of the sexes 
-
-```{r}
-
+# T-test of BMI between Genders 
 t.test(female$BMI, male$BMI)
 ```
-The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. 
 
-# Is there a difference between the sex with heart disease 
+The p-value is less than 0.05% significance level, allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. However, we still don't know which population has the higher BMI.  
+
+# Is there a difference in average BMI between the sexes with heart disease 
 
 ```{r}
-female_HD<- subset(female, heartDisease==1)
-male_HD<- subset(male, heartDisease== 1)
+# Subsetting genders based on respondents that have heart disease 
+HD <- subset(heart, HeartDisease==1)
+female_HD<- subset(female, HeartDisease==1)
+male_HD<- subset(male, HeartDisease== 1)
 
-t.test(female_HD$BMI, 
-       male_HD$BMI)
+# Checking normality of data. Skewed but approxiamately normal  
+qqnorm(female_HD$BMI)
+qqline(female_HD$BMI)
+
+qqnorm(male_HD$BMI)
+qqline(male_HD$BMI)
+
+
+#T-Test
+t.test(female_HD$BMI, male_HD$BMI)
+                  
+ 
 ```
 
-We see that there is no difference in average BMI between the men and women who do have heart disease. 
+From the welches,  We see that there is no difference in average BMI between the men and women who do have heart disease. 
 
+Most of our other varaiables in HD are zero. So can't really assess lifelstyle habits.
+
+#Physical Health 
+```{r}
+par(mfrow=c(2,2))
+boxplot(female_HD$PhysicalHealth)
+boxplot(male_HD$PhysicalHealth)
+
+qqnorm(female_HD$PhysicalHealth)
+qqline(female_HD$PhysicalHealth)
+
+qqnorm(male_HD$PhysicalHealth)
+qqline(male_HD$PhysicalHealth)
+
+t.test(male_HD$PhysicalHealth, 
+       female_HD$PhysicalHealth)
+```
+#Mental Health 
+```{r}
+t.test  (male_HD$MentalHealth, 
+       female_HD$MentalHealth)
+```
+
+# Sleep
+```{r}
+t.test  (male_HD$SleepTime, 
+       female_HD$SleepTime)
+```
+
+# Age, Race, Gen Health
+```{r}
+freq(HD$AgeCategory)
+freq(HD$Race)
+freq(HD$GenHealth)
+
+```
+
+# Liner Regression on Sex 
+```{r}
+reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
+summary (reg_1)
+
+reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
+summary (reg_2)
+
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime +AgeCategory + Race, data=heart)
+summary (reg_3)
+```
+
+Adjusted r-square is increasing so definitely model fit is improving but still not a good fit 
 # heart Disease & Secondary Illnesses 
 
 # Correlation matrix among diseases 
