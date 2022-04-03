@@ -108,12 +108,10 @@ According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s He
 
 We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
+##Plots for Sex & Heart Disease 
 
-<<<<<<< HEAD
-# Plots for Sex & Heart Disease 
-=======
 #Contingency Table for Sex & Heart Disease
->>>>>>> 25656f97d1b26d2c00b9ffe168f8f5f790b769a8
+
 
 ```{r}
 
@@ -130,13 +128,12 @@ barplot(with(heart, table(HeartDisease, Sex)), main="heart Disease & Sex", besid
 ```
 
 
-<<<<<<< HEAD
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
-=======
+
 However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?
 
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease.
->>>>>>> 25656f97d1b26d2c00b9ffe168f8f5f790b769a8
+
 
 ##Body Mass Index (BMI)
 
@@ -242,7 +239,7 @@ freq(HD$GenHealth)
 
 When looking at the population make-up of respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
 
-Considering the other factors
+Considering the other factors 
 # Liner Regression on Sex
 ```{r}
 reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
