@@ -221,7 +221,7 @@ Men and women have statistically diffeent sleep times. Men on average get about 
 
 https://www.wellandgood.com/benefits-of-getting-more-sleep/
 
-This lack of sleep could explain why women report feeling pjhysically unwell more days in a month than men. 
+This lack of sleep could explain why women report feeling physically unwell more days in a month than men. 
 
 When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. Remember people lie. 
 
@@ -232,6 +232,8 @@ freq(HD$Race)
 freq(HD$GenHealth)
 
 ```
+
+We looking at the population make-up respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of caucasian descent. At the time of the intervoew they also said they felt their overall health is good. 
 
 # Liner Regression on Sex 
 ```{r}
