@@ -239,25 +239,24 @@ freq(HD$GenHealth)
 
 When looking at the population make-up of respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
 
-Considering the other factors 
+Even though a logit regression seems more to estimate whether or not an individual gets heart disease, we can still use a linear regression in our exploratory stages to find the best fitting model. 
 # Liner Regression on Sex
 ```{r}
-reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
+reg_1 <- lm(HeartDisease~Sex+BMI, data=heart)
 summary (reg_1)
 
 reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
 summary (reg_2)
 
-reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime +AgeCategory + Race, data=heart)
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
 summary (reg_3)
 ```
 
-Adjusted r-square is increasing so definitely model fit is improving but still not a good fit 
-
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving> However,the fir statistic is still quite low. 
 
 ###########################################################################################
 
-# heart Disease & Secondary Illnesses 
+# Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether heartDisease and secondary illnesses have correlation or not(are they dependent or independent?).
 
 ```{r}
