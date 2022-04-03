@@ -253,7 +253,7 @@ Adjusted r-square is increasing so definitely model fit is improving but still n
 ###########################################################################################
 
 # heart Disease & Secondary Illnesses 
-
+In this part we are Identifying whether heartDisease and secondary illnesses have correlation or not(are they dependent or independent?).
 # Correlation matrix among diseases 
 
 ```{r}
