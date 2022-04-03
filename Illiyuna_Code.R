@@ -158,7 +158,7 @@ t.test(female_HD$BMI,
 
 We see that there is no difference in average BMI between the men and women who do have heart disease. 
 
-# Heart Disease & Secondary illnesses 
+# Heart Disease & Secondary Illnesses 
 
 ```{r}
 diseases <- data.frame (heart$HeartDisease,
