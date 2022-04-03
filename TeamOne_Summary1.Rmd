@@ -117,7 +117,7 @@ We started off by trying to see which gender tends to have more heart disease ba
 
 ```{r}
 
-contable = table(heart$heartDisease, heart$Sex)
+contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for heart Disease and Sex")
 addmargins(contable)
 
@@ -126,7 +126,7 @@ percent <- round(prop*100, 2)
 
 print ("Contingency Table for heart Disease and Sex in Percentage")
 print (percent)
-barplot(with(heart, table(heartDisease, Sex)), main="heart Disease & Sex", beside=T, col=3:2)
+barplot(with(heart, table(HeartDisease, Sex)), main="heart Disease & Sex", beside=T, col=3:2)
 ```
 
 
@@ -264,13 +264,12 @@ Adjusted r-square is increasing so definitely model fit is improving but still n
 In this part we are Identifying whether heartDisease and secondary illnesses have correlation or not(are they dependent or independent?).
 
 ```{r}
-# diseases <- data.frame (heart$heartDisease,
-#                         heart$Stroke,
-#                         heart$Diabetic,
-#                         heart$Asthma, 
-#                         heart$KidneyDisease,
-#                         heart$SkinCancer)
-diseases<-subset(heart,select = c(HeartDisease,Stroke,Diabetic,Asthma,KidneyDisease,SkinCancer))
+diseases <- data.frame (heart$HeartDisease,
+                        heart$Stroke,
+                        heart$Diabetic,
+                        heart$Asthma,
+                        heart$KidneyDisease,
+                        heart$SkinCancer)
 
 # Rename columns
 
