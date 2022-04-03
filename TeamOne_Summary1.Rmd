@@ -106,7 +106,7 @@ According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s He
 We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
 
-# Contingency Table for Sex & Heart Disease 
+#Contingency Table for Sex & Heart Disease
 
 ```{r}
 
@@ -123,9 +123,9 @@ barplot(with(heart, table(heartDisease, Sex)), main="heart Disease & Sex", besid
 ```
 
 
-However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?   
+However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?
 
-In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
+In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease.
 
 
 ##Body Mass Index (BMI)
@@ -183,8 +183,8 @@ ggplot(heart, aes(x = factor(HeartDisease), y = PhysicalHealth))+
 ```
 
 ```{r}
-t.test(male_HD$PhysicalHealth, 
-       female_HD$PhysicalHealth)
+t.test(male_HD$PhysicalHealth,
+female_HD$PhysicalHealth)
 ```
 
 The t-test also confirms what the boxplot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
@@ -197,8 +197,8 @@ ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 
-t.test  (male_HD$MentalHealth, 
-       female_HD$MentalHealth)
+t.test  (male_HD$MentalHealth,
+female_HD$MentalHealth)
 ```
 
 The boxplot shows that women tend to report feeling mentally unwell more often then men.Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell twice as many days as men.
@@ -211,8 +211,8 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 
-t.test  (male_HD$SleepTime, 
-       female_HD$SleepTime)
+t.test  (male_HD$SleepTime,
+female_HD$SleepTime)
 ```
 
 Men and women have statistically diffeent sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep is cumulative.According to Dr.Rebecca Robbins,  sleep expert and postdoctoral researcher at the Brigham and Women’s Hospital and Harvard Medical School,Dr. Robbins conducted research that examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus.
@@ -235,7 +235,7 @@ freq(HD$GenHealth)
 
 We looking at the population make-up respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of caucasian descent. At the time of the intervoew they also said they felt their overall health is good. 
 
-# Liner Regression on Sex 
+# Liner Regression on Sex
 ```{r}
 reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
 summary (reg_1)
@@ -254,15 +254,15 @@ Adjusted r-square is increasing so definitely model fit is improving but still n
 
 # heart Disease & Secondary Illnesses 
 In this part we are Identifying whether heartDisease and secondary illnesses have correlation or not(are they dependent or independent?).
-# Correlation matrix among diseases 
 
 ```{r}
-diseases <- data.frame (heart$heartDisease,
-                        heart$Stroke,
-                        heart$Diabetic,
-                        heart$Asthma, 
-                        heart$KidneyDisease,
-                        heart$SkinCancer)
+# diseases <- data.frame (heart$heartDisease,
+#                         heart$Stroke,
+#                         heart$Diabetic,
+#                         heart$Asthma, 
+#                         heart$KidneyDisease,
+#                         heart$SkinCancer)
+diseases<-subset(heart,select = c(HeartDisease,Stroke,Diabetic,Asthma,KidneyDisease,SkinCancer))
 
 # Rename columns
 
@@ -290,6 +290,15 @@ Diabetes is correlated with heart disease and Kidney disease. Less with Stroke.
 Skin cancer is not correlated with other  diseases.
 
 # Determining Independence between Diseases
+The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables(All the variables we have here are already categorical).  The frequency of each category for one nominal variable is compared across the categories of the second nominal variable.  The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable. The null hypothesis for this test is that there is no relationship between primary disease heartDisease and other secondary illnesses.  The alternative hypothesis is that there is a relationship between heartDisease and secondary illnesses.
+
+output:
+the title of the test,
+which variables have been used,
+the test statistic,
+the degrees of freedom and
+the p-value of the test.
+
 ```{r}
 hea_as=table(heart$heartDisease,heart$Asthma)
 chi_1=chisq.test(hea_as)
