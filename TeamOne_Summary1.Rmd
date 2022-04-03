@@ -242,7 +242,7 @@ freq(HD$GenHealth)
 
 When looking at the population make-up of respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
 
-
+Considering the other factors
 # Liner Regression on Sex
 ```{r}
 reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
