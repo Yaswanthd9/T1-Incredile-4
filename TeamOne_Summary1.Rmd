@@ -279,18 +279,19 @@ names(diseases) <- c ('heart_disease',
 
 ```
 
-# Corellation  Matrix between diseases
+# Corellation  Matrix and correlation plot between diseases
+```{r}
+cor_matrix<-cor(diseases)
+cor_matrix
+```
+
 ```{r}
 model.matrix(~0+., data=diseases) %>% 
      cor(use="pairwise.complete.obs") %>% 
     ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 
 ```
-
-Correlations not particularly strong 
-heart disease and stroke seem correlated
-Diabetes is correlated with heart disease and Kidney disease. Less with Stroke.
-Skin cancer is not correlated with other  diseases.
+From the above correlation test we can see that overall Correlations are not particularly strong. Heartdisease has more correlation with stroke than any other secondary illnesses(Which is not a surprise generally). Diabetes is correlated with heart disease and Kidney disease, Less with Stroke. Skin cancer shows negligible correlation with all other diseases.
 
 # Determining Independence between Diseases
 The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables(All the variables we have here are already categorical).  The frequency of each category for one nominal variable is compared across the categories of the second nominal variable.  The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable. The null hypothesis for this test is that there is no relationship between primary disease heartDisease and other secondary illnesses.  The alternative hypothesis is that there is a relationship between heartDisease and secondary illnesses.
@@ -303,23 +304,23 @@ the degrees of freedom and
 the p-value of the test.
 
 ```{r}
-hea_as=table(heart$heartDisease,heart$Asthma)
+hea_as=table(heart$HeartDisease,heart$Asthma)
 chi_1=chisq.test(hea_as)
 chi_1
 
-hea_dia=table(heart$heartDisease,heart$Diabetic)
+hea_dia=table(heart$HeartDisease,heart$Diabetic)
 chi_2=chisq.test(hea_dia)
 chi_2
 
-hea_kid=table(heart$heartDisease,heart$KidneyDisease)
+hea_kid=table(heart$HeartDisease,heart$KidneyDisease)
 chi_3=chisq.test(hea_kid)
 chi_3
 
-hea_skin=table(heart$heartDisease,heart$SkinCancer)
+hea_skin=table(heart$HeartDisease,heart$SkinCancer)
 chi_4=chisq.test(hea_skin)
 chi_4
 
-hea_stroke=table(heart$heartDisease,heart$Stroke)
+hea_stroke=table(heart$HeartDisease,heart$Stroke)
 chi_5=chisq.test(hea_stroke)
 chi_5
 ```
