@@ -96,7 +96,7 @@ nrow(skin_pa1)
 #correlation plot for heart disease and other secondary illnesses
 ```{r,results='asis'}
 library("corrplot")
-heart_des<-subset(heart,select = c(HeartDisease,Diabetic,Asthma,KidneyDisease,SkinCancer))
+heart_des<-subset(heart,select = c(HeartDisease,Stroke,Diabetic,Asthma,KidneyDisease,SkinCancer))
 str(heart_des)
 cor_matrix<-cor(heart_des)
 cor_matrix

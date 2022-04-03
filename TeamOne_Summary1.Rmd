@@ -66,27 +66,22 @@ heart %>%
 
 On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in a 30 day period is slightly higher for people with heart disease, than for people without. 
 
-# Frequency distributions of all our categorical variables 
 ```{r}
+# Frequency distributions of all our categorical variables 
 freq(heart)
-```
-
 
 # Changing Diabetes bordeline and pregnancy categories to Yes/No
-```{r}
+
 heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
 heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
-```
-
 
 #Checking if diabetic has been changed 
-```{r}
+
 describe (heart$Diabetic)
 freq(heart$Diabetic)
-```
 
 # Changing all the categorical variables to numerical dummies 
-```{r}
+
 heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
 heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
 heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
@@ -99,7 +94,7 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
-#Correlation Plots of all variables
+#Correlation Plots of All Variables
 ```{r}
  model.matrix(~0+., data=heart) %>% 
      cor(use="pairwise.complete.obs") %>% 
@@ -107,14 +102,16 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
 
-## Gender and Lifestyle
+## Gender and Lifestyle Factors
 
 According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men.  Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
 
 We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
+##Plots for Sex & Heart Disease 
 
-# Contingency Table for Sex & Heart Disease 
+#Contingency Table for Sex & Heart Disease
+
 
 ```{r}
 
@@ -131,9 +128,11 @@ barplot(with(heart, table(HeartDisease, Sex)), main="heart Disease & Sex", besid
 ```
 
 
-However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?   
-
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
+
+However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?
+
+In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease.
 
 
 ##Body Mass Index (BMI)
@@ -178,10 +177,10 @@ t.test(female_HD$BMI, male_HD$BMI)
 From the T-test output above, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
 
 
-#Physical Health 
+##Physical Health 
 # How many times in the last 30 days have you felt physically ill? 
 
-Earlier, we saw that respondents, who have heart disease, reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. The boxplot below, shows us that women with heart disease generally report felling unwell more than men. 
+Earlier, we saw that respondents, who have heart disease, reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. The box plot below shows us that women with heart disease generally report felling unwell more than men. 
 
 ```{r}
 ggplot(heart, aes(x = factor(HeartDisease), y = PhysicalHealth))+
@@ -191,27 +190,28 @@ ggplot(heart, aes(x = factor(HeartDisease), y = PhysicalHealth))+
 ```
 
 ```{r}
-t.test(male_HD$PhysicalHealth, 
-       female_HD$PhysicalHealth)
+t.test(male_HD$PhysicalHealth,
+female_HD$PhysicalHealth)
 ```
 
-The t-test also confirms what the boxplot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
+The t-test also confirms what the box plot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
 
 
-#Mental Health 
+##Mental Health 
+# How many times in the last 30 days have you felt physically ill? 
 ```{r}
 ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
     geom_boxplot(aes(fill = Sex))+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 
-t.test  (male_HD$MentalHealth, 
-       female_HD$MentalHealth)
+t.test  (male_HD$MentalHealth,
+female_HD$MentalHealth)
 ```
 
-The boxplot shows that women tend to report feeling mentally unwell more often then men.Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell twice as many days as men.
+The boxplot shows that women tend to report feeling mentally unwell more often then men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men.
 
-# Sleep
+##Sleep
 #On average,how many hours of sleep do you get in a 24-hour period?
 ```{r}
 ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
@@ -219,21 +219,17 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 
-t.test  (male_HD$SleepTime, 
-       female_HD$SleepTime)
+t.test  (male_HD$SleepTime,
+female_HD$SleepTime)
 ```
 
-Men and women have statistically diffeent sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep is cumulative.According to Dr.Rebecca Robbins,  sleep expert and postdoctoral researcher at the Brigham and Women’s Hospital and Harvard Medical School,Dr. Robbins conducted research that examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus.
+Men and women have statistically different sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep effects are known to be cumulative. A study conducted by Robbins et al. in 2021 "examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus". The study found that curtailing sleep below the recommended seven hours increases the risk for viral infection "nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest" (Robbins et al, 2021). 
 
-"We see experimentally when we curtail sleep below the recommended seven hours that risk for viral infection goes up many fold—nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest,"
+This lack of sleep could explain why we see that women in our data on average report feeling sick more often and could also be a contributing factors is why women are more likely to die from heart attacks than men (Noel Bairey Merz).
 
-https://www.wellandgood.com/benefits-of-getting-more-sleep/
+When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. However, it should be noted that the survey is voluntary and there is no way to ensure that the respondents are being truthful. 
 
-This lack of sleep could explain why women report feeling physically unwell more days in a month than men. 
-
-When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. Remember people lie. 
-
-# Age, Race, Gen Health
+## Age, Race, Gen Health
 ```{r}
 freq(HD$AgeCategory)
 freq(HD$Race)
@@ -241,34 +237,33 @@ freq(HD$GenHealth)
 
 ```
 
-We looking at the population make-up respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of caucasian descent. At the time of the intervoew they also said they felt their overall health is good. 
+When looking at the population make-up of respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
 
-# Liner Regression on Sex 
+Even though a logit regression seems more to estimate whether or not an individual gets heart disease, we can still use a linear regression in our exploratory stages to find the best fitting model. 
+# Liner Regression on Sex
 ```{r}
-reg_1 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth, data=heart)
+reg_1 <- lm(HeartDisease~Sex+BMI, data=heart)
 summary (reg_1)
 
 reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
 summary (reg_2)
 
-reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime +AgeCategory + Race, data=heart)
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
 summary (reg_3)
 ```
 
-Adjusted r-square is increasing so definitely model fit is improving but still not a good fit 
-
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving> However,the fir statistic is still quite low. 
 
 ###########################################################################################
 
-# heart Disease & Secondary Illnesses 
+# Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether heartDisease and secondary illnesses have correlation or not(are they dependent or independent?).
-# Correlation matrix among diseases 
 
 ```{r}
 diseases <- data.frame (heart$HeartDisease,
                         heart$Stroke,
                         heart$Diabetic,
-                        heart$Asthma, 
+                        heart$Asthma,
                         heart$KidneyDisease,
                         heart$SkinCancer)
 
@@ -298,6 +293,15 @@ Diabetes is correlated with heart disease and Kidney disease. Less with Stroke.
 Skin cancer is not correlated with other  diseases.
 
 # Determining Independence between Diseases
+The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables(All the variables we have here are already categorical).  The frequency of each category for one nominal variable is compared across the categories of the second nominal variable.  The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable. The null hypothesis for this test is that there is no relationship between primary disease heartDisease and other secondary illnesses.  The alternative hypothesis is that there is a relationship between heartDisease and secondary illnesses.
+
+output:
+the title of the test,
+which variables have been used,
+the test statistic,
+the degrees of freedom and
+the p-value of the test.
+
 ```{r}
 hea_as=table(heart$HeartDisease,heart$Asthma)
 chi_1=chisq.test(hea_as)
