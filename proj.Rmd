@@ -16,7 +16,8 @@ options(scientific=T, digits = 3)
 
 ```{r, echo = F}
 heart <- data.frame(read.csv("heart_2020_cleaned_binary.csv"))
-
+str(heart)
+frequency(heart, sort.count = False)
 ```
 
 

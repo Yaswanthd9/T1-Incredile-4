@@ -1,5 +1,5 @@
 # Libraries 
-library (tidyverse)
+
 library (dplyr)
 library (funModeling)
 library(ezids)
@@ -23,7 +23,7 @@ nrow (heart)
 
 # Descrpitive Statistics  
 ```{r}
-status (heart)
+status(heart)
 ```
 
 From the table we can see that Physical and Mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set are not physically active while about 60% of the respondents do not report having mental health issues. 
@@ -53,7 +53,7 @@ On average, people with heart disease have a slightly higher BMI than those who 
 
 # Frequency distributions of all our categorical variables 
 ```{r}
-freq(heart)
+freq(heart+ scale_y_continuous(labels = scales::comma))
 ```
 
 

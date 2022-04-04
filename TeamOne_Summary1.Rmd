@@ -122,8 +122,11 @@ We started off by trying to see which gender tends to have more heart disease ba
 # Contingency Table for Sex & Heart Disease
 
 
+<<<<<<< Updated upstream
 ```{r, results = 'markup'}
 
+=======
+>>>>>>> Stashed changes
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for heart Disease and Sex")
 addmargins(contable)
@@ -373,7 +376,11 @@ Some researchers have found that among people who drink have  high changes of sm
 
 ```{r}
 
+<<<<<<< Updated upstream
 contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
+=======
+contable_drink = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$AlcoholDrinking)
+>>>>>>> Stashed changes
 
 prop <-prop.table(contable_drink)
 percent <- round(prop*100, 2)
