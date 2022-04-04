@@ -424,3 +424,11 @@ Liau, S. Y., Mohamed Izham, M. I., Hassali, M. A., & Shafie, A. A. (2010). A lit
 Robbins, R., Quan, S. F., Weaver, M. D., Bormes, G., Barger, L. K., & Czeisler, C. A. (2021). Examining sleep deficiency and disturbance and their risk for incident dementia and all-cause mortality in older adults across 5 years in the United States. Aging, 13(3), 3254–3268. https://doi.org/10.18632/aging.202591
 
 Sadick, B. (2019, April). Women Die From Heart Attacks More Often Than Men. Here’s Why — and What Doctors Are Doing About It. Time; Time. https://time.com/5499872/women-heart-disease/
+
+Bethesda, MD: National Institutes of Health.
+https://www.cdc.gov/stroke/conditions.htm#:~:text=Common%20heart%20disorders%20can%20increase,rich%20blood%20to%20the%20brain.
+
+Antoine Soetewey 
+https://statsandr.com/blog/chi-square-test-of-independence-in-r/
+
+https://www.statisticssolutions.com/free-resources/directory-of-statistical-analyses/chi-square/
