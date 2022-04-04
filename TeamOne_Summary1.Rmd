@@ -184,7 +184,7 @@ t.test(female_HD$BMI, male_HD$BMI)
 From the T-test output above, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
 
 
-#Physical Health: How many times in the last 30 days have you felt physically ill? 
+# Physical Health: How many times in the last 30 days have you felt physically ill? 
 
 Earlier, we saw that respondents, who have heart disease, reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. The box plot below shows us that women with heart disease generally report felling unwell more than men. 
 
