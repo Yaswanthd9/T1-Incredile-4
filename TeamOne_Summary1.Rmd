@@ -259,6 +259,7 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 # Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether heartDisease and secondary illnesses have correlation or not(are they dependent or independent?).
 
+#We are seperating our desired variables to test them in an easier way.
 ```{r}
 diseases <- data.frame (heart$HeartDisease,
                         heart$Stroke,
@@ -291,10 +292,12 @@ model.matrix(~0+., data=diseases) %>%
     ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 
 ```
-From the above correlation test we can see that overall Correlations are not particularly strong. Heartdisease has more correlation with stroke than any other secondary illnesses(Which is not a surprise generally). Diabetes is correlated with heart disease and Kidney disease, Less with Stroke. Skin cancer shows negligible correlation with all other diseases.
+From the above correlation test we can see that overall Correlations are not particularly strong. Heartdisease has more correlation with stroke than any other secondary illnesses(Which is not a surprise generally). Diabetes is correlated with heart disease and Kidney disease, Less with Stroke. Skin cancer shows negligible correlation with all other diseases. overall, we can see that only stroke, diabetes and kidney disease have considerable correlation with heart disease.
+Not only from our correlation test, but as per center for disease control and prevention, Common heart disorders can increase your risk for stroke. For example, coronary artery disease increases your risk for stroke, because plaque builds up in the arteries and blocks the flow of oxygen-rich blood to the brain. Also diabetes increases your risk for stroke(Stroke vs Diabetes in our correlation plot ).Diabetes causes sugars to build up in the blood and prevent oxygen and nutrients from getting to the various parts of your body, including your brain. High blood pressure is also common in people with diabetes. High blood pressure is the leading cause of stroke and is the main cause for increased risk of stroke among people with diabetes. Reference:-(https://www.cdc.gov/stroke/conditions.htm#:~:text=Common%20heart%20disorders%20can%20increase,rich%20blood%20to%20the%20brain.)
 
 # Determining Independence between Diseases
-The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables(All the variables we have here are already categorical).  The frequency of each category for one nominal variable is compared across the categories of the second nominal variable.  The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable. The null hypothesis for this test is that there is no relationship between primary disease heartDisease and other secondary illnesses.  The alternative hypothesis is that there is a relationship between heartDisease and secondary illnesses.
+After finding the correlation between variables we are now performing a chi-suare test of independence to find out whether the varibles are dependent or independent with each other.
+The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables(All the variables we have here are already categorical). In a more general sense, it tests to see whether distributions of categorical variables differ from each another.The frequency of each category for one nominal variable is compared across the categories of the second nominal variable.  The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable. The null hypothesis for this test is that there is no relationship between primary disease heartDisease and other secondary illnesses. The alternative hypothesis is that there is a relationship between heartDisease and secondary illnesses.
 
 output:
 the title of the test,
@@ -325,8 +328,7 @@ chi_5=chisq.test(hea_stroke)
 chi_5
 ```
 
-For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
-Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with heart Disease. 
+From the output and from `test$p.value` we see that the p-value is less than the significance level of 5%. Like any other statistical test, if the p-value is less than the significance level, we can reject the null hypothesis.Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with heart Disease.
 
 
 # Smokers Vs Drinkers 
