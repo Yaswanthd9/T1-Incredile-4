@@ -2,13 +2,30 @@
 title: "Key Risk Factors of Heart Disease in 2020"
 author: "Team One"
 date: April 4, 2022
-output: html_document
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+```{r init, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+
 ```
-#Introduction 
 
 According to the Center for Disease Control and Prevention (CDC), cardiovascular or heart diseases account for 1 in every 4 deaths in the United States annually. The estimated costs to the nation’s economy amount to about $363 billion annually, which include hospitalizations, after services health care needs as well as lost productivity due to death and disability (SS Virani, 2021).  The CDC also states that given the lifestyle habits of an average American, about half of the population (47%) are reported to have “1 of the 3 key risk factors for heart disease: high blood pressure, high cholesterol, and smoking”. However, the risk factors for developing heart diseases are vast and diverse and tend to vary between most racial and ethnic groups in the United States. 
 
@@ -18,11 +35,10 @@ The beginnings of the current understanding of the interconnected role of risk f
 
 In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases in the US population, so that we may be able to see some of the intermingling between different risk factors.   
 
-#Description of Dataset
+# Description of Dataset
 
 The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2020), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
 
-*** Table with variable names****
 
 
 ```{r}
@@ -42,8 +58,8 @@ nrow (heart)
 ```
 
 
+```{r, results = 'markup'}
 # Descrpitive Statistics  
-```{r}
 status (heart)
 ```
 
@@ -51,8 +67,9 @@ From the table we can see that physical and mental health have a higher percenta
 
 We can also see that there are no N/A values in our data set. This is not surprising given that our data was cleaned before being retrieved.  
 
+Below are the plots showing the means of our numerical variables. We can see that, on average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in a 30 day period is slightly higher for people with heart disease, than for people without. 
 
-```{r }
+```{r, results = 'markup' }
 # Finding the mean of numerical variables grouped by heart disease
 plot_num(heart)
 
@@ -64,21 +81,14 @@ heart %>%
                     "SleepTime"), mean)
 ```
 
-On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in a 30 day period is slightly higher for people with heart disease, than for people without. 
+
 
 ```{r}
-# Frequency distributions of all our categorical variables 
-freq(heart)
 
 # Changing Diabetes bordeline and pregnancy categories to Yes/No
 
 heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
 heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
-
-#Checking if diabetic has been changed 
-
-describe (heart$Diabetic)
-freq(heart$Diabetic)
 
 # Changing all the categorical variables to numerical dummies 
 
@@ -94,11 +104,11 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
-#Correlation Plots of All Variables
-```{r}
+# Correlation Plots of All Variables
+```{r, results = 'markup'}
  model.matrix(~0+., data=heart) %>% 
      cor(use="pairwise.complete.obs") %>% 
-   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
+   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
 ```
 
 
@@ -108,12 +118,11 @@ According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s He
 
 We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
-##Plots for Sex & Heart Disease 
 
-#Contingency Table for Sex & Heart Disease
+# Contingency Table for Sex & Heart Disease
 
 
-```{r}
+```{r, results = 'markup'}
 
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for heart Disease and Sex")
@@ -122,9 +131,9 @@ addmargins(contable)
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
 
-print ("Contingency Table for heart Disease and Sex in Percentage")
+print ("Contingency Table for Heart Disease and Sex in Percentage")
 print (percent)
-barplot(with(heart, table(HeartDisease, Sex)), main="heart Disease & Sex", beside=T, col=3:2)
+barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", beside=T, col=3:2)
 ```
 
 
@@ -135,11 +144,9 @@ However, we are then forced to ask why do men have more heart disease in our sam
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease.
 
 
-##Body Mass Index (BMI)
+# BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
 
-# Is there a difference between the mean BMI of men and woman in the overall population? 
-
-```{r}
+```{r, results = 'markup'}
 hist(heart$BMI)
 ```
 
@@ -147,7 +154,7 @@ In the historgram, we can see that our data is approximately normal and given th
 
 After sub-setting the data between male and female, we conducted a Welch's t-test on the BMIs of both population subsets. 
 
-```{r}
+```{r, results = 'markup'}
 # Subset Male & Female with and without Heart Disease
 female <- subset(heart, Sex== "Female")
 male  <- subset (heart, Sex == "Male")
@@ -160,9 +167,9 @@ The p-value is less than 5% significance level, allowing us to reject the null h
 
 Next, we divided our data frame between men and women who do have heart disease. Once again assuming normality due to the large sample size, we conducted another Welch's T-test to look at the mean BMI difference. 
 
-# Is there a difference in average BMI between the sexes with heart disease?
+# BMI: Is there a difference in average BMI between the sexes with heart disease?
 
-```{r}
+```{r, results = 'markup'}
 # Subsetting genders based on respondents that have heart disease 
 HD <- subset(heart, HeartDisease==1)
 female_HD<- subset(female, HeartDisease==1)
@@ -177,29 +184,26 @@ t.test(female_HD$BMI, male_HD$BMI)
 From the T-test output above, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
 
 
-##Physical Health 
-# How many times in the last 30 days have you felt physically ill? 
+#Physical Health: How many times in the last 30 days have you felt physically ill? 
 
 Earlier, we saw that respondents, who have heart disease, reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. The box plot below shows us that women with heart disease generally report felling unwell more than men. 
 
-```{r}
+```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = PhysicalHealth))+
     geom_boxplot(aes(fill = Sex))+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 ```
 
-```{r}
-t.test(male_HD$PhysicalHealth,
-female_HD$PhysicalHealth)
+```{r, results = 'markup'}
+t.test(male_HD$PhysicalHealth, female_HD$PhysicalHealth)
 ```
 
 The t-test also confirms what the box plot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
 
 
-##Mental Health 
-# How many times in the last 30 days have you felt physically ill? 
-```{r}
+## Mental Health: How many times in the last 30 days have you felt physically ill? 
+```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
     geom_boxplot(aes(fill = Sex))+
     xlab('HeartDisease') + 
@@ -211,9 +215,8 @@ female_HD$MentalHealth)
 
 The boxplot shows that women tend to report feeling mentally unwell more often then men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men.
 
-##Sleep
-#On average,how many hours of sleep do you get in a 24-hour period?
-```{r}
+## Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
+```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     geom_boxplot(aes(fill = Sex))+
     xlab('HeartDisease') + 
@@ -229,8 +232,8 @@ This lack of sleep could explain why we see that women in our data on average re
 
 When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. However, it should be noted that the survey is voluntary and there is no way to ensure that the respondents are being truthful. 
 
-## Age, Race, Gen Health
-```{r}
+# Age, Race, General Health
+```{r, results = 'markup'}
 freq(HD$AgeCategory)
 freq(HD$Race)
 freq(HD$GenHealth)
@@ -240,8 +243,9 @@ freq(HD$GenHealth)
 When looking at the population make-up of respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
 
 Even though a logit regression seems more to estimate whether or not an individual gets heart disease, we can still use a linear regression in our exploratory stages to find the best fitting model. 
+
 # Liner Regression on Sex
-```{r}
+```{r, results = 'markup'}
 reg_1 <- lm(HeartDisease~Sex+BMI, data=heart)
 summary (reg_1)
 
@@ -252,7 +256,7 @@ reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeC
 summary (reg_3)
 ```
 
-With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving> However,the fir statistic is still quite low. 
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. 
 
 ###########################################################################################
 
