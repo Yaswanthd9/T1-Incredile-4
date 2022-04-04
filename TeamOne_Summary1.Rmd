@@ -395,6 +395,26 @@ chisq.test(contable_smoke)
 chisq.test(contable_drink)
 
 ```
-```
+
 For both the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
 Both drinking and smoking have a relationship with heart Disease. 
+
+## References 
+
+Ara S. A literature review of cardiovascular disease management programs in managed care populations. Journal of Managed Care Pharmacy 2004; 10(4): 326-344.
+
+Centers for Disease Control and Prevention. Underlying Cause of Death, 1999–2018. CDC WONDER Online Database. Atlanta, GA: Centers for Disease Control and Prevention; 2018. 
+
+CDC. (2019, December 2). Heart Disease Facts | cdc.gov. Centers for Disease Control and Prevention. 
+
+Giampaoli S, Palmieri L, Mattiello A, et al. Definition of high risk individuals to optimize strategies for primary prevention of cardiovascular diseases. Nutr Metab Cardiovasc Dis 2005;15:79–85.
+
+Here’s What an Extra 20 Minutes of Sleep Does to Your Brain. (2020, July 17). Well+Good. https://www.wellandgood.com/benefits-of-getting-more-sleep/
+
+Hong, Y. (2018). Framingham Heart Study (FHS) [Review of Framingham Heart Study (FHS)]. National Heart, Lung and Blood Institute. https://www.nhlbi.nih.gov/science/framingham-heart-study-fhs
+
+Liau, S. Y., Mohamed Izham, M. I., Hassali, M. A., & Shafie, A. A. (2010). A literature review of the cardiovascular risk-assessment tools: applicability among Asian population. Heart Asia, 2(1), 15–18. https://doi.org/10.1136/ha.2009.001115
+
+Robbins, R., Quan, S. F., Weaver, M. D., Bormes, G., Barger, L. K., & Czeisler, C. A. (2021). Examining sleep deficiency and disturbance and their risk for incident dementia and all-cause mortality in older adults across 5 years in the United States. Aging, 13(3), 3254–3268. https://doi.org/10.18632/aging.202591
+
+Sadick, B. (2019, April). Women Die From Heart Attacks More Often Than Men. Here’s Why — and What Doctors Are Doing About It. Time; Time. https://time.com/5499872/women-heart-disease/
