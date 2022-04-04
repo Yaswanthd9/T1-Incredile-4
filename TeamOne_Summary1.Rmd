@@ -335,11 +335,9 @@ First of all does smoking and drinking cause heart attack or heart disease?
 
 Yes, it is actually one among the reason that can cause heart disease in young people and majority of cases are seen in women according to a most of the publishes articles and researchers.
 
-To determine if there is a link between heart disease and drug use, researchers investigated and discovered that recreational use of nicotine, cannabis, alcohol, and illegal substances such as amphetamine and cocaine may be linked to prematurely clogged arteries.Premature heart disease can arise before the age of 65 in women and 55 in males, and it can be difficult and dangerous.
+To determine if there is a link between heart disease and drug use, researchers investigated and discovered that recreational use of nicotine, cannabis, alcohol, and illegal substances such as amphetamine and cocaine may be linked to prematurely clogged arteries.Premature heart disease can arise before the age of 65 in women and 55 in males, and it can be difficult and dangerous. (Blakemore, E. 2021, February 20).
 
-According to statistics from the countrywide veterans affairs healthcare and veterans with premaTure AtheroscLerosis (VITAL) registry (2014-2015). There are 7716 patients who are having extremely premature heart disease , and they discovered this by comparing them to those who do not have premature heart disease.
-
-According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent )
+According to statistics from the countrywide veterans affairs healthcare and veterans with premaTure AtheroscLerosis (VITAL) registry (2014-2015). There are 7716 patients who are having extremely premature heart disease , and they discovered this by comparing them to those who do not have premature heart disease. According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent). (Aislinn Antrim, Assistant Editor. 2021, March 5)
 
 ```{r}
 contable_smoke = table(heart$HeartDisease, heart$Smoking)
@@ -352,11 +350,9 @@ xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Pe
 
 How does Smoking and Drinking is the cause?
 
-The interaction between the tobacco(smoking) and alcohol can lead to heart problems and it depends on some factors in which we can find out.
-Initially, It might depend upon quantity of dose the person is consuming it.
-And based on some research I found that consuming alcohol in range of  3 to 14 drinks per week is prone to lower risk of heart attack but there are other risks factors that lead to complex issues like blockage in artery and deficiency in blood flow or it can lead to heart failure.
+The interaction between the tobacco(smoking) and alcohol can lead to heart problems and it depends on some factors in which we can find out. Initially, It might depend upon quantity of dose the person is consuming it. And based on some research I found that consuming alcohol in range of  3 to 14 drinks per week is prone to lower risk of heart attack but there are other risks factors that lead to complex issues like blockage in artery and deficiency in blood flow or it can lead to heart failure.
 
-When looked at the cause for smoking there is a high change of risk leading to heart problems.  Some heart failures caused by smoking are stroke, bleeding from brain and congestion in chest.
+When looked at the cause for smoking there is a high change of risk leading to heart problems.  Some heart failures caused by smoking are stroke, bleeding from brain and congestion in (chest.Jill Murphy, Associate Editor. 2022, April 3)
 
 Does people who Drink smoke?
 
@@ -375,9 +371,9 @@ xkabledply(percent, title="Contingency Table for heart Disease and Drinking in P
 ```
 What is the relation between smoking and heart disease ?
 
-So, basically people who tend to smoke have issues related to cardiovascular disease(CVD). CVD occurs when chemicals in cigarettes release then the blood becomes thick and starts forming clots inside veins and arteries. When the blood vessel are completely blocked then it can lead to heart attack and sudden death. Which can lead to death of the person. In the United States, there were reportedly 800,000 people who faced cardiovascular disease and was the mere cause of death in which 8million died of heart attack and other 7 million died of stroke.
+So, basically people who tend to smoke have issues related to cardiovascular disease(CVD). CVD occurs when chemicals in cigarettes release then the blood becomes thick and starts forming clots inside veins and arteries. When the blood vessel are completely blocked then it can lead to heart attack and sudden death. Which can lead to death of the person. In the United States, there were reportedly 800,000 people who faced cardiovascular disease and was the mere cause of death in which 8million died of heart attack and other 7 million died of stroke. 
 
-When measured on how many cigarettes people consume leads to health issues there is 100 percent chance that people’s health will be damaged no matter if they consumed one or two per day. The fact that when people consume one to two cigarettes may show signs of CVD but gradually they might face problems. Another risk factor is that if people consume more than 5 cigarettes a day they may show signs of early CVD. Based on this we can imagine that the risk of CVD increases based on the number of cigarettes consumed per day. 
+When measured on how many cigarettes people consume leads to health issues there is 100 percent chance that people’s health will be damaged no matter if they consumed one or two per day. The fact that when people consume one to two cigarettes may show signs of CVD but gradually they might face problems. Another risk factor is that if people consume more than 5 cigarettes a day they may show signs of early CVD. Based on this we can imagine that the risk of CVD increases based on the number of cigarettes consumed per day. (Statistics of Tobacco-Smoking. (1877))
 
 How is smoking Effecting?
 
@@ -385,7 +381,7 @@ When a person smoke the chemicals substances in the cigarette cause the cells of
 
 What is the relation between Drinking and heart disease ?
 
-When a person has a habit to drink than to indicate that his health is getting damaged then we have to understand what is the percentage of alcohol being consumed per day and we can weight it in grams/units. On an average the standard practice of people who drink consume 12 to 15grams off alcohol. Based on this practice there are most often low and high risks. Low risk or moderate risk has an average of 1 to 2 drinks per day and high risk can be measured on consuming more than 4 drinks per day.
+When a person has a habit to drink than to indicate that his health is getting damaged then we have to understand what is the percentage of alcohol being consumed per day and we can weight it in grams/units. On an average the standard practice of people who drink consume 12 to 15grams off alcohol. Based on this practice there are most often low and high risks. Low risk or moderate risk has an average of 1 to 2 drinks per day and high risk can be measured on consuming more than 4 drinks per day. (Larsson, S. C., Burgess, S., Mason, A. M., & Michaëlsson, K.(2020))
 ```{r chisq}
 
 chisq.test(contable_smoke)
