@@ -151,6 +151,10 @@ boxplot(HD~GeneralHealth,data=heart)
 ```
 
 ```{r}
+boxplot(Ethnicity~HD,data=heart)
+```
+
+```{r}
 
 t.test(heart$GeneralHealth, heart$HD)
 t.test(heart$GeneralHealth, heart$Ethnicity)
