@@ -169,5 +169,9 @@ chi_2=chisq.test(HD_Eth)
 chi_2
 ```
 
-
+```{r}
+png(file="Logistic Regression.png")
+plot(GeneralHealth,Ethnicity)
+g=glm(Ethnicity~GeneralHealth,family=binomial,heart)
+```
 
