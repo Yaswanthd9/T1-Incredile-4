@@ -153,7 +153,16 @@ boxplot(HD~GeneralHealth,data=heart)
 ```{r}
 
 t.test(heart$GeneralHealth, heart$HD)
+t.test(heart$GeneralHealth, heart$Ethnicity)
 ```
+
+```{r}
+Genh_HD=table(heart$GeneralHealth,heart$HD)
+chi_1=chisq.test(Genh_HD)
+chi_1
+HD_Eth=table(heart$GeneralHealth,heart$Ethnicity)
+chi_2=chisq.test(HD_Eth)
+chi_2
 ```
 
 
