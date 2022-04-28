@@ -64,6 +64,12 @@ data_integrity(heart)
 ```{r error= TRUE}
 describe (heart)
 ```
+
+Converting HeartDIsease categorical into Numerical Variable
+
+```{r}
+heart$HD<-ifelse(heart$HeartDisease=="Yes",1,0)
+```
 # Finding the mean of numerical variables grouped by Gen Health
 ```{r }
 #plot_num(heart)
@@ -73,8 +79,8 @@ heart %>%
   group_by(HeartDisease) %>%
   summarise_at(vars("GeneralHealth"), mean)
 ```
-On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. HD people reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3.
 
+There is very less differnce in General Health, Even people are healthy (normal GeneralHealth) people have No heartDisease by 3.22 times than people wih people with non general health get by 3.12 
 # Frequency distributions of all our categorical variables 
 ```{r}
 freq(heart)
@@ -96,7 +102,7 @@ freq(heart$Diabetic)
 
 # Changing all the categorical variables to numerical dummies 
 ```{r}
-heart$heartDisease<-ifelse(heart$heartDisease=="Yes",1,0)
+
 heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
 heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
 heart$Stroke<-ifelse(heart$Stroke=="Yes",1,0)
@@ -117,11 +123,38 @@ heart$Ethnicity<-sapply(heart$Race,unclass)
 
 # Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
 
+```{r}
+
+ model.matrix(~0+., data=heart) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
+```
 
 
 
+```{r}
 
+contable = table(heart$GeneralHealth, heart$Ethnicity)
+xkabledply(contable, title="Contingency Table for heart Disease and Sex")
+addmargins(contable)
 
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for heart Disease and Sex in Percentage")
+print (percent)
+barplot(with(heart, table(GeneralHealth, Ethnicity)), main="heart Disease & Sex", beside=T, col=3:2)
+```
+
+```{r}
+boxplot(HD~GeneralHealth,data=heart)
+```
+
+```{r}
+
+t.test(heart$GeneralHealth, heart$HD)
+```
+```
 
 
 
