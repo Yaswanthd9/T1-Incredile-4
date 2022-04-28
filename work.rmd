@@ -108,7 +108,14 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
+# Changing race variable to numerical variable
+```{r}
+heart$Race<-as.factor(heart$Race)
+heart$Ethnicity<-sapply(heart$Race,unclass)
+```
 
+
+# Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
 
 
 
