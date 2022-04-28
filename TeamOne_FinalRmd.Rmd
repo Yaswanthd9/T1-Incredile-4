@@ -1,7 +1,7 @@
 ---
 title: "Key Risk Factors of Heart Disease in 2020"
 author: "Team One"
-date: April 4, 2022
+date: May 1, 2022
 output:
   html_document:
     code_folding: hide
@@ -121,12 +121,8 @@ We started off by trying to see which gender tends to have more heart disease ba
 
 # Contingency Table for Sex & Heart Disease
 
-
-<<<<<<< Updated upstream
 ```{r, results = 'markup'}
 
-=======
->>>>>>> Stashed changes
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for heart Disease and Sex")
 addmargins(contable)
@@ -375,12 +371,10 @@ Some researchers have found that among people who drink have  high changes of sm
 
 
 ```{r}
-
-<<<<<<< Updated upstream
 contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
-=======
-contable_drink = table(heart_2020_cleaned$HeartDisease, heart_2020_cleaned$AlcoholDrinking)
->>>>>>> Stashed changes
+
+contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
+
 
 prop <-prop.table(contable_drink)
 percent <- round(prop*100, 2)
