@@ -250,11 +250,23 @@ summary (reg_3)
 ```
 ** Check VIF to select variables 
 ```{r}
-ezids::xkablevif( reg_3)
+ezids::xkablevif(reg_3)
 ```
 
 From, the VIF values, VUF for sleep time is 11.3 so we will drop. 
+
+# Using SMOTE Library to address unbalanced issue 
+```{r}
+
+
+```
 ** Build logit 
+
+```{r}
+
+model <- glm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + AgeCategory + Race, data=heart, family='binomial')
+summary(model)
+```
 ** Build KNN 
 
 With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. 
