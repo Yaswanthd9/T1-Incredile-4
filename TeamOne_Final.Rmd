@@ -103,35 +103,16 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
-# Correlation Plots of All Variables ###DELETE
-```{r, results = 'markup'}
- model.matrix(~0+., data=heart) %>% 
-     cor(use="pairwise.complete.obs") %>% 
-   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
-```
+
 
 
 ## Gender and Lifestyle Factors
 
-According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men.  Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
+According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men. Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
 
 We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
-# Correlation Plot for Gender Dataframe 
 
-```{r}
-
-# Creating dataframe for sex and related variables
-gender <- data.frame (  heart$HeartDisease,
-                        heart$BMI,
-                        heart$AgeCategory,
-                        heart$Sex,
-                        heart$PhysicalHealth,
-                        heart$MentalHealth,
-                        heart$SleepTime,
-                        heart$GenHealth)
-heart
-```
 # Contingency Table for Sex & Heart Disease
 
 ```{r, results = 'markup'}
@@ -168,8 +149,8 @@ After sub-setting the data between male and female, we conducted a Welch's t-tes
 
 ```{r, results = 'markup'}
 # Subset Male & Female with and without Heart Disease
-female <- subset(heart, Sex== "Female")
-male  <- subset (heart, Sex == "Male")
+female <- subset(gender, Sex== "Female")
+male  <- subset (gender, Sex == "Male")
 
 # T-test of BMI between Genders 
 t.test(female$BMI, male$BMI)
@@ -183,7 +164,7 @@ Next, we divided our data frame between men and women who do have heart disease.
 
 ```{r, results = 'markup'}
 # Subsetting genders based on respondents that have heart disease 
-HD <- subset(heart, HeartDisease==1)
+HD <- subset(gender, HeartDisease==1)
 female_HD<- subset(female, HeartDisease==1)
 male_HD<- subset(male, HeartDisease== 1)
 
@@ -466,7 +447,6 @@ Next steps are to use what we learned in our dataset and develop a linear model.
 
 
 
-
 ## References 
 
 Ara S. A literature review of cardiovascular disease management programs in managed care populations. Journal of Managed Care Pharmacy 2004; 10(4): 326-344.
@@ -494,3 +474,12 @@ Antoine Soetewey
 https://statsandr.com/blog/chi-square-test-of-independence-in-r/
 
 https://www.statisticssolutions.com/free-resources/directory-of-statistical-analyses/chi-square/
+
+# #### CODE CEMETERY ######
+
+# Correlation Plots of All Variables ###DELETE since every section has theire own 
+```{r, results = 'markup'}
+ model.matrix(~0+., data=heart) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
+```
