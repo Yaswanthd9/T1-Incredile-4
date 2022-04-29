@@ -272,24 +272,21 @@ exp(cbind(OR = coef(model_1), confint(model_1)))
 
 Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of surviving. 
 
-According to model 1, the log odds for getting heart disease for a man compared to 
+According to model 1, the log odds for getting heart disease increases by 1.64 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
 
+# Model 2: HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory
 ```{r}
 
 # Logit Model 2 
-model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
+model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=heart, family='binomial')
 summary(model_2)
 
 1-pchisq(186906 - 157118, df=(319794-319772))
 
-# Exponential Coefficients 
-expcoeff = exp(coef(model_2))
-xkabledply( as.table(expcoeff), title = "Exponential of Coefficients in Logit Reg" )
-
-# Confidence Interval
-xkabledply( confint.default(model_2), title = "CIs using standard errors" )
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model_1), confint(model_1)))
 ```
-
+Just like before, 
 
 
 ################ END OF SECTION ###########################
