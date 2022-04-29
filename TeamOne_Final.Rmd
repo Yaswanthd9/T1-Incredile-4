@@ -255,7 +255,7 @@ ezids::xkablevif(reg_3)
 
 From, the VIF values, VUF for sleep time is 11.3 so we will drop. 
 
-# Using SMOTE Library to address unbalanced issue 
+# Separate into train-test variables 
 ```{r}
 
 
