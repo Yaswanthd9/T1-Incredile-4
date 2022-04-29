@@ -54,10 +54,7 @@ library(corrplot)
 # Load the Data 
 heart <-read.csv("heart_2020_cleaned.csv")
 nrow (heart)
-```
 
-
-```{r, results = 'markup'}
 # Descriptive Statistics  
 status (heart)
 ```
@@ -78,11 +75,7 @@ heart %>%
                     "PhysicalHealth", 
                     "MentalHealth",
                     "SleepTime"), mean)
-```
 
-
-
-```{r}
 
 # Changing Diabetes bordeline and pregnancy categories to Yes/No
 
@@ -168,7 +161,6 @@ male_HD<- subset(male, HeartDisease== 1)
 #T-test
 t.test(female_HD$BMI, male_HD$BMI)
                   
- 
 ```
 
 From the T-test output above, we see that the p-value is 0.60, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
@@ -256,7 +248,7 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 ezids::xkablevif(reg_3)
 ```
 
-From, the VIF values, VUF for sleep time is 11.3 so we will drop.  Race will aslo be dropped since it is super unbalanced 
+From, the VIF values, VUF for sleep time is 11.3 so we will drop. Race will aslo be dropped since it is super unbalanced 
 
 
 # Logistic Regression  
@@ -267,29 +259,18 @@ From, the VIF values, VUF for sleep time is 11.3 so we will drop.  Race will asl
 heart$HeartDisease<-factor(heart$HeartDisease)
 heart$Sex<-factor(heart$Sex)
 
+# Training and Testing sets 
 set.seed(101) 
-# Set Seed so that same sample can be reproduced in future also
-# Now Selecting 75% of data as sample from total 'n' rows of the data  
 sample <- sample.int(n = nrow(heart), size = floor(.75*nrow(heart)), replace = F)
 train <- heart[sample, ]
 test  <- heart[-sample, ]
 
-```
-
-
-
-```{r}
-
-
-
+# Logit Model 1
 model_1<- glm(HeartDisease~ Sex+ BMI, data=train, family='binomial')
 summary(model)
-```
-```{r, results = 'markup'}
 
-
+# Chi-square for Model 1
 1-pchisq(186906 - 184556, df=(319794-319792))
-
 
 ```
 Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. 
@@ -297,12 +278,15 @@ Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the 
 
 ```{r}
 
-
+# Logit Model 2 
 model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
 summary(model_2)
-```
-```{r}
+
 1-pchisq(186906 - 157118, df=(319794-319772))
+
+# Exponential Coefficients 
+expcoeff = exp(coef(model_2))
+xkabledply( as.table(expcoeff), title = "Exponential of Coefficients in Logit Reg" )
 ```
 
 # testing using model_2
@@ -320,6 +304,12 @@ test <- test  %>% mutate(model_pred = 1*(model_prob > .53) + 0,
 test <- test %>% mutate(accurate = 1*(model_pred == heart_disease))
 sum(test$accurate)/nrow(test)
 
+```
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+# confusion_matrix(test)
+xkabledply( confusion_matrix(test), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
 ```
 
 
