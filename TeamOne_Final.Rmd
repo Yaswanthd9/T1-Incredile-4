@@ -255,17 +255,59 @@ ezids::xkablevif(reg_3)
 
 From, the VIF values, VUF for sleep time is 11.3 so we will drop. 
 
-# Separate into train-test variables 
+
+# Logistic Regression  
+
+# Separate to  80-20 Train-Test Sets 
 ```{r}
+# Change variables to factors 
+heart$HeartDisease<-factor(heart$HeartDisease)
+heart$Sex<-factor(heart$Sex)
+
+set.seed(101) 
+# Set Seed so that same sample can be reproduced in future also
+# Now Selecting 75% of data as sample from total 'n' rows of the data  
+sample <- sample.int(n = nrow(heart), size = floor(.75*nrow(heart)), replace = F)
+train <- heart[sample, ]
+test  <- heart[-sample, ]
+
+```
+
+
+
+```{r}
+
+
+
+model_1<- glm(HeartDisease~ Sex+ BMI, data=train, family='binomial')
+summary(model)
+```
+```{r, results = 'markup'}
+
+
+1-pchisq(186906 - 184556, df=(319794-319792))
 
 
 ```
-** Build logit 
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. 
+Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with age and pclass as predictors is good fit model for predicting the probability of surviving. 
 
 ```{r}
 
-model <- glm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + AgeCategory + Race, data=heart, family='binomial')
-summary(model)
+
+model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth+ MentalHealth +  AgeCategory + Race, data=train, family='binomial')
+summary(model_2)
+```
+```{r}
+1-pchisq(186906 - 157118, df=(319794-319772))
+```
+
+# Testing our 
+```{r}
+
+
+
+
 ```
 ** Build KNN 
 
@@ -386,13 +428,9 @@ When looked at the cause for smoking there is a high change of risk leading to h
 Some researchers have found that among people who drink have  high changes of smoking most of the times. 
 
 
-<<<<<<< HEAD:TeamOne_FinalRmd.Rmd
-```{r}
-=======
-#```{r}
 
-<<<<<<< Updated upstream
->>>>>>> 4f9915b752c18dd701345dd5f20b34e9d1ee6a04:TeamOne_Summary1.Rmd
+```{r}
+
 contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
 
 contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
