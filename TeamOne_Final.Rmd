@@ -172,9 +172,9 @@ Earlier, we saw that respondents, who have heart disease, reported feeling physi
 
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = PhysicalHealth))+
-    geom_boxplot(aes(fill = Sex))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
     xlab('HeartDisease') + 
-    scale_fill_brewer(palette = 'Set1', name = 'Sex')
+    scale_fill_brewer(palette = 'Set2', name = 'Sex')
 ```
 
 ```{r, results = 'markup'}
@@ -187,7 +187,7 @@ The t-test also confirms what the box plot is showing. Since the p-value is less
 ## Mental Health: How many times in the last 30 days have you felt physically ill? 
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
-    geom_boxplot(aes(fill = Sex))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 
@@ -200,7 +200,7 @@ The boxplot shows that women tend to report feeling mentally unwell more often t
 # Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
-    geom_boxplot(aes(fill = Sex))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
     xlab('HeartDisease') + 
     scale_fill_brewer(palette = 'Set1', name = 'Sex')
 
@@ -241,40 +241,38 @@ reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeC
 summary (reg_3)
 ```
 
-With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. 
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. 
 
-** Check VIF to select variables 
+# Check VIF to select variables 
 ```{r}
 ezids::xkablevif(reg_3)
 ```
 
-From, the VIF values, VUF for sleep time is 11.3 so we will drop. Race will aslo be dropped since it is super unbalanced 
-
+From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. 
 
 # Logistic Regression  
 
-# Separate to  80-20 Train-test Sets 
+# Model 1: HeartDisease~ Sex+ BMI
 ```{r}
 # Change variables to factors 
 heart$HeartDisease<-factor(heart$HeartDisease)
 heart$Sex<-factor(heart$Sex)
 
-# Training and Testing sets 
-set.seed(101) 
-sample <- sample.int(n = nrow(heart), size = floor(.75*nrow(heart)), replace = F)
-train <- heart[sample, ]
-test  <- heart[-sample, ]
-
 # Logit Model 1
-model_1<- glm(HeartDisease~ Sex+ BMI, data=train, family='binomial')
-summary(model)
+model_1<- glm(HeartDisease~ Sex+ BMI, data=heart, family='binomial')
+#summary(model)
 
 # Chi-square for Model 1
 1-pchisq(186906 - 184556, df=(319794-319792))
 
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model_1), confint(model_1)))
+
 ```
-Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. 
-Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with age and pclass as predictors is good fit model for predicting the probability of surviving. 
+
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of surviving. 
+
+According to model 1, the log odds for getting heart disease for a man compared to 
 
 ```{r}
 
@@ -287,29 +285,9 @@ summary(model_2)
 # Exponential Coefficients 
 expcoeff = exp(coef(model_2))
 xkabledply( as.table(expcoeff), title = "Exponential of Coefficients in Logit Reg" )
-```
 
-# testing using model_2
-```{r}
-
-test$model_prob <- predict(model_2, test, type = "response")
-
-test <- test  %>% mutate(model_pred = 1*(model_prob > .53) + 0, 
-                                  heart_disease = 1*(HeartDisease == 1) + 0)
-
-#How do I show the predictions??? 
-
-# Model Accuracy
-
-test <- test %>% mutate(accurate = 1*(model_pred == heart_disease))
-sum(test$accurate)/nrow(test)
-
-```
-```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
-# confusion_matrix(test)
-xkabledply( confusion_matrix(test), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+# Confidence Interval
+xkabledply( confint.default(model_2), title = "CIs using standard errors" )
 ```
 
 
@@ -454,7 +432,7 @@ When a person smoke the chemicals substances in the cigarette cause the cells of
 What is the relation between Drinking and heart disease ?
 
 When a person has a habit to drink than to indicate that his health is getting damaged then we have to understand what is the percentage of alcohol being consumed per day and we can weight it in grams/units. On an average the standard practice of people who drink consume 12 to 15grams off alcohol. Based on this practice there are most often low and high risks. Low risk or moderate risk has an average of 1 to 2 drinks per day and high risk can be measured on consuming more than 4 drinks per day.
-#```{r chisq}
+```{r chisq}
 
 chisq.test(contable_smoke)
 
