@@ -103,7 +103,7 @@ heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
-# Correlation Plots of All Variables
+# Correlation Plots of All Variables ###DELETE
 ```{r, results = 'markup'}
  model.matrix(~0+., data=heart) %>% 
      cor(use="pairwise.complete.obs") %>% 
