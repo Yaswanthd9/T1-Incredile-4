@@ -247,10 +247,12 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 
 # VIF Table to select variables 
 ```{r}
-ezids::xkablevif(reg_3)
+ezids::xkablevif(reg_3, wide=FALSE)
 ```
 
 From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. 
+
+remove race 
 
 ## Logistic Regression  
 
@@ -281,7 +283,7 @@ According to model 1, the log odds for getting heart disease increases by 1.64 f
 
 # Logit Model 2 
 model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=heart, family='binomial')
-summary(model_2)
+#summary(model_2)
 
 #Chi-squared test for model fit 
 1-pchisq(186906 - 157118, df=(319794-319772))
