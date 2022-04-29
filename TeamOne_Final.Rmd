@@ -27,6 +27,8 @@ options(scientific=T, digits = 3)
 
 ```
 
+### Introduction 
+
 According to the Center for Disease Control and Prevention (CDC), cardiovascular or heart diseases account for 1 in every 4 deaths in the United States annually. The estimated costs to the nation’s economy amount to about $363 billion annually, which include hospitalizations, after services health care needs as well as lost productivity due to death and disability (SS Virani, 2021).  The CDC also states that given the lifestyle habits of an average American, about half of the population (47%) are reported to have “1 of the 3 key risk factors for heart disease: high blood pressure, high cholesterol, and smoking”. However, the risk factors for developing heart diseases are vast and diverse and tend to vary between most racial and ethnic groups in the United States. 
 
 Therefore, there is an immediate need to detect the major risk factors early on, so that a wellness-oriented healthcare system can be instituted. Ideally, such a system would assess the intensity of the risk factors (compared to a baseline) and focus efforts on preventing the occurrence of developing heart diseases in the first place rather than minimizing second occurrences (Liau et al, 2010; Giampaoli et al, 2005 ). 
@@ -35,7 +37,7 @@ The beginnings of the current understanding of the interconnected role of risk f
 
 In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases in the US population, so that we may be able to see some of the intermingling between different risk factors.   
 
-# Description of Dataset
+### Description of Dataset
 
 The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2021), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
 
@@ -97,7 +99,7 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
 
-# Gender and Lifestyle Factors
+### Gender and Lifestyle Factors
 
 According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men. Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
 
@@ -184,7 +186,7 @@ t.test(male_HD$PhysicalHealth, female_HD$PhysicalHealth)
 The t-test also confirms what the box plot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
 
 
-## Mental Health: How many times in the last 30 days have you felt physically ill? 
+# Mental Health: How many times in the last 30 days have you felt physically ill? 
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
     geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
@@ -243,14 +245,14 @@ summary (reg_3)
 
 With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. 
 
-# Check VIF to select variables 
+# VIF Table to select variables 
 ```{r}
 ezids::xkablevif(reg_3)
 ```
 
 From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. 
 
-# Logistic Regression  
+## Logistic Regression  
 
 # Model 1: HeartDisease~ Sex+ BMI
 ```{r}
@@ -281,17 +283,24 @@ According to model 1, the log odds for getting heart disease increases by 1.64 f
 model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=heart, family='binomial')
 summary(model_2)
 
+#Chi-squared test for model fit 
 1-pchisq(186906 - 157118, df=(319794-319772))
 
 # Exponential Coefficients  & Confidence Interval 
-exp(cbind(OR = coef(model_1), confint(model_1)))
+exp(cbind(OR = coef(model_2), confint(model_2)))
 ```
-Just like before, 
+
+Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
+
+
+did not have enough lifestyle variables, 
+death variables: bevause of previous reference about women dying more 
+
 
 
 ################ END OF SECTION ###########################
 
-# Heart Disease & Secondary Illnesses 
+### Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
 
 
@@ -368,7 +377,7 @@ chi_5
 From the output and from `test$p.value` we see that the p-value is less than the significance level of 5%. Like any other statistical test, if the p-value is less than the significance level, we can reject the null hypothesis.Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with heart Disease.
 
 
-# Smokers Vs Alcoholic Drinkers 
+### Smokers Vs Alcoholic Drinkers 
 
 First of all does smoking and drinking cause heart attack or heart disease?
 
@@ -441,7 +450,7 @@ For both the chi^2 tests we performed above, the p-value<0.05. So all the above 
 Both drinking and smoking have a relationship with heart Disease. 
 
 
-#Limitations
+### Limitations
 Telephone interviews- voluntary bias (old retired): Most of the surveys were made telephonic because of the covid and most of the people didn’t want to meet in person to risk their lives for the sake of surveys & Covid. So, they started doing telephonic surveys to find out whether the key indicators like high blood pressure, high cholesterol, and smoking among most racial and ethnic groups to know how they play a crucial role in Heart Disease. Most of the responses were rude and arrogant because they were frustrated with the covid and were not getting out of the home. Few people were very nice to surveys and were cool and they responded by stating to questions they have given relevant answers to and surveys have recorded their responses.
 			
 Liars - We are uncertain about the responses because we found that the responses which were recorded were different at times. We found that when we called them for the survey we got the responses as one and while we called them and said that we may be giving them some medical discounts we found the responses as other.
@@ -450,7 +459,7 @@ Liars - We are uncertain about the responses because we found that the responses
 During the year 2021, the covid was at its peak and most people got affected by covid. Post covid, people’s immune systems got broken down and they became prone to several illnesses like diabetes, Asthma. The death rates with covid were very high and this led to the increase in death rates of heart disease because most of the people got infected with key indicators like high BMI and high cholesterol. Not only did the older people got affected by covid it was the younger people who got affected by covid their death rates were also high. From the noted survey, people tend to develop more secondary illnesses which in turn caused them primary disease which is Heart Disease, And got affected with higher death rates.
 
 
-#Conclusions:
+### Conclusions:
 
 To conclude, we found strong evidence from our EDA that people with higher BMI, high cholesterol, and age affect Heart Disease. Moreover, the variables were Sex, BMI, Physical Health, Mental Health, sleep time, Secondary Illnesses, alcohol, and Drinking.
 
@@ -471,7 +480,6 @@ Our dataset contains 18 variables, for the EDA Analysis we have used only a few 
 
 Next Steps:
 Next steps are to use what we learned in our dataset and develop a linear model. And try to create a model which is helpful for everyone. As we all know Health is Wealth and without health, we can't achieve heights so we tend to develop a model which we can use to know which variables are developing heart disease and with that, we can try to decrease the effect on Heart Disease.
-
 
 
 
