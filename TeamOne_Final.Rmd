@@ -117,7 +117,21 @@ According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s He
 
 We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
+# Correlation Plot for Gender Dataframe 
 
+```{r}
+
+# Creating dataframe for sex and related variables
+gender <- data.frame (  heart$HeartDisease,
+                        heart$BMI,
+                        heart$AgeCategory,
+                        heart$Sex,
+                        heart$PhysicalHealth,
+                        heart$MentalHealth,
+                        heart$SleepTime,
+                        heart$GenHealth)
+heart
+```
 # Contingency Table for Sex & Heart Disease
 
 ```{r, results = 'markup'}
