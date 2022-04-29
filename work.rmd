@@ -171,9 +171,18 @@ chi_2
 library(aod)
 library(ggplot2)
 summary(heart)
-mylogit <- glm(HD ~ GeneralHealth , data = heart, family = "binomial")
+mylogit <- glm(HD ~ GeneralHealth+PhysicalActivity , data = heart, family = "binomial")
 summary(mylogit)
 confint(mylogit)
 confint.default(mylogit)
 ```
 
+```{r}
+library(aod)
+library(ggplot2)
+summary(heart)
+mylogit <- glm(HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic , data = heart, family = "binomial")
+summary(mylogit)
+confint(mylogit)
+confint.default(mylogit)
+```
