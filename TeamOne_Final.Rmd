@@ -165,7 +165,7 @@ Next, we divided our data frame between men and women who do have heart disease.
 female_HD<- subset(female, HeartDisease==1)
 male_HD<- subset(male, HeartDisease== 1)
 
-#T-Test
+#T-test
 t.test(female_HD$BMI, male_HD$BMI)
                   
  
@@ -248,17 +248,20 @@ summary (reg_2)
 reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
 summary (reg_3)
 ```
+
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. 
+
 ** Check VIF to select variables 
 ```{r}
 ezids::xkablevif(reg_3)
 ```
 
-From, the VIF values, VUF for sleep time is 11.3 so we will drop. 
+From, the VIF values, VUF for sleep time is 11.3 so we will drop.  Race will aslo be dropped since it is super unbalanced 
 
 
 # Logistic Regression  
 
-# Separate to  80-20 Train-Test Sets 
+# Separate to  80-20 Train-test Sets 
 ```{r}
 # Change variables to factors 
 heart$HeartDisease<-factor(heart$HeartDisease)
@@ -295,25 +298,31 @@ Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the 
 ```{r}
 
 
-model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth+ MentalHealth +  AgeCategory + Race, data=train, family='binomial')
+model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
 summary(model_2)
 ```
 ```{r}
 1-pchisq(186906 - 157118, df=(319794-319772))
 ```
 
-# Testing our 
+# testing using model_2
 ```{r}
 
+test$model_prob <- predict(model_2, test, type = "response")
 
+test <- test  %>% mutate(model_pred = 1*(model_prob > .53) + 0, 
+                                  heart_disease = 1*(HeartDisease == 1) + 0)
 
+#How do I show the predictions??? 
+
+# Model Accuracy
+
+test <- test %>% mutate(accurate = 1*(model_pred == heart_disease))
+sum(test$accurate)/nrow(test)
 
 ```
-** Build KNN 
 
-With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. 
 
-Logit
 
 ################ END OF SECTION ###########################
 
