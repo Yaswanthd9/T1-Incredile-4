@@ -31,14 +31,13 @@ According to the Center for Disease Control and Prevention (CDC), cardiovascular
 
 Therefore, there is an immediate need to detect the major risk factors early on, so that a wellness-oriented healthcare system can be instituted. Ideally, such a system would assess the intensity of the risk factors (compared to a baseline) and focus efforts on preventing the occurrence of developing heart diseases in the first place rather than minimizing second occurrences (Liau et al, 2010; Giampaoli et al, 2005 ). 
 
-The beginnings of the current understanding of the interconnected role of risk factors was first discussed in the Framingham Heart Study. Started in 1948, the study’s original goal was “ to identify common factors or characteristics that contribute to cardiovascular disease” (Hong 2018). However, today the FHS has morphed into a multigenerational study gathering genetic information that help analyze family patterns of certain diseases, including cardiovascular ailments (National Heart, Lung and Blood Institute). Jumping off from this, current research in the field has focused on using precision medicine algorithms along with computational development technology to assess a patient’s likelihood of developing heart disease given certain lifestyle factors. Most of the studies have focused largely on Caucasian individuals as a sample and indicating that there is a gap in the usefulness of current risk assessment tools working for individuals of differenet races. 
+The beginnings of the current understanding of the interconnected role of risk factors was first discussed in the Framingham Heart Study. Started in 1948, the study’s original goal was “ to identify common factors or characteristics that contribute to cardiovascular disease” (Hong 2018). However, today the FHS has morphed into a multigenerational study gathering genetic information that help analyze family patterns of certain diseases, including cardiovascular ailments (National Heart, Lung and Blood Institute). Jumping off from this, current research in the field has focused on using precision medicine algorithms along with computational development technology to assess a patient’s likelihood of developing heart disease given certain lifestyle factors. Most of the studies have focused largely on Caucasian individuals as a sample and indicating that there is a gap in the usefulness of current risk assessment tools working for individuals of different races. 
 
 In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases in the US population, so that we may be able to see some of the intermingling between different risk factors.   
 
 # Description of Dataset
 
-The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2020), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
-
+The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2021), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
 
 
 ```{r}
@@ -59,11 +58,11 @@ nrow (heart)
 
 
 ```{r, results = 'markup'}
-# Descrpitive Statistics  
+# Descriptive Statistics  
 status (heart)
 ```
 
-From the table we can see that physical and mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set are report physically sick in a 30 day period while about 60% of the respondents report feeling mentally unwell in that same time period.  
+From the table we can see that physical and mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set report being  physically sick in a 30 day period while about 60% of the respondents report feeling mentally unwell in that same time period.  
 
 We can also see that there are no N/A values in our data set. This is not surprising given that our data was cleaned before being retrieved.  
 
@@ -121,13 +120,7 @@ We started off by trying to see which gender tends to have more heart disease ba
 
 # Contingency Table for Sex & Heart Disease
 
-<<<<<<< HEAD:TeamOne_FinalRmd.Rmd
 ```{r, results = 'markup'}
-=======
-
-<<<<<<< Updated upstream
-#```{r, results = 'markup'}
->>>>>>> 4f9915b752c18dd701345dd5f20b34e9d1ee6a04:TeamOne_Summary1.Rmd
 
 contable = table(heart$HeartDisease, heart$Sex)
 xkabledply(contable, title="Contingency Table for heart Disease and Sex")
@@ -260,10 +253,16 @@ summary (reg_2)
 reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
 summary (reg_3)
 ```
+** Check VIF to select variables 
+
+** Build logit 
+** Build KNN 
 
 With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. 
 
-###########################################################################################
+Logit
+
+################ END OF SECTION ###########################
 
 # Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
