@@ -131,7 +131,7 @@ heart$Ethnicity<-sapply(heart$Race,unclass)
 
 ```{r}
 
-contable = table(heart$GeneralHealth, heart$Ethnicity)
+contable = table(heart$GeneralHealth, heart$PhysicalActivity)
 xkabledply(contable, title="Contingency Table for heart Disease and Sex")
 addmargins(contable)
 
@@ -140,7 +140,7 @@ percent <- round(prop*100, 2)
 
 print ("Contingency Table for heart Disease and Sex in Percentage")
 print (percent)
-barplot(with(heart, table(GeneralHealth, Ethnicity)), main="heart Disease & Sex", beside=T, col=3:2)
+barplot(with(heart, table(GeneralHealth, PhysicalActivity)), main="heart Disease & Sex", beside=T, col=3:2)
 ```
 
 ```{r}
@@ -148,7 +148,7 @@ boxplot(HD~GeneralHealth,data=heart)
 ```
 
 ```{r}
-boxplot(Ethnicity~HD,data=heart)
+plot(HD~PhysicalActivity,data=heart)
 ```
 
 ```{r}
@@ -192,20 +192,27 @@ confint(mylogit)
 confint.default(mylogit)
 ```
 
-
 ```{r}
-loadPkg("rpart") # Classification trees, rpart(formula, data=, method=,control=) 
+install.packages('caTools')
+library(caTools)
+set.seed(88)
+split <- sample.split(heart$HD, SplitRatio = 0.75)
+dressheart <- subset(heart, split == TRUE)
+dresstest <- subset(heart, split == FALSE)
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = dressheart, family = binomial)
+summary(model)
+predict <- predict(model, type = 'response')
+table(dressheart$HD, predict > 0.5)
+#ROCR Curve
+library(ROCR)
+ROCRpred <- prediction(predict, dressheart$HD)
+ROCRperf <- performance(ROCRpred, 'tpr','fpr')
+plot(ROCRperf, colorize = TRUE, text.adj = c(-0.2,1.7))
+#plot glm
+library(ggplot2)
+ggplot(dresstrain, aes(x=Rating, y=Recommended)) + geom_point() + 
+stat_smooth(method="glm", family="binomial", se=FALSE)
 ```
 
-```{r, echo = T, fig.dim=c(6,4)}
-set.seed(1)
-HDfit <- rpart(HD  ~ GeneralHealth+PhysicalActivity, data=heart, method="class", control = list(maxdepth = 4) )
-# kyphosisfit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, method="class", control = {rpart.control list} )
-# rpart.control(maxdepth = 30, minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, ...)
-printcp(HDfit) # display the results 
-plotcp(HDfit) # visualize cross-validation results 
-summary(HDfit) # detailed summary of splits
-plot(HDfit, uniform=TRUE, main="Classification Tree for Kyphosis")
-text(HDfit, use.n=TRUE, all=TRUE, cex=.8)
 
-```
+
