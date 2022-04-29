@@ -197,20 +197,20 @@ install.packages('caTools')
 library(caTools)
 set.seed(88)
 split <- sample.split(heart$HD, SplitRatio = 0.75)
-dressheart <- subset(heart, split == TRUE)
+dresstrain <- subset(heart, split == TRUE)
 dresstest <- subset(heart, split == FALSE)
-model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = dressheart, family = binomial)
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = dresstrain, family = binomial)
 summary(model)
 predict <- predict(model, type = 'response')
-table(dressheart$HD, predict > 0.5)
+table(dresstrain$HD, predict > 0.5)
 #ROCR Curve
 library(ROCR)
-ROCRpred <- prediction(predict, dressheart$HD)
+ROCRpred <- prediction(predict, dresstrain$HD)
 ROCRperf <- performance(ROCRpred, 'tpr','fpr')
 plot(ROCRperf, colorize = TRUE, text.adj = c(-0.2,1.7))
 #plot glm
 library(ggplot2)
-ggplot(dresstrain, aes(x=Rating, y=Recommended)) + geom_point() + 
+ggplot(dresstrain, aes(x=GeneralHealth+PhysicalActivity, y=HD)) + geom_point() + 
 stat_smooth(method="glm", family="binomial", se=FALSE)
 ```
 
