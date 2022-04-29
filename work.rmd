@@ -175,6 +175,11 @@ mylogit <- glm(HD ~ GeneralHealth+PhysicalActivity , data = heart, family = "bin
 summary(mylogit)
 confint(mylogit)
 confint.default(mylogit)
+wald.test(b = coef(mylogit), Sigma = vcov(mylogit), Terms = 1:2)
+exp(coef(mylogit))
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+newdata1 <- with(heart, data.frame(GeneralHealth = mean(GeneralHealth), PhysicalActivity = mean(PhysicalActivity), rank = factor(1:2)))
+newdata1$rankP <- predict(mylogit, newdata = newdata1, type = "response")
 ```
 
 ```{r}
@@ -185,4 +190,22 @@ mylogit <- glm(HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic , data = heart, fam
 summary(mylogit)
 confint(mylogit)
 confint.default(mylogit)
+```
+
+
+```{r}
+loadPkg("rpart") # Classification trees, rpart(formula, data=, method=,control=) 
+```
+
+```{r, echo = T, fig.dim=c(6,4)}
+set.seed(1)
+HDfit <- rpart(HD  ~ GeneralHealth+PhysicalActivity, data=heart, method="class", control = list(maxdepth = 4) )
+# kyphosisfit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, method="class", control = {rpart.control list} )
+# rpart.control(maxdepth = 30, minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, ...)
+printcp(HDfit) # display the results 
+plotcp(HDfit) # visualize cross-validation results 
+summary(HDfit) # detailed summary of splits
+plot(HDfit, uniform=TRUE, main="Classification Tree for Kyphosis")
+text(HDfit, use.n=TRUE, all=TRUE, cex=.8)
+
 ```
