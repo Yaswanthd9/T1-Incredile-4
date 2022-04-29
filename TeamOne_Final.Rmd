@@ -104,9 +104,7 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
 
-
-
-## Gender and Lifestyle Factors
+# Gender and Lifestyle Factors
 
 According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men. Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
 
@@ -149,8 +147,8 @@ After sub-setting the data between male and female, we conducted a Welch's t-tes
 
 ```{r, results = 'markup'}
 # Subset Male & Female with and without Heart Disease
-female <- subset(gender, Sex== "Female")
-male  <- subset (gender, Sex == "Male")
+female <- subset(heart, Sex== "Female")
+male  <- subset (heart, Sex == "Male")
 
 # T-test of BMI between Genders 
 t.test(female$BMI, male$BMI)
@@ -164,7 +162,6 @@ Next, we divided our data frame between men and women who do have heart disease.
 
 ```{r, results = 'markup'}
 # Subsetting genders based on respondents that have heart disease 
-HD <- subset(gender, HeartDisease==1)
 female_HD<- subset(female, HeartDisease==1)
 male_HD<- subset(male, HeartDisease== 1)
 
@@ -174,7 +171,7 @@ t.test(female_HD$BMI, male_HD$BMI)
  
 ```
 
-From the T-test output above, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
+From the T-test output above, we see that the p-value is 0.60, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
 
 
 # Physical Health: How many times in the last 30 days have you felt physically ill? 
@@ -206,9 +203,9 @@ t.test  (male_HD$MentalHealth,
 female_HD$MentalHealth)
 ```
 
-The boxplot shows that women tend to report feeling mentally unwell more often then men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men.
+The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men.
 
-## Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
+# Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     geom_boxplot(aes(fill = Sex))+
@@ -227,6 +224,9 @@ When looking at other lifestyle factors such as smoking or alcohol drinking, we 
 
 # Age, Race, General Health
 ```{r, results = 'markup'}
+
+HD <- subset(heart, HeartDisease==1)
+
 freq(HD$AgeCategory)
 freq(HD$Race)
 freq(HD$GenHealth)
@@ -249,7 +249,11 @@ reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeC
 summary (reg_3)
 ```
 ** Check VIF to select variables 
+```{r}
+ezids::xkablevif( reg_3)
+```
 
+From, the VIF values, VUF for sleep time is 11.3 so we will drop. 
 ** Build logit 
 ** Build KNN 
 
