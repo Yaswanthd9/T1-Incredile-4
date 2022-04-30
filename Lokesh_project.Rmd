@@ -146,19 +146,6 @@ predicted<- predict(mod1, heart, type = "response")
 hist(predicted)
 ```
 
-```{r growthDecayFactors, results='markup', collapse=F}
-expcoeff = exp(coef(mod1))
-# expcoeff
-xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
-```
 
-### Model evaluation
-#### Confusion matrix 
-```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
-# confusion_matrix
-xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
-```
 
 
