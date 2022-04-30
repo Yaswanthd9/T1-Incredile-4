@@ -286,12 +286,23 @@ unloadPkg("regclass")
 ```{r roc_auc}
 loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
 prob=predict(model, type = "response" )
-model$prob=prob
-h <- roc(model~prob, data=model)
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
 auc(h) # area-under-curve prefer 0.8 or higher.
 plot(h)
 # unloadPkg("pROC")
 ```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model, type = "response" )
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
 
 ```{r}
 
