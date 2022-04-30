@@ -216,7 +216,7 @@ train_sample<-createDataPartition(y = heart$HD, p= 0.7, list = FALSE)
 train_data<-heart[train_sample, ]
 test_data<-heart[-train_sample, ]
 
-model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = train_data, family = binomial)
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = train_data, family = "binomial")
 summary(model)
 predict <- predict(model, type = 'response')
 table(train_data$HD, predict > 0.5)
@@ -242,7 +242,7 @@ Logistic regressiob for Q.no 4
 
 ```{r}
 
-model <- glm (HD ~ GeneralHealth+PhysicalActivity, data =heart, family = "binomial")
+model <- glm (HD ~ GeneralHealth+PhysicalActivity+Ethnicity, data =heart, family = "binomial")
 summary(model)
 ```
 
@@ -266,7 +266,7 @@ predict(model)  # the is from the model, which gives you the value for logit(p) 
 ```
 
 ```{r}
-newdata1 <- data.frame(GeneralHealth=4, PhysicalActivity=0) # new data frame with 1 row
+newdata1 <- data.frame(GeneralHealth=4, PhysicalActivity=0,Ethnicity=1) # new data frame with 1 row
 predict(model, newdata = newdata1)
 # The default option is "link", with gives you the value of the link function, 
 # in this case, logit(p) or log(p/1-p) value
@@ -331,41 +331,41 @@ unloadPkg("pROC")
 Logistic regressiob for Q.no 2
 ```{r}
 
-model <- glm (HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic, data =heart, family = "binomial")
-summary(model)
+model1<- glm (HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic, data =heart, family = "binomial")
+summary(model1)
 ```
 
 ```{r results='markup'}
-xkabledply(model, title = paste("Logistic Regression :", format(formula(model)) ))
+xkabledply(model1, title = paste("Logistic Regression :", format(formula(model)) ))
 ```
 
 ```{r growthDecayFactors, results='markup', collapse=F}
-expcoeff = exp(coef(model))
+expcoeff = exp(coef(model1))
 # expcoeff
 xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
 ```
 
 ```{r logit_fitted_value}
-p_fitted = model$fitted.values[1] # this is the model predicated value p-hat for the first data row (not the actual data point p)  
+p_fitted = model1$fitted.values[1] # this is the model predicated value p-hat for the first data row (not the actual data point p)  
 ```  
 
 ```{r}
 # This gives you the predicted values of the data points inside the model.
-predict(model)  # the is from the model, which gives you the value for logit(p) or ln(p/q) 
+predict(model1)  # the is from the model, which gives you the value for logit(p) or ln(p/q) 
 ```
 
 ```{r}
 newdata1 <- data.frame(SkinCancer=1,KidneyDisease=1,Asthma=1,Diabetic=1) # new data frame with 1 row
-predict(model, newdata = newdata1)
+predict(model1, newdata = newdata1)
 # The default option is "link", with gives you the value of the link function, 
 # in this case, logit(p) or log(p/1-p) value
-predict(model, newdata = newdata1, type = "link") -> pred_link # same as predict(admitLogit, newdata = newdata1)
+predict(model1, newdata = newdata1, type = "link") -> pred_link # same as predict(admitLogit, newdata = newdata1)
 paste("This is pred_link: ",pred_link) 
 
-predict(model, newdata = newdata1, type = "response") -> pred_response 
+predict(model1, newdata = newdata1, type = "response") -> pred_response 
 paste("This is pred_response: ",pred_response)
 
-predict(model, newdata = newdata1, type = "term") -> pred_term
+predict(model1, newdata = newdata1, type = "term") -> pred_term
 paste("This is pred_term, which is a vector with three values, plus the y-intercept term, called `attribute`")
 pred_term 
 # attr(pred_term,"constant")
@@ -377,23 +377,23 @@ pred_term
 # But this is not "y-value" p that we want to compare to.  
 # These three things are the same: 
 # 1. using the response option:
-predict(model, newdata = newdata1, type = "response")
+predict(model1, newdata = newdata1, type = "response")
 # 2. Using the link function value (default), to calculate the probability p-hat: 
-1/(1+exp(-predict(model, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
+1/(1+exp(-predict(model1, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
 # 3. Find the odds-ratio first, then calculate the probability p-hat: 
-oddsratio = exp( predict(model, newdata = newdata1, type="link"))
+oddsratio = exp( predict(model1, newdata = newdata1, type="link"))
 oddsratio / (oddsratio+1)
 ```
 
 ```{r confusionMatrix, results='markup'}
 loadPkg("regclass")
-xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+xkabledply( confusion_matrix(model1), title = "Confusion matrix from Logit Model" )
 unloadPkg("regclass")
 ```
 
 ```{r roc_auc}
 loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
-prob=predict(model, type = "response" )
+prob=predict(model1, type = "response" )
 heart$prob=prob
 h <- roc(HD~prob, data=heart)
 auc(h) # area-under-curve prefer 0.8 or higher.
@@ -408,7 +408,7 @@ loadPkg("rpart") # Classification trees, rpart(formula, data=, method=,control=)
 
 ```{r, echo = T, fig.dim=c(6,4)}
 set.seed(1)
-HDfit <- rpart(HD ~ GeneralHealth + PhysicalActivity , data=heart, method="class", control = list(maxdepth = 4) )
+HDfit <- rpart(HD ~ GeneralHealth + PhysicalActivity+Ethnicity , data=heart, method="class", control = list(maxdepth = 4) )
 # kyphosisfit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, method="class", control = {rpart.control list} )
 # rpart.control(maxdepth = 30, minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, ...)
 printcp(HDfit) # display the results 
