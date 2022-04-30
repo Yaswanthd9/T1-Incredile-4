@@ -62,6 +62,7 @@ project$AlcoholDrinking <- as.numeric(project$AlcoholDrinking)
 project$Diabetic <- as.numeric(project$Diabetic)
 str(project)
 ```
+
 ```{r}
 
 library("corrplot")
@@ -73,7 +74,7 @@ corrplot(y,method="number",title = "Correlation of numberical variables",mar = c
 
 ```{r}
 
-lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking,data = project)
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = project)
 xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
@@ -95,7 +96,7 @@ summary(lm2)
 
 
 ```{r}
-lm4 <- lm(Diabetic ~ Smoking + AlcoholDrinking,data = project)
+lm4 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
 xkabledply(lm4, title = paste("Model :", format(formula(lm4)) ) )
 xkablevif(lm4)
 summary(lm4)
@@ -149,7 +150,7 @@ chitest2
 
 ```{r}
 
-model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking, data = project , family = "binomial")
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking, data = project , family = "binomial")
 summary(model_lr)
 xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
 ```
@@ -176,7 +177,7 @@ xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Mod
 ```
 ```{r}
 
-model_lr2 <- glm(Diabetic ~ Smoking + AlcoholDrinking, data = project , family = "binomial")
+model_lr2 <- glm(Diabetic ~ Smoking + AlcoholDrinking  + Smoking:AlcoholDrinking, data = project , family = "binomial")
 summary(model_lr2)
 xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
 ```
