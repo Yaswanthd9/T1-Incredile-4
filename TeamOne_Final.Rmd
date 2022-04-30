@@ -125,10 +125,6 @@ barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", besid
 
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
 
-However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?
-
-In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease.
-
 
 # BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
 
@@ -300,7 +296,94 @@ death variables: bevause of previous reference about women dying more
 
 # Cost Analysis 
 
+# VIF Table to select variables 
+```{r}
+ezids::xkablevif(reg_3, wide=FALSE)
+```
 
+From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is pretty above 5 for whites and other races, race as a variable will be dropped. We will train and test the model to see the cost analysis of our predictions. 
+
+## Logistic Regression  
+
+# Model Training 
+```{r}
+# Convert to factor variables 
+heart$HeartDisease<-factor(heart$HeartDisease)
+heart$Sex<-factor(heart$Sex)
+
+# Split into 80-20 train-test sets
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(heart), size = floor(.80*nrow(heart)), replace = F)
+train <- heart[sample, ]
+test  <- heart[-sample, ]
+
+# Logit Model Training
+model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
+summary(model)
+
+#Chi-squared test for model fit 
+#-pchisq(186906 - 157118, df=(319794-319772))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model), confint(model)))
+```
+
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of getting heart disease. 
+
+According to model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
+Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
+
+coefficients are narrow in the beginning but get wider as age goes up. This means that there are some other things that affect HD other than sex and age
+
+did not have enough lifestyle variables, 
+death variables: bevause of previous reference about women dying more 
+
+# Cost Analysis
+# VIF Table to select variables 
+```{r}
+ezids::xkablevif(reg_3, wide=FALSE)
+```
+
+From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is pretty above 5 for whites and other races, race as a variable will be dropped. We will train and test the model to see the cost analysis of our predictions. 
+
+## Logistic Regression  
+
+# Model Training 
+```{r}
+# Convert to factor variables 
+heart$HeartDisease<-factor(heart$HeartDisease)
+heart$Sex<-factor(heart$Sex)
+
+# Split into 80-20 train-test sets
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(heart), size = floor(.80*nrow(heart)), replace = F)
+train <- heart[sample, ]
+test  <- heart[-sample, ]
+
+# Logit Model Training
+model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
+summary(model)
+
+#Chi-squared test for model fit 
+#-pchisq(186906 - 157118, df=(319794-319772))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model), confint(model)))
+```
+
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of getting heart disease. 
+
+According to model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
+Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
+
+coefficients are narrow in the beginning but get wider as age goes up. This means that there are some other things that affect HD other than sex and age
+
+did not have enough lifestyle variables, 
+death variables: bevause of previous reference about women dying more 
+
+# Cost Analysis
 ################ END OF SECTION ###########################
 
 ### Heart Disease & Secondary Illnesses 
