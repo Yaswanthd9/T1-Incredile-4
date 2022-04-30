@@ -215,7 +215,15 @@ library(ggplot2)
 #ggplot(project, aes(x = HeartDisease, y= Smoking, fill = group, inherit.aes = FALSE)) + 
   
 
-ggplot(project, aes(x = HeartDisease, y= Smoking, fill = group)) + 
+ggplot(project, aes(x = HeartDisease)) + 
   geom_bar(stat = "identity") +
   scale_fill_manual(values = c("#DADAEB", "#9E9AC8"))
+```
+
+```{r}
+barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$HeartDisease,project1$Smoking)), col =(c("red", "darkblue")))
+
+barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$HeartDisease,project1$AlcoholDrinking)), col =(c("red", "darkblue")))
+
+barplot(table(project1$HeartDisease,project1$Diabetic), legend= rownames(table(project1$HeartDisease,project1$Diabetic)), col =(c("red", "darkblue")))
 ```
