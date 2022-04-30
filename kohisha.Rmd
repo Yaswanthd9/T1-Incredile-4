@@ -41,14 +41,6 @@ Checking if there are any missing values in the dataset project.
 we can see that there are no missing values for smoking and alcoholdrinking.
 
 ```{r}
-contable  <- table(project$HeartDisease, project$Smoking)
-summary(contable ) 
-```
-```{r}
-contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
-summary(contable2) 
-```
-```{r}
 library(plyr)
 project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
 project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
@@ -76,11 +68,13 @@ library("corrplot")
 
 y <- cor(project)
 corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
+
 ```
 
 ```{r}
 
 lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking,data = project)
+xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
 ```
@@ -89,7 +83,8 @@ confint(lm1)
 ```
 
 ```{r}
-lm2 <- lm(HeartDisease ~ Smoking,data = project)
+lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic,data = project)
+xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
 xkablevif(lm2)
 summary(lm2)
 
@@ -99,19 +94,10 @@ summary(lm2)
 confint(lm2)
 ```
 
-```{r}
-lm3 <- lm(HeartDisease ~ Diabetic,data = project)
-xkablevif(lm3)
-summary(lm3)
-```
-
-```{r}
-confint(lm3)
-```
-
 
 ```{r}
 lm4 <- lm(Diabetic ~ Smoking + AlcoholDrinking,data = project)
+xkabledply(lm4, title = paste("Model :", format(formula(lm4)) ) )
 xkablevif(lm4)
 summary(lm4)
 ```
@@ -122,8 +108,12 @@ confint(lm4)
 
 ```{r}
 library(dyn)
-result <- anova(lm1,lm2,lm3)
-xkabledply(result, title = "ANOVA comparison between the three models")
+anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=project)
+xkabledply(anovaRes, title = "ANOVA result summary")
+
+anovaRes1 = aov(HeartDisease ~ Smoking, data=project)
+xkabledply(anovaRes1, title = "ANOVA result summary")
+
 ```
 
 ```{r}
@@ -141,19 +131,19 @@ cor(project$HeartDisease,project$Smoking)
 
 ```
 
-```{r ctable}
+```{r}
+contable  <- table(project$HeartDisease, project$Smoking)
+summary(contable ) 
+```
 
-contable1 = table(project$HeartDisease, project$AlcoholDrinking)
-contable1 # the contingency table
-contable2 = table(project$HeartDisease, project$Smoking)
-contable2 # the contingency table
-loadPkg("printr")
-
+```{r}
+contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
+summary(contable2) 
 ```
 
 ```{r chisq}
 
-chitest1 = chisq.test(contable1)
+chitest1 = chisq.test(contable)
 chitest1
 chitest2 = chisq.test(contable2)
 chitest2
