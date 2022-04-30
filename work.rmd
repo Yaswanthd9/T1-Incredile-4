@@ -260,7 +260,7 @@ predict(model)  # the is from the model, which gives you the value for logit(p) 
 ```
 
 ```{r}
-newdata1 <- data.frame(GeneralHealth=5, PhysicalActivity=1) # new data frame with 1 row
+newdata1 <- data.frame(GeneralHealth=4, PhysicalActivity=0) # new data frame with 1 row
 predict(model, newdata = newdata1)
 # The default option is "link", with gives you the value of the link function, 
 # in this case, logit(p) or log(p/1-p) value
