@@ -22,7 +22,9 @@ library(ezids)
 ```
 
 ```{r init, include=F}
-project = data.frame(read.csv("heart_2020_cleaned.csv"))
+project1 = data.frame(read.csv("heart_2020_cleaned.csv"))
+project <- subset(project1,select = -c(BMI,Stroke,PhysicalHealth,MentalHealth,DiffWalking,Sex,AgeCategory,Race,PhysicalActivity,GenHealth,SleepTime,Asthma,KidneyDisease, SkinCancer))
+str(project)
 ```
 
 
@@ -30,6 +32,7 @@ project = data.frame(read.csv("heart_2020_cleaned.csv"))
 sum(is.na(project$AlcoholDrinking))
 sum(is.na(project$Smoking))
 sum(is.na(project$HeartDisease))
+sum(is.na(project$Diabetic))
 project[is.na(project) | project=="Inf"] = NA
 missing_val<- subset(project, is.na(HeartDisease)==TRUE) # eliminating the missing values
 summary(missing_val)
@@ -38,12 +41,12 @@ Checking if there are any missing values in the dataset project.
 we can see that there are no missing values for smoking and alcoholdrinking.
 
 ```{r}
-table1 <- table(project$HeartDisease, project$Smoking)
-summary(table1) 
+contable  <- table(project$HeartDisease, project$Smoking)
+summary(contable ) 
 ```
 ```{r}
-table2 <- table(project$HeartDisease, project$AlcoholDrinking)
-summary(table2) 
+contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
+summary(contable2) 
 ```
 ```{r}
 library(plyr)
@@ -61,15 +64,24 @@ project
 ```
 
 ```{r}
-project$HeartDisease <- as.factor(project$HeartDisease)
-project$Smoking <- as.factor(project$Smoking)
-project$AlcoholDrinking <- as.factor(project$AlcoholDrinking)
-project
+project$HeartDisease <- as.numeric(project$HeartDisease)
+project$Smoking <- as.numeric(project$Smoking)
+project$AlcoholDrinking <- as.numeric(project$AlcoholDrinking)
+project$Diabetic <- as.numeric(project$Diabetic)
+str(project)
+```
+```{r}
+
+library("corrplot")
+
+y <- cor(project)
+corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
 ```
 
 ```{r}
 
-
+totaluser <- lm(HeartDisease ~ AlcoholDrinking + Smoking,data = project)
+summary(totaluser)
 ```
 
 ```{r}
