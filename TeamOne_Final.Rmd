@@ -298,6 +298,7 @@ Just like before, all the coefficient p-values for our second model is significa
 did not have enough lifestyle variables, 
 death variables: bevause of previous reference about women dying more 
 
+# Cost Analysis 
 
 
 ################ END OF SECTION ###########################
