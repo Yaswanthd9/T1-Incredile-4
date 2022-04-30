@@ -140,6 +140,11 @@ summary(mod1)
 xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
 ```
 
+```{r}
+predicted<- predict(mod1, heart, type = "response")
+
+hist(predicted)
+```
 
 
 
