@@ -1,0 +1,578 @@
+---
+title: "Key Risk Factors of Heart Disease in 2020"
+author: "Team One"
+date: May 1, 2022
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=FALSE}
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+library(ezids)
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+
+```
+
+### Introduction 
+
+According to the Center for Disease Control and Prevention (CDC), cardiovascular or heart diseases account for 1 in every 4 deaths in the United States annually. The estimated costs to the nation’s economy amount to about $363 billion annually, which include hospitalizations, after services health care needs as well as lost productivity due to death and disability (SS Virani, 2021).  The CDC also states that given the lifestyle habits of an average American, about half of the population (47%) are reported to have “1 of the 3 key risk factors for heart disease: high blood pressure, high cholesterol, and smoking”. However, the risk factors for developing heart diseases are vast and diverse and tend to vary between most racial and ethnic groups in the United States. 
+
+Therefore, there is an immediate need to detect the major risk factors early on, so that a wellness-oriented healthcare system can be instituted. Ideally, such a system would assess the intensity of the risk factors (compared to a baseline) and focus efforts on preventing the occurrence of developing heart diseases in the first place rather than minimizing second occurrences (Liau et al, 2010; Giampaoli et al, 2005 ). 
+
+The beginnings of the current understanding of the interconnected role of risk factors was first discussed in the Framingham Heart Study. Started in 1948, the study’s original goal was “ to identify common factors or characteristics that contribute to cardiovascular disease” (Hong 2018). However, today the FHS has morphed into a multigenerational study gathering genetic information that help analyze family patterns of certain diseases, including cardiovascular ailments (National Heart, Lung and Blood Institute). Jumping off from this, current research in the field has focused on using precision medicine algorithms along with computational development technology to assess a patient’s likelihood of developing heart disease given certain lifestyle factors. Most of the studies have focused largely on Caucasian individuals as a sample and indicating that there is a gap in the usefulness of current risk assessment tools working for individuals of different races. 
+
+In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases in the US population, so that we may be able to see some of the intermingling between different risk factors.   
+
+### Description of Dataset
+
+The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2021), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
+
+
+```{r}
+# Lets load the appropriate libraries
+library(tidyverse)
+library(dplyr)
+library(funModeling)
+library(ezids)
+library(ggplot2)
+library(ggcorrplot)
+library(corrr)
+library(corrplot)
+library(ROCR)
+library(grid)
+library(broom)
+#library(caret)
+library(tidyr)
+library(dplyr)
+library(scales)
+library(ggthemr)
+#library(ggthemes)
+library(gridExtra)
+library(data.table)
+
+# Load the Data 
+heart <-read.csv("heart_2020_cleaned.csv")
+nrow (heart)
+
+# Descriptive Statistics  
+status (heart)
+```
+
+From the table we can see that physical and mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set report being  physically sick in a 30 day period while about 60% of the respondents report feeling mentally unwell in that same time period.  
+
+We can also see that there are no N/A values in our data set. This is not surprising given that our data was cleaned before being retrieved.  
+
+Below are the plots showing the means of our numerical variables. We can see that, on average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in a 30 day period is slightly higher for people with heart disease, than for people without. 
+
+```{r, results = 'markup' }
+# Finding the mean of numerical variables grouped by heart disease
+plot_num(heart)
+
+heart %>%
+  group_by(HeartDisease) %>%
+  summarise_at(vars("BMI", 
+                    "PhysicalHealth", 
+                    "MentalHealth",
+                    "SleepTime"), mean)
+
+
+# Changing Diabetes bordeline and pregnancy categories to Yes/No
+
+heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
+heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
+
+# Changing all the categorical variables to numerical dummies 
+
+heart$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
+heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
+heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
+heart$Stroke<-ifelse(heart$Stroke=="Yes",1,0)
+heart$DiffWalking<-ifelse(heart$DiffWalking=="Yes",1,0)
+heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
+heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
+heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
+heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
+```
+
+
+### Gender and Lifestyle Factors
+
+According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men. Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
+
+We started off by trying to see which gender tends to have more heart disease based on certain lifestyle choices.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
+
+
+# Contingency Table for Sex & Heart Disease
+
+```{r, results = 'markup'}
+
+contable = table(heart$HeartDisease, heart$Sex)
+xkabledply(contable, title="Contingency Table for heart Disease and Sex")
+addmargins(contable)
+
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for Heart Disease and Sex in Percentage")
+print (percent)
+barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", beside=T, col=3:2)
+```
+
+
+In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
+
+However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts?
+
+In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease.
+
+
+# BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
+
+```{r, results = 'markup'}
+hist(heart$BMI)
+```
+
+In the historgram, we can see that our data is approximately normal and given the Central Limit Theorem, if n>30, then we can assume normality for the sake of statistical tests.
+
+After sub-setting the data between male and female, we conducted a Welch's t-test on the BMIs of both population subsets. 
+
+```{r, results = 'markup'}
+# Subset Male & Female with and without Heart Disease
+female <- subset(heart, Sex== "Female")
+male  <- subset (heart, Sex == "Male")
+
+# T-test of BMI between Genders 
+t.test(female$BMI, male$BMI)
+```
+
+The p-value is less than 5% significance level, allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. From the mean values, we see that men have a mean BMI of 28.50 while women have a BMI of 28.16. A difference of 0.34.  
+
+Next, we divided our data frame between men and women who do have heart disease. Once again assuming normality due to the large sample size, we conducted another Welch's T-test to look at the mean BMI difference. 
+
+# BMI: Is there a difference in average BMI between the sexes with heart disease?
+
+```{r, results = 'markup'}
+# Subsetting genders based on respondents that have heart disease 
+female_HD<- subset(female, HeartDisease==1)
+male_HD<- subset(male, HeartDisease== 1)
+
+#T-test
+t.test(female_HD$BMI, male_HD$BMI)
+                  
+```
+
+From the T-test output above, we see that the p-value is 0.60, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
+
+
+# Physical Health: How many times in the last 30 days have you felt physically ill? 
+
+Earlier, we saw that respondents, who have heart disease, reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. The box plot below shows us that women with heart disease generally report felling unwell more than men. 
+
+```{r, results = 'markup'}
+ggplot(heart, aes(x = factor(HeartDisease), y = PhysicalHealth))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    xlab('HeartDisease') + 
+    scale_fill_brewer(palette = 'Set2', name = 'Sex')
+```
+
+```{r, results = 'markup'}
+t.test(male_HD$PhysicalHealth, female_HD$PhysicalHealth)
+```
+
+The t-test also confirms what the box plot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
+
+
+# Mental Health: How many times in the last 30 days have you felt physically ill? 
+```{r, results = 'markup'}
+ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    xlab('HeartDisease') + 
+    scale_fill_brewer(palette = 'Set1', name = 'Sex')
+
+t.test  (male_HD$MentalHealth,
+female_HD$MentalHealth)
+```
+
+The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men.
+
+# Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
+```{r, results = 'markup'}
+ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    xlab('HeartDisease') + 
+    scale_fill_brewer(palette = 'Set1', name = 'Sex')
+
+t.test  (male_HD$SleepTime,
+female_HD$SleepTime)
+```
+
+Men and women have statistically different sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep effects are known to be cumulative. A study conducted by Robbins et al. in 2021 "examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus". The study found that curtailing sleep below the recommended seven hours increases the risk for viral infection "nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest" (Robbins et al, 2021). 
+
+This lack of sleep could explain why we see that women in our data on average report feeling sick more often and could also be a contributing factors is why women are more likely to die from heart attacks than men (Noel Bairey Merz).
+
+When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. However, it should be noted that the survey is voluntary and there is no way to ensure that the respondents are being truthful. 
+
+# Age, Race, General Health
+```{r, results = 'markup'}
+
+HD <- subset(heart, HeartDisease==1)
+
+freq(HD$AgeCategory)
+freq(HD$Race)
+freq(HD$GenHealth)
+
+```
+
+When looking at the population make-up of respondents who do have heart, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
+
+Even though a logit regression seems more to estimate whether or not an individual gets heart disease, we can still use a linear regression in our exploratory stages to find the best fitting model. 
+
+# Liner Regression on Sex
+```{r, results = 'markup'}
+reg_1 <- lm(HeartDisease~Sex+BMI, data=heart)
+summary (reg_1)
+
+reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
+summary (reg_2)
+
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
+summary (reg_3)
+```
+
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. 
+
+# VIF Table to select variables 
+```{r}
+ezids::xkablevif(reg_3, wide=FALSE)
+```
+
+From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. 
+
+remove race 
+
+## Logistic Regression  
+
+# Model 1: HeartDisease~ Sex+ BMI
+```{r}
+# Change variables to factors 
+heart$HeartDisease<-factor(heart$HeartDisease)
+heart$Sex<-factor(heart$Sex)
+
+# Logit Model 1
+model_1<- glm(HeartDisease~ Sex+ BMI, data=heart, family='binomial')
+#summary(model)
+
+# Chi-square for Model 1
+1-pchisq(186906 - 184556, df=(319794-319792))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model_1), confint(model_1)))
+
+```
+
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of surviving. 
+
+According to model 1, the log odds for getting heart disease increases by 1.64 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
+
+# Model 2: HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory
+```{r}
+
+# Logit Model 2 
+model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=heart, family='binomial')
+#summary(model_2)
+
+#Chi-squared test for model fit 
+1-pchisq(186906 - 157118, df=(319794-319772))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model_2), confint(model_2)))
+```
+
+Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
+
+
+did not have enough lifestyle variables, 
+death variables: bevause of previous reference about women dying more 
+
+# Cost Analysis 
+
+# VIF Table to select variables 
+```{r}
+ezids::xkablevif(reg_3, wide=FALSE)
+```
+
+From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is pretty above 5 for whites and other races, race as a variable will be dropped. We will train and test the model to see the cost analysis of our predictions. 
+
+## Logistic Regression  
+
+# Model Training 
+```{r}
+# Convert to factor variables 
+heart$HeartDisease<-factor(heart$HeartDisease)
+heart$Sex<-factor(heart$Sex)
+
+# Split into 80-20 train-test sets
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(heart), size = floor(.80*nrow(heart)), replace = F)
+train <- heart[sample, ]
+test  <- heart[-sample, ]
+
+# Logit Model Training
+model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
+summary(model)
+
+#Chi-squared test for model fit 
+#-pchisq(186906 - 157118, df=(319794-319772))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model), confint(model)))
+```
+
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of getting heart disease. 
+
+According to model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
+Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
+
+coefficients are narrow in the beginning but get wider as age goes up. This means that there are some other things that affect HD other than sex and age
+
+did not have enough lifestyle variables, 
+death variables: bevause of previous reference about women dying more 
+
+# Cost Analysis
+################ END OF SECTION ###########################
+
+### Heart Disease & Secondary Illnesses 
+In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
+
+
+```{r}
+# We are seperating our desired variables to test them in an easier way.
+diseases <- data.frame (heart$HeartDisease,
+                        heart$Stroke,
+                        heart$Diabetic,
+                        heart$Asthma,
+                        heart$KidneyDisease,
+                        heart$SkinCancer)
+
+# Rename columns
+
+names(diseases) <- c ('heart_disease',
+                      'stroke',
+                      'diabetic',
+                      'asthma',
+                      'kidney_disease',
+                      'skin_cancer')
+
+
+```
+
+# Corellation  Matrix and Correlation Plot Between Diseases
+```{r}
+cor_matrix<-cor(diseases)
+cor_matrix
+```
+
+```{r}
+model.matrix(~0+., data=diseases) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
+
+```
+From the above correlation test we can see that overall Correlations are not particularly strong. Heartdisease has more correlation with stroke than any other secondary illnesses(Which is not a surprise generally). Diabetes is correlated with heart disease and Kidney disease, Less with Stroke. Skin cancer shows negligible correlation with all other diseases. overall, we can see that only stroke, diabetes and kidney disease have considerable correlation with heart disease.
+Not only from our correlation test, but as per center for disease control and prevention, Common heart disorders can increase your risk for stroke. For example, coronary artery disease increases your risk for stroke, because plaque builds up in the arteries and blocks the flow of oxygen-rich blood to the brain. Also diabetes increases your risk for stroke(Stroke vs Diabetes in our correlation plot ).Diabetes causes sugars to build up in the blood and prevent oxygen and nutrients from getting to the various parts of your body, including your brain. High blood pressure is also common in people with diabetes. High blood pressure is the leading cause of stroke and is the main cause for increased risk of stroke among people with diabetes (CDC Stroke Fact sheet).
+(https://www.cdc.gov/stroke/conditions.htm#:~:text=Common%20heart%20disorders%20can%20increase,rich%20blood%20to%20the%20brain.)
+
+# Determining Independence Between Diseases
+After finding the correlation between variables we are now performing a chi-suare test of independence to find out whether the varibles are dependent or independent with each other.
+The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables(All the variables we have here are already categorical). In a more general sense, it tests to see whether distributions of categorical variables differ from each another.The frequency of each category for one nominal variable is compared across the categories of the second nominal variable.  The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable. The null hypothesis for this test is that there is no relationship between primary disease heartDisease and other secondary illnesses. The alternative hypothesis is that there is a relationship between heartDisease and secondary illnesses.
+
+output:
+the title of the test,
+which variables have been used,
+the test statistic,
+the degrees of freedom and
+the p-value of the test.
+
+```{r}
+hea_as=table(heart$HeartDisease,heart$Asthma)
+chi_1=chisq.test(hea_as)
+chi_1
+
+hea_dia=table(heart$HeartDisease,heart$Diabetic)
+chi_2=chisq.test(hea_dia)
+chi_2
+
+hea_kid=table(heart$HeartDisease,heart$KidneyDisease)
+chi_3=chisq.test(hea_kid)
+chi_3
+
+hea_skin=table(heart$HeartDisease,heart$SkinCancer)
+chi_4=chisq.test(hea_skin)
+chi_4
+
+hea_stroke=table(heart$HeartDisease,heart$Stroke)
+chi_5=chisq.test(hea_stroke)
+chi_5
+```
+
+From the output and from `test$p.value` we see that the p-value is less than the significance level of 5%. Like any other statistical test, if the p-value is less than the significance level, we can reject the null hypothesis.Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with heart Disease.
+
+
+### Smokers Vs Alcoholic Drinkers 
+
+First of all does smoking and drinking cause heart attack or heart disease?
+
+Yes, it is actually one among the reason that can cause heart disease in young people and majority of cases are seen in women according to a most of the publishes articles and researchers.
+
+To determine if there is a link between heart disease and drug use, researchers investigated and discovered that recreational use of nicotine, cannabis, alcohol, and illegal substances such as amphetamine and cocaine may be linked to prematurely clogged arteries.Premature heart disease can arise before the age of 65 in women and 55 in males, and it can be difficult and dangerous.
+
+According to statistics from the countrywide veterans affairs healthcare and veterans with premaTure AtheroscLerosis (VITAL) registry (2014-2015). There are 7716 patients who are having extremely premature heart disease , and they discovered this by comparing them to those who do not have premature heart disease.
+
+According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent )
+
+```{r}
+contable_smoke = table(heart$HeartDisease, heart$Smoking)
+
+prop <-prop.table(contable_smoke)
+percent <- round(prop*100, 2)
+
+xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
+```
+
+# What is the effect of Smoking and Drinking?
+
+The interaction between the tobacco(smoking) and alcohol can lead to heart problems and it depends on some factors in which we can find out.
+Initially, It might depend upon quantity of dose the person is consuming it.
+And based on some research I found that consuming alcohol in range of  3 to 14 drinks per week is prone to lower risk of heart attack but there are other risks factors that lead to complex issues like blockage in artery and deficiency in blood flow or it can lead to heart failure.
+
+When looked at the cause for smoking there is a high change of risk leading to heart problems.  Some heart failures caused by smoking are stroke, bleeding from brain and congestion in chest.
+
+# Does people who Drink smoke?
+
+Some researchers have found that among people who drink have  high changes of smoking most of the times. 
+
+
+
+```{r}
+
+contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
+
+contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
+
+
+prop <-prop.table(contable_drink)
+percent <- round(prop*100, 2)
+
+xkabledply(percent, title="Contingency Table for heart Disease and Drinking in Percentage")
+
+```
+# What is the relation between smoking and heart disease ?
+
+So, basically people who tend to smoke have issues related to cardiovascular disease(CVD). CVD occurs when chemicals in cigarettes release then the blood becomes thick and starts forming clots inside veins and arteries. When the blood vessel are completely blocked then it can lead to heart attack and sudden death. Which can lead to death of the person. In the United States, there were reportedly 800,000 people who faced cardiovascular disease and was the mere cause of death in which 8million died of heart attack and other 7 million died of stroke.
+
+When measured on how many cigarettes people consume leads to health issues there is 100 percent chance that people’s health will be damaged no matter if they consumed one or two per day. The fact that when people consume one to two cigarettes may show signs of CVD but gradually they might face problems. Another risk factor is that if people consume more than 5 cigarettes a day they may show signs of early CVD. Based on this we can imagine that the risk of CVD increases based on the number of cigarettes consumed per day. 
+
+# How is smoking effecting?
+
+When a person smoke the chemicals substances in the cigarette cause the cells of boodle vessels stolen and inflamed which leads to blood vessels becoming narrow. 
+
+What is the relation between Drinking and heart disease ?
+
+When a person has a habit to drink than to indicate that his health is getting damaged then we have to understand what is the percentage of alcohol being consumed per day and we can weight it in grams/units. On an average the standard practice of people who drink consume 12 to 15grams off alcohol. Based on this practice there are most often low and high risks. Low risk or moderate risk has an average of 1 to 2 drinks per day and high risk can be measured on consuming more than 4 drinks per day.
+```{r chisq}
+
+chisq.test(contable_smoke)
+
+chisq.test(contable_drink)
+
+```
+
+For both the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+Both drinking and smoking have a relationship with heart Disease. 
+
+
+### Limitations
+Telephone interviews- voluntary bias (old retired): Most of the surveys were made telephonic because of the covid and most of the people didn’t want to meet in person to risk their lives for the sake of surveys & Covid. So, they started doing telephonic surveys to find out whether the key indicators like high blood pressure, high cholesterol, and smoking among most racial and ethnic groups to know how they play a crucial role in Heart Disease. Most of the responses were rude and arrogant because they were frustrated with the covid and were not getting out of the home. Few people were very nice to surveys and were cool and they responded by stating to questions they have given relevant answers to and surveys have recorded their responses.
+			
+Liars - We are uncertain about the responses because we found that the responses which were recorded were different at times. We found that when we called them for the survey we got the responses as one and while we called them and said that we may be giving them some medical discounts we found the responses as other.
+
+ 
+During the year 2021, the covid was at its peak and most people got affected by covid. Post covid, people’s immune systems got broken down and they became prone to several illnesses like diabetes, Asthma. The death rates with covid were very high and this led to the increase in death rates of heart disease because most of the people got infected with key indicators like high BMI and high cholesterol. Not only did the older people got affected by covid it was the younger people who got affected by covid their death rates were also high. From the noted survey, people tend to develop more secondary illnesses which in turn caused them primary disease which is Heart Disease, And got affected with higher death rates.
+
+
+### Conclusions:
+
+To conclude, we found strong evidence from our EDA that people with higher BMI, high cholesterol, and age affect Heart Disease. Moreover, the variables were Sex, BMI, Physical Health, Mental Health, sleep time, Secondary Illnesses, alcohol, and Drinking.
+
+# Analysis of SMART Questions:
+ From the first question one Which gender tends to have more diseases based on BMI, smoking, drinking, and mental health in the year 2020? We concluded that On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in 30 days is slightly higher for people with heart disease than for people without. we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. From the mean values, we see that men have a mean BMI of 28.50 while women have a BMI of 28.16. A difference of 0.34.  From the T-test output, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. Since the p-value is less than 5%, there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick for about 9 days while men reported just over 6 days.  
+
+#From the second smart question Are people with heart diseases more prone to developing secondary illnesses’ or is it the other way around? 
+we concluded that secondary illnesses are significantly dependent on heart diseases. We concluded this based on the Chi-squared test we observed that the p-value<0.05. We can reject the null hypothesis. Every secondary illness (Diabetic, Asthma, Kidney disease, and skin cancer) has a relationship with heart disease. 
+  
+From the third smart question Are smokers or drinkers more prone to developing heart disease? Our analysis was based on the test not to conclude any kind of assumptions or theory we did some chi-squared tests For smoking and drinking the chi^2 tests we performed above, the p-value<0.05. So we can reject the null hypothesis. 
+Both drinking and smoking have a relationship with heart disease.
+
+
+From all the smart questions we can come to conclude that smokers, drinkers, and people with secondary illnesses are more prone to develop heart diseases and they are high chances of death rates. However, people with high BMI are unhealthy and most often tend to sick.
+
+#Limitations of Dataset:
+Our dataset contains 18 variables, for the EDA Analysis we have used only a few variables for our analysis and drew some conclusions and we may use all the variables for the final that is building the model.
+
+Next Steps:
+Next steps are to use what we learned in our dataset and develop a linear model. And try to create a model which is helpful for everyone. As we all know Health is Wealth and without health, we can't achieve heights so we tend to develop a model which we can use to know which variables are developing heart disease and with that, we can try to decrease the effect on Heart Disease.
+
+
+
+## References 
+
+Ara S. A literature review of cardiovascular disease management programs in managed care populations. Journal of Managed Care Pharmacy 2004; 10(4): 326-344.
+
+Centers for Disease Control and Prevention. Underlying Cause of Death, 1999–2018. CDC WONDER Online Database. Atlanta, GA: Centers for Disease Control and Prevention; 2018. 
+
+CDC. (2019, December 2). Heart Disease Facts | cdc.gov. Centers for Disease Control and Prevention. 
+
+Giampaoli S, Palmieri L, Mattiello A, et al. Definition of high risk individuals to optimize strategies for primary prevention of cardiovascular diseases. Nutr Metab Cardiovasc Dis 2005;15:79–85.
+
+Here’s What an Extra 20 Minutes of Sleep Does to Your Brain. (2020, July 17). Well+Good. https://www.wellandgood.com/benefits-of-getting-more-sleep/
+
+Hong, Y. (2018). Framingham Heart Study (FHS) [Review of Framingham Heart Study (FHS)]. National Heart, Lung and Blood Institute. https://www.nhlbi.nih.gov/science/framingham-heart-study-fhs
+
+Liau, S. Y., Mohamed Izham, M. I., Hassali, M. A., & Shafie, A. A. (2010). A literature review of the cardiovascular risk-assessment tools: applicability among Asian population. Heart Asia, 2(1), 15–18. https://doi.org/10.1136/ha.2009.001115
+
+Robbins, R., Quan, S. F., Weaver, M. D., Bormes, G., Barger, L. K., & Czeisler, C. A. (2021). Examining sleep deficiency and disturbance and their risk for incident dementia and all-cause mortality in older adults across 5 years in the United States. Aging, 13(3), 3254–3268. https://doi.org/10.18632/aging.202591
+
+Sadick, B. (2019, April). Women Die From Heart Attacks More Often Than Men. Here’s Why — and What Doctors Are Doing About It. Time; Time. https://time.com/5499872/women-heart-disease/
+
+Bethesda, MD: National Institutes of Health.
+https://www.cdc.gov/stroke/conditions.htm#:~:text=Common%20heart%20disorders%20can%20increase,rich%20blood%20to%20the%20brain.
+
+Antoine Soetewey 
+https://statsandr.com/blog/chi-square-test-of-independence-in-r/
+
+https://www.statisticssolutions.com/free-resources/directory-of-statistical-analyses/chi-square/
+
+# #### CODE CEMETERY ######
+
+# Correlation Plots of All Variables ###DELETE since every section has theire own 
+```{r, results = 'markup'}
+ model.matrix(~0+., data=heart) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
+```
