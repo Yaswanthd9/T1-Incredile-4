@@ -1,0 +1,112 @@
+---
+title: "R - Assignment"
+author: "Kohisha Aruganti"
+date: "March 21 2022"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes a lot of the helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# Once installed, load the library.
+library(ezids)
+```
+
+```{r init, include=F}
+project = data.frame(read.csv("heart_2020_cleaned.csv"))
+```
+
+
+```{r}
+sum(is.na(project$AlcoholDrinking))
+sum(is.na(project$Smoking))
+sum(is.na(project$HeartDisease))
+project[is.na(project) | project=="Inf"] = NA
+missing_val<- subset(project, is.na(HeartDisease)==TRUE) # eliminating the missing values
+summary(missing_val)
+```
+Checking if there are any missing values in the dataset project.
+we can see that there are no missing values for smoking and alcoholdrinking.
+
+```{r}
+table1 <- table(project$HeartDisease, project$Smoking)
+summary(table1) 
+```
+```{r}
+table2 <- table(project$HeartDisease, project$AlcoholDrinking)
+summary(table2) 
+```
+```{r}
+library(plyr)
+project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
+project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
+project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("Yes"=1))
+project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("No"=0))
+project$Smoking <- revalue(project$Smoking, c("Yes"=1))
+project$Smoking <- revalue(project$Smoking, c("No"=0))
+project$Diabetic  <- revalue(project$Diabetic , c("Yes"=1))
+project$Diabetic  <- revalue(project$Diabetic , c("No"=0))
+
+project
+
+```
+
+```{r}
+project$HeartDisease <- as.factor(project$HeartDisease)
+project$Smoking <- as.factor(project$Smoking)
+project$AlcoholDrinking <- as.factor(project$AlcoholDrinking)
+project
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+percent <- xtabs(~project$AlcoholDrinking+ project$Smoking + project$HeartDisease)
+ftable(prop.table(percent))* 100
+
+```
+
+# Correlation coefficient 
+
+```{r}
+cor(project$AlcoholDrinking,project$Smoking)
+cor(project$AlcoholDrinking,project$HeartDisease)
+cor(project$HeartDisease,project$Smoking)
+
+```
+
+```{r ctable}
+
+contable1 = table(project$HeartDisease, project$AlcoholDrinking)
+contable1 # the contingency table
+contable2 = table(project$HeartDisease, project$Smoking)
+contable2 # the contingency table
+loadPkg("printr")
+
+```
+
+```{r chisq}
+
+chitest1 = chisq.test(contable1)
+chitest1
+chitest2 = chisq.test(contable2)
+chitest2
+```
+
+
