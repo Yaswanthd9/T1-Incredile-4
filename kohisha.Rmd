@@ -86,7 +86,7 @@ plot(lm1)
 ```
 
 ```{r}
-lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic,data = project)
+lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = project)
 xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
 xkablevif(lm2)
 summary(lm2)
