@@ -189,3 +189,25 @@ auc(h) # area-under-curve prefer 0.8 or higher.
 plot(h)
 # unloadPkg("pROC")
 ```
+
+```{r}
+library(pROC)
+# Compute AUC for predicting Class with the variable CreditHistory.Critical
+f1 = roc(HeartDisease~prob, data=heart) 
+plot(f1, col="red")
+## 
+## Call:
+## roc.formula(formula = Class ~ CreditHistory.Critical, data = training)
+## 
+## Data: CreditHistory.Critical in 180 controls (Class Bad) < 420 cases (Class Good).
+## Area under the curve: 0.5944
+library(ROCR)
+# Compute AUC for predicting Class with the model
+prob <- predict(mod1, newdata=heart, type="response")
+pred <- prediction(prob, heart$HeartDisease)
+perf <- performance(pred, measure = "tpr", x.measure = "fpr")
+plot(perf)
+auc <- performance(pred, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+```
