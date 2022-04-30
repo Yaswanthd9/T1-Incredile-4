@@ -131,7 +131,9 @@ heart$Ethnicity<-sapply(heart$Race,unclass)
 ```
 
 ```{r}
+loadPkg("corrplot")
 cor(heart$HD,heart$GeneralHealth)
+
 ```
 
 ```{r}
@@ -207,21 +209,25 @@ Logistic regressiob for Q.no 4
 install.packages('caTools')
 library(caTools)
 set.seed(88)
-split <- sample.split(heart$HD, SplitRatio = 0.75)
-dresstrain <- subset(heart, split == TRUE)
-dresstest <- subset(heart, split == FALSE)
-model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = dresstrain, family = binomial)
+#split <- sample.split(heart$HD, SplitRatio = 0.75)
+#dresstrain <- subset(heart, split == TRUE)
+#dresstest <- (heart)
+train_sample<-createDataPartition(y = heart$HD, p= 0.7, list = FALSE)
+train_data<-heart[train_sample, ]
+test_data<-heart[-train_sample, ]
+
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = train_data, family = binomial)
 summary(model)
 predict <- predict(model, type = 'response')
-table(dresstrain$HD, predict > 0.5)
+table(train_data$HD, predict > 0.5)
 #ROCR Curve
 library(ROCR)
-ROCRpred <- prediction(predict, dresstrain$HD)
+ROCRpred <- prediction(predict, train_data$HD)
 ROCRperf <- performance(ROCRpred, 'tpr','fpr')
 plot(ROCRperf, colorize = TRUE, text.adj = c(-0.2,1.7))
 #plot glm
 library(ggplot2)
-ggplot(dresstrain, aes(x=GeneralHealth+PhysicalActivity, y=HD)) + geom_point() + 
+ggplot(train_data, aes(x=GeneralHealth+PhysicalActivity, y=HD)) + geom_point() + 
 stat_smooth(method="glm", family="binomial", se=FALSE)
 loadPkg("regclass")
 confusion_matrix(model)
@@ -236,7 +242,7 @@ Logistic regressiob for Q.no 4
 
 ```{r}
 
-model <- glm (HD ~ GeneralHealth+PhysicalActivity, data =heart, family = binomial)
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data =heart, family = "binomial")
 summary(model)
 ```
 
@@ -251,7 +257,7 @@ xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Re
 ```
 
 ```{r logit_fitted_value}
-p_fitted = model$fitted.values[1] # this is the model predicated value p-hat for the first data row (not the actual data point p)  
+p_fitted = model$fitted.value# this is the model predicated value p-hat for the first data row (not the actual data point p)  
 ```  
 
 ```{r}
@@ -264,7 +270,7 @@ newdata1 <- data.frame(GeneralHealth=4, PhysicalActivity=0) # new data frame wit
 predict(model, newdata = newdata1)
 # The default option is "link", with gives you the value of the link function, 
 # in this case, logit(p) or log(p/1-p) value
-predict(model, newdata = newdata1, type = "link") -> pred_link # same as predict(admitLogit, newdata = newdata1)
+predict(model, newdata = newdata1, type = "link") -> pred_link # same as predict(model, newdata = newdata1)
 paste("This is pred_link: ",pred_link) 
 
 predict(model, newdata = newdata1, type = "response") -> pred_response 
@@ -318,11 +324,14 @@ plot(h)
 
 
  
+```{r}
+unloadPkg("pROC")
+```
  
 Logistic regressiob for Q.no 2
 ```{r}
 
-model <- glm (HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic, data =heart, family = binomial)
+model <- glm (HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic, data =heart, family = "binomial")
 summary(model)
 ```
 
@@ -391,3 +400,30 @@ auc(h) # area-under-curve prefer 0.8 or higher.
 plot(h)
 # unloadPkg("pROC")
 ```
+
+
+```{r}
+loadPkg("rpart") # Classification trees, rpart(formula, data=, method=,control=) 
+```
+
+```{r, echo = T, fig.dim=c(6,4)}
+set.seed(1)
+HDfit <- rpart(HD ~ GeneralHealth + PhysicalActivity , data=heart, method="class", control = list(maxdepth = 4) )
+# kyphosisfit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, method="class", control = {rpart.control list} )
+# rpart.control(maxdepth = 30, minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, ...)
+printcp(HDfit) # display the results 
+plotcp(HDfit) # visualize cross-validation results 
+summary(HDfit) # detailed summary of splits
+```
+
+# plot tree 
+plot(HDfit, uniform=TRUE, main="Classification Tree for Kyphosis")
+text(HDfit, use.n=TRUE, all=TRUE, cex=.8)
+
+
+```{r}
+# create attractive postcript plot of tree 
+post(HDfit, file = "kythosisTree2.ps", title = "Classification Tree for Kythosis")
+```
+
+`
