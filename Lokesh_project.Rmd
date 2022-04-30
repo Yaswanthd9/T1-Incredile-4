@@ -122,3 +122,15 @@ chi_4
 ```
 For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. Every secondary illness(Diabetic,Asthma, Kidney disease and skin cancer) is dependent on heart disease.
 
+```{r}
+model1 = lm(HeartDisease~Stroke + Diabetic + Asthma + KidneyDisease 
+              + SkinCancer, data=heart)
+sum_md1 = summary(model1) # also for later use on inline codes
+sum_md1
+```
+
+
+
+
+
+
