@@ -129,6 +129,16 @@ sum_md1 = summary(model1) # also for later use on inline codes
 sum_md1
 ```
 
+```{r}
+ mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
+              + SkinCancer,
+              data=heart,family = binomial)
+summary(mod1)
+```
+
+```{r}
+xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
+```
 
 
 
