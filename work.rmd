@@ -271,7 +271,7 @@ pred_term
 # 1. using the response option:
 predict(model, newdata = newdata1, type = "response")
 # 2. Using the link function value (default), to calculate the probability p-hat: 
-1/(1+exp(-predict(model, newdata = newdata1))) # 1/(1+exp(-predict(admitLogit, newdata = newdata1, type="link")))
+1/(1+exp(-predict(model, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
 # 3. Find the odds-ratio first, then calculate the probability p-hat: 
 oddsratio = exp( predict(model, newdata = newdata1, type="link"))
 oddsratio / (oddsratio+1)
@@ -288,6 +288,78 @@ loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic 
 prob=predict(model, type = "response" )
 model$prob=prob
 h <- roc(model~prob, data=model)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
+```{r}
+
+model <- glm (HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic, data =heart, family = binomial)
+summary(model)
+```
+
+```{r results='markup'}
+xkabledply(model, title = paste("Logistic Regression :", format(formula(model)) ))
+```
+
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(model))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+```{r logit_fitted_value}
+p_fitted = model$fitted.values[1] # this is the model predicated value p-hat for the first data row (not the actual data point p)  
+```  
+
+```{r}
+# This gives you the predicted values of the data points inside the model.
+predict(model)  # the is from the model, which gives you the value for logit(p) or ln(p/q) 
+```
+
+```{r}
+newdata1 <- data.frame(SkinCancer=1,KidneyDisease=1,Asthma=1,Diabetic=1) # new data frame with 1 row
+predict(model, newdata = newdata1)
+# The default option is "link", with gives you the value of the link function, 
+# in this case, logit(p) or log(p/1-p) value
+predict(model, newdata = newdata1, type = "link") -> pred_link # same as predict(admitLogit, newdata = newdata1)
+paste("This is pred_link: ",pred_link) 
+
+predict(model, newdata = newdata1, type = "response") -> pred_response 
+paste("This is pred_response: ",pred_response)
+
+predict(model, newdata = newdata1, type = "term") -> pred_term
+paste("This is pred_term, which is a vector with three values, plus the y-intercept term, called `attribute`")
+pred_term 
+# attr(pred_term,"constant")
+```
+
+
+
+```{r}
+# But this is not "y-value" p that we want to compare to.  
+# These three things are the same: 
+# 1. using the response option:
+predict(model, newdata = newdata1, type = "response")
+# 2. Using the link function value (default), to calculate the probability p-hat: 
+1/(1+exp(-predict(model, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
+# 3. Find the odds-ratio first, then calculate the probability p-hat: 
+oddsratio = exp( predict(model, newdata = newdata1, type="link"))
+oddsratio / (oddsratio+1)
+```
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model, type = "response" )
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
 auc(h) # area-under-curve prefer 0.8 or higher.
 plot(h)
 # unloadPkg("pROC")
