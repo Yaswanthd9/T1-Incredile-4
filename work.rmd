@@ -67,7 +67,8 @@ Converting HeartDIsease categorical into Numerical Variable
 ```{r}
 heart$HD<-ifelse(heart$HeartDisease=="Yes",1,0)
 ```
-# Finding the mean of numerical variables grouped by Gen Health
+#Converting General Health as numericals
+Finding the mean of numerical variables grouped by Gen Health
 ```{r }
 #plot_num(heart)
 heart$GenHealth<-as.factor(heart$GenHealth)
@@ -76,6 +77,8 @@ heart %>%
   group_by(HeartDisease) %>%
   summarise_at(vars("GeneralHealth"), mean)
 ```
+
+#5-Very good,4-poor,3-Good,2-fair,1-excellent
 
 There is very less differnce in General Health, Even people are healthy (normal GeneralHealth) people have No heartDisease by 3.22 times than people wih people with non general health get by 3.12 
 # Frequency distributions of all our categorical variables 
@@ -127,7 +130,9 @@ heart$Ethnicity<-sapply(heart$Race,unclass)
    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 ```
 
-
+```{r}
+cor(heart$HD,heart$GeneralHealth)
+```
 
 ```{r}
 
@@ -149,6 +154,10 @@ boxplot(HD~GeneralHealth,data=heart)
 
 ```{r}
 plot(HD~PhysicalActivity,data=heart)
+```
+
+```{r}
+plot(HD~DiffWalking,data=heart)
 ```
 
 ```{r}
