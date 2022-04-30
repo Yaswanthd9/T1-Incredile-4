@@ -161,4 +161,18 @@ xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" 
 unloadPkg("regclass")
 ```
 
+#### Hosmer and Lemeshow test  
 
+The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit. 
+
+```{r HosmerLemeshow}
+loadPkg("ResourceSelection") # function hoslem.test( ) for logit model evaluation
+heartLogitHoslem = hoslem.test(heart$HeartDisease, fitted(mod1)) # Hosmer and Lemeshow test, a chi-squared test
+unloadPkg("ResourceSelection") 
+```
+
+The result is shown here:  
+```{r HosmerLemeshowRes, results='markup', collapse=F}
+heartLogitHoslem
+# Have not found a good way to display it.
+```
