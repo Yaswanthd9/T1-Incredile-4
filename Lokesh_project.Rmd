@@ -39,6 +39,13 @@ heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
+```{r}
+heart$GenHealth <- ifelse(heart$GenHealth == 'Poor',0,
+               ifelse(heart$GenHealth == 'Fair',1,
+                 ifelse(heart$GenHealth == 'Good',2,
+                        ifelse(heart$GenHealth=='Very good',3,4
+                        ))))
+```
 #Exploratory data analysis
 ```{r, results='markup'}
 ggplot(heart, aes(HeartDisease)) +
@@ -219,3 +226,4 @@ auc <- performance(pred, measure = "auc")
 auc <- auc@y.values[[1]]
 auc
 ```
+
