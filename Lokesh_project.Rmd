@@ -48,6 +48,7 @@ heart$GenHealth <- ifelse(heart$GenHealth == 'Poor',0,
 ```
 #Exploratory data analysis
 ```{r, results='markup'}
+library(ggplot2)
 ggplot(heart, aes(HeartDisease)) +
   geom_bar(color="black",fill="aquamarine4")
 ```
@@ -153,14 +154,6 @@ predicted<- predict(mod1, heart, type = "response")
 hist(predicted)
 ```
 
-```{r}
-probabilities <- mod1 %>% predict(heart, type = "response")
-head(probabilities)
-predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
-head(predicted.classes)
-mean(predicted.classes == heart$HeartDisease)
-```
-
 ```{r growthDecayFactors, results='markup', collapse=F}
 expcoeff = exp(coef(mod1))
 # expcoeff
@@ -226,4 +219,38 @@ auc <- performance(pred, measure = "auc")
 auc <- auc@y.values[[1]]
 auc
 ```
+```{r}
+heartsub <- data.frame(heart)
+heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")]
+head(heartsub)
+```
+```{r}
+set.seed(1)
+heart_train_rows = sample(1:nrow(heartsub),     #<- from 1 to the number of rows in the data set
+                              round(0.8 * nrow(heartsub), 0),  #<- multiply the number of rows by 0.8 and round the decimals
+                              replace = FALSE)  
+heart_train = heartsub[heart_train_rows, ] 
+heart_test = heartsub[-heart_train_rows, ]
+nrow(heart_train)
+nrow(heart_test)
+```
 
+```{r}
+install.packages("class") 
+loadPkg("class")
+
+# k-Nearest Neighbor is a randomized algorithm, so make sure to
+# use set.seed() to make your results repeatable.
+set.seed(1)
+heart_3NN = knn(train = heart_train[, c("Stroke", "Diabetic", "Asthma","KidneyDisease","SkinCancer")],  #<- training set cases
+               test = heart_test[, c("Stroke", "Diabetic", "Asthma","KidneyDisease","SkinCancer")],    #<- test set cases
+               cl = heart_train[, "HeartDisease"],                         #<- category for true classification
+               k = 3) #,                                                    #<- number of neighbors considered
+               # use.all = TRUE)                                            #<- control ties between class assignments
+                                                                            #   If true, all distances equal to the k-th largest are included
+
+# View the output.
+str(heart_3NN)
+length(heart_3NN)
+table(heart_3NN)
+```
