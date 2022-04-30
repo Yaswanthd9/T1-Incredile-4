@@ -80,12 +80,50 @@ corrplot(y,method="number",title = "Correlation of numberical variables",mar = c
 
 ```{r}
 
-totaluser <- lm(HeartDisease ~ AlcoholDrinking + Smoking,data = project)
-summary(totaluser)
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking,data = project)
+xkablevif(lm1)
+summary(lm1)
+```
+```{r}
+confint(lm1)
 ```
 
 ```{r}
+lm2 <- lm(HeartDisease ~ Smoking,data = project)
+xkablevif(lm2)
+summary(lm2)
 
+```
+
+```{r}
+confint(lm2)
+```
+
+```{r}
+lm3 <- lm(HeartDisease ~ Diabetic,data = project)
+xkablevif(lm3)
+summary(lm3)
+```
+
+```{r}
+confint(lm3)
+```
+
+
+```{r}
+lm4 <- lm(Diabetic ~ Smoking + AlcoholDrinking,data = project)
+xkablevif(lm4)
+summary(lm4)
+```
+
+```{r}
+confint(lm4)
+```
+
+```{r}
+library(dyn)
+result <- anova(lm1,lm2,lm3)
+xkabledply(result, title = "ANOVA comparison between the three models")
 ```
 
 ```{r}
