@@ -67,6 +67,8 @@ str(project)
 
 library("corrplot")
 
+  
+
 y <- cor(project)
 corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
 
@@ -212,8 +214,8 @@ plot(h)
 library(ggplot2)
 #ggplot(project, aes(x = HeartDisease, y= Smoking, fill = group, inherit.aes = FALSE)) + 
   
-geom_path(data = project, aes(x = HeartDisease, y= Smoking), inherit.aes = FALSE ) +
-  geom_histogram(alpha = 0.5, position = "identity")
-#ggplot(df, aes(x = x, y = y, fill = group)) + 
- # geom_bar(stat = "identity")
+
+ggplot(project, aes(x = HeartDisease, y= Smoking, fill = group)) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#DADAEB", "#9E9AC8"))
 ```
