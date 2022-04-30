@@ -146,6 +146,14 @@ predicted<- predict(mod1, heart, type = "response")
 hist(predicted)
 ```
 
+```{r}
+probabilities <- mod1 %>% predict(heart, type = "response")
+head(probabilities)
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+head(predicted.classes)
+mean(predicted.classes == heart$HeartDisease)
+```
+
 ```{r growthDecayFactors, results='markup', collapse=F}
 expcoeff = exp(coef(mod1))
 # expcoeff
