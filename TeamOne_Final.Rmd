@@ -329,11 +329,41 @@ In the current case, both distributions are slight skewed to the left. Not only 
 
 A slight digression, when developing models for prediction, we all know that we want the model to be as accurate as possible, or in other words, to do a good job in predicting the target variable on out of sample observations.
 
-Our *skewed* double density plot, however, can actually tell us a very important thing: **Accuracy will not be a suitable measurement for this model.** We'll show why below.
+Our *skewed* double density plot, however, can actually tell us a very important thing: **Accuracy will not be a suitable measurement for this model.** 
 **Section Takeaway:** Accuracy is not the suitable indicator for the model when you have unbalanced distribution or costs
 
+# ROC-AUC 
+```{r}
+
+# user-defined different cost for false negative and false positive
+cost_fp <- 40
+cost_fn <- 80
+roc_info <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HeartDisease", cost.fp = cost_fp, cost.fn = cost_fn )
+grid.draw(roc_info$plot)
+```
+
+Cots for false negatives are higher than false positives. acoording to ... 40 to 80 thou annual cost so will be those values 
+
+Total cost of choosing cut off : $ 432840
 
 # Confusion Matrix 
+```{r}
+# Default 0.5 cut off
+cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", 
+                                actual = 1, cutoff = .39 )
+ggthemr("flat")
+cm_info$plot
+
+```
+
+the cost associated with FN is `r cost_fn/cost_fp` times higher than a false positive (FP). 
+
+Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this doucmentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
+
+There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
+
 
 
 ################ END OF SECTION ###########################
