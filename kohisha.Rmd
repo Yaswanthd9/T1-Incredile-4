@@ -194,3 +194,25 @@ xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
 #loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
+
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+
+```{r}
+loadPkg("pROC") 
+
+model2 = predict(model_lr, type = "response" )
+h <- roc(HeartDisease ~ model2, data=project)
+auc(h) 
+plot(h)
+```
+
+
+```{r}
+library(ggplot2)
+#ggplot(project, aes(x = HeartDisease, y= Smoking, fill = group, inherit.aes = FALSE)) + 
+  
+geom_path(data = project, aes(x = HeartDisease, y= Smoking), inherit.aes = FALSE ) +
+  geom_histogram(alpha = 0.5, position = "identity")
+#ggplot(df, aes(x = x, y = y, fill = group)) + 
+ # geom_bar(stat = "identity")
+```
