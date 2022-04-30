@@ -132,7 +132,7 @@ In our exploratory analysis, we compared the different lifestyle variables betwe
 hist(heart$BMI)
 ```
 
-In the historgram, we can see that our data is approximately normal and given the Central Limit Theorem, if n>30, then we can assume normality for the sake of statistical tests.
+In the histogram, we can see that our data is approximately normal and given the Central Limit Theorem, if n>30, then we can assume normality for the sake of statistical tests.
 
 After sub-setting the data between male and female, we conducted a Welch's t-test on the BMIs of both population subsets. 
 
@@ -230,71 +230,20 @@ Even though a logit regression seems more to estimate whether or not an individu
 # Liner Regression on Sex
 ```{r, results = 'markup'}
 reg_1 <- lm(HeartDisease~Sex+BMI, data=heart)
+BIC(reg_1)
 summary (reg_1)
 
 reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
+BIC(reg_2)
 summary (reg_2)
 
 reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
+BIC(reg_3)
 summary (reg_3)
 ```
 
-With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. 
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
 
-# VIF Table to select variables 
-```{r}
-ezids::xkablevif(reg_3, wide=FALSE)
-```
-
-From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. 
-
-remove race 
-
-## Logistic Regression  
-
-# Model 1: HeartDisease~ Sex+ BMI
-```{r}
-# Change variables to factors 
-heart$HeartDisease<-factor(heart$HeartDisease)
-heart$Sex<-factor(heart$Sex)
-
-# Logit Model 1
-model_1<- glm(HeartDisease~ Sex+ BMI, data=heart, family='binomial')
-#summary(model)
-
-# Chi-square for Model 1
-1-pchisq(186906 - 184556, df=(319794-319792))
-
-# Exponential Coefficients  & Confidence Interval 
-exp(cbind(OR = coef(model_1), confint(model_1)))
-
-```
-
-Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of surviving. 
-
-According to model 1, the log odds for getting heart disease increases by 1.64 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
-
-# Model 2: HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory
-```{r}
-
-# Logit Model 2 
-model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=heart, family='binomial')
-#summary(model_2)
-
-#Chi-squared test for model fit 
-1-pchisq(186906 - 157118, df=(319794-319772))
-
-# Exponential Coefficients  & Confidence Interval 
-exp(cbind(OR = coef(model_2), confint(model_2)))
-```
-
-Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
-
-
-did not have enough lifestyle variables, 
-death variables: bevause of previous reference about women dying more 
-
-# Cost Analysis 
 
 # VIF Table to select variables 
 ```{r}
