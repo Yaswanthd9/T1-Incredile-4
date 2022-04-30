@@ -78,8 +78,10 @@ xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
 ```
+
 ```{r}
-confint(lm1)
+
+plot(lm1)
 ```
 
 ```{r}
@@ -90,9 +92,6 @@ summary(lm2)
 
 ```
 
-```{r}
-confint(lm2)
-```
 
 
 ```{r}
@@ -102,9 +101,7 @@ xkablevif(lm4)
 summary(lm4)
 ```
 
-```{r}
-confint(lm4)
-```
+
 
 ```{r}
 library(dyn)
@@ -125,9 +122,10 @@ ftable(prop.table(percent))* 100
 # Correlation coefficient 
 
 ```{r}
-cor(project$AlcoholDrinking,project$Smoking)
-cor(project$AlcoholDrinking,project$HeartDisease)
-cor(project$HeartDisease,project$Smoking)
+cor_ad_smoke <- cor(project$AlcoholDrinking,project$Smoking)
+cor_as_hd <- cor(project$AlcoholDrinking,project$HeartDisease)
+cor_hd_smoke <- cor(project$HeartDisease,project$Smoking)
+
 
 ```
 
@@ -149,4 +147,30 @@ chitest2 = chisq.test(contable2)
 chitest2
 ```
 
+```{r}
 
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking, data = project , family = "binomial")
+summary(model_lr)
+xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
+```
+```{r}
+expcoeff = exp(coef(model_lr))
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+### Using Confidence Intervals
+
+```{r, results='hold'}
+
+
+xkabledply(confint(model_lr), title = "CIs using profiled log-likelihood" )
+xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
+```
+
+### Model evaluation
+#### Confusion matrix 
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+```
