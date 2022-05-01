@@ -350,6 +350,76 @@ plot(cm_info$plot)
 
 
 
+```{r}
+# Split into 80-20 train-test sets
+
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+```{r}
+# Logit Model Training
+model2<- glm(HD~ GeneralHealth+Ethnicity, data= train, family="binomial")
+summary(model2)
+```
+
+# Predicting and Assessing the Model 
+
+```{r}
+# Prediction
+train$prediction <- predict( model2, newdata = train, type = "response" )
+test$prediction  <- predict( model2, newdata = test , type = "response" )
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 2 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+roc_info <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HD", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+p <- recordPlot()
+dev.off()
+plot(grid.draw(roc_info$plot))
+
+
+```
+
+
+```{r}
+accuracy_info <- AccuracyCutoffInfo( train = train, 
+                                     test = test, 
+                                     predict = "prediction", 
+                                     actual = 'HeartDisease' )
+# define the theme for the next plot
+ggthemr("light")
+plot(accuracy_info$plot)
+```
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+loadPkg("regclass")
+xkabledply( confusion_matrix(model2), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+
+# 
+cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = 0.27 )
+#ggthemr("flat")
+plot(cm_info$plot)
+
+```
 
 
 
