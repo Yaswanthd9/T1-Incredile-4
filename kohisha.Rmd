@@ -23,25 +23,10 @@ library(ezids)
 
 ```{r init, include=F}
 project1 = data.frame(read.csv("heart_2020_cleaned.csv"))
-project <- subset(project1,select = -c(BMI,Stroke,PhysicalHealth,MentalHealth,DiffWalking,Sex,AgeCategory,Race,PhysicalActivity,GenHealth,SleepTime,Asthma,KidneyDisease, SkinCancer))
+project <- subset(project1,select = c(HeartDisease, Smoking, AlcoholDrinking, Diabetic))
 str(project)
 ```
 
-```{r}
-heartsub <- data.frame(project)
-heartsub <- heartsub[, c("HeartDisease","Diabetic","Smoking", "AlcoholDrinking")]
-head(heartsub)
-
-newdata1<- subset(heartsub, HeartDisease==1)
-newdata1_1<-head(newdata1,27373)
-nrow(newdata1_1)
-newdata0<- subset(heartsub, HeartDisease==0)
-newdata0_1<-head(newdata0,27373)
-nrow(newdata0_1)
-total <- rbind(newdata1_1, newdata0_1)
-nrow(total)
-summary(total)
-```
 
 ```{r}
 library(tidyr)
@@ -66,15 +51,15 @@ Checking if there are any missing values in the dataset project.
 we can see that there are no missing values for smoking and alcoholdrinking.
 
 ```{r}
-barplot(table(total$Smoking, total$HeartDisease), legend= rownames(table(total$Smoking, total$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
+barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$Smoking, project1$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
 
 ```{r}
-barplot(table(total$AlcoholDrinking, total$HeartDisease), legend= rownames(table(total$AlcoholDrinking, total$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
+barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$AlcoholDrinking, project1$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
 ```
 
 ```{r}
-barplot(table(total$HeartDisease, total$Diabetic), legend= rownames(table(total$HeartDisease, total$Diabetic)), col =(c("green", "brown")),xlab="Heartdiease",ylab="Diabetic", main = "Barplot for Heartdisease and Diabetic")
+barplot(table(project1$HeartDisease, project1$Diabetic), legend= rownames(table(project1$HeartDisease, project1$Diabetic)), col =(c("green", "brown")),xlab="Diabetic",ylab="HeartDisease", main = "Barplot for Heartdisease and Diabetic")
 ```
 
 ```{r}
@@ -103,7 +88,7 @@ str(project)
 
 ```{r}
 
-lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = total)
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = project)
 xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
@@ -114,7 +99,7 @@ plot(lm1)
 ```
 
 ```{r}
-lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = total)
+lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = project)
 xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
 xkablevif(lm2)
 summary(lm2)
@@ -124,7 +109,7 @@ summary(lm2)
 
 
 ```{r}
-lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = total)
+lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
 xkabledply(lm3, title = paste("Model :", format(formula(lm3)) ) )
 xkablevif(lm3)
 summary(lm3)
@@ -134,7 +119,7 @@ summary(lm3)
 
 ```{r}
 library(dyn)
-anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=total)
+anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=project)
 xkabledply(anovaRes, title = "ANOVA result summary")
 
 anovaRes1 = aov(HeartDisease ~ Smoking, data=project)
@@ -143,7 +128,7 @@ xkabledply(anovaRes1, title = "ANOVA result summary")
 ```
 
 ```{r}
-percent <- xtabs(~total$AlcoholDrinking+ total$Smoking + total$HeartDisease)
+percent <- xtabs(~project$AlcoholDrinking+ project$Smoking + project$HeartDisease)
 ftable(prop.table(percent))* 100
 
 ```
@@ -151,18 +136,18 @@ ftable(prop.table(percent))* 100
 # Correlation coefficient 
 
 ```{r}
-cor_ad_smoke <- cor(total$AlcoholDrinking, total$Smoking)
+cor_ad_smoke <- cor(project$AlcoholDrinking, project$Smoking)
 summary(cor_ad_smoke)
-cor_as_hd <- cor(total$AlcoholDrinking, total$HeartDisease)
+cor_as_hd <- cor(project$AlcoholDrinking, project$HeartDisease)
 summary(cor_as_hd)
-cor_hd_smoke <- cor(total$HeartDisease, total$Smoking)
+cor_hd_smoke <- cor(project$HeartDisease, project$Smoking)
 summary(cor_hd_smoke)
 
 
 ```
 
 ```{r}
-contable  <- table(total$HeartDisease, total$Smoking)
+contable  <- table(project$HeartDisease, project$Smoking)
 summary(contable ) 
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
@@ -170,7 +155,7 @@ xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Pe
 ```
 
 ```{r}
-contable2 <- table(total$HeartDisease, total$AlcoholDrinking)
+contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
 summary(contable2) 
 prop <-prop.table(contable2)
 percent <- round(prop*100, 2)
@@ -183,6 +168,31 @@ chitest1 = chisq.test(contable)
 chitest1
 chitest2 = chisq.test(contable2)
 chitest2
+```
+
+
+```{r}
+heartsub <- data.frame(project)
+heartsub <- heartsub[, c("HeartDisease","Diabetic","Smoking", "AlcoholDrinking")]
+head(heartsub)
+
+newdata1<- subset(heartsub, HeartDisease==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heartsub, HeartDisease==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+```
+
+
+```{r}
+set.seed(123)
+train_rows <- sample(1:nrow(heartsub), 0.7*nrow(heartsub))
+train <- heartsub[train_rows, ]
+test <- heartsub[-train_rows, ]
 ```
 
 ```{r}
@@ -223,6 +233,12 @@ h <- roc(HeartDisease ~ model2, data=total)
 auc(h) 
 plot(h)
 ```
+```{r}
+
+train_prediction <- predict( model_lr, newdata = train, type = "response" )
+test_prediction  <- predict( model_lr, newdata = test , type = "response" )
+```
+
 
 ```{r}
 
@@ -241,7 +257,7 @@ xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
 #### Confusion matrix 
 
 ```{r confusionMatrix, results='markup'}
-#loadPkg("regclass")
+loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
 
@@ -256,4 +272,12 @@ co_matrix
 corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
 
 ```
+
+```{r}
+
+train_prediction11<- predict( model_lr2, newdata = train, type = "response" )
+test_prediction1   <- predict( model_lr2, newdata = test , type = "response" )
+```
+
+
 
