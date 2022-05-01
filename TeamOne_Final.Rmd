@@ -57,18 +57,11 @@ library(grid)
 library(broom)
 library(caret)
 library(tidyr)
-library(dplyr)
 library(scales)
-library(ggplot2)
 # ggthemr is not on CRAN. Need to install from console using 
-devtools::install_github('cttobin/ggthemr')
-# Might need to install devtools first if not already on system
-# Follow prompt. Use 1 or 2 to install/update other dependencies. 
-# Choose "no" to install those without needing to compile
-# Nevermind, still failed. Not working for R 4.1.2 (202204 - EL)
-# library(ggthemr)
-library(ggthemr)
-library(ggthemes)
+#devtools::install_github('cttobin/ggthemr')
+#library(ggthemr)
+#library(ggthemes)
 library(gridExtra)
 library(data.table)
 
@@ -137,7 +130,7 @@ percent <- round(prop*100, 2)
 
 print ("Contingency Table for Heart Disease and Sex in Percentage")
 print (percent)
-barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", beside=T, col=3:2)
+barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease Among Male & Female", beside=T, col=3:2)
 ```
 
 
@@ -326,6 +319,9 @@ Also note, the confidence intervals for all the variables are narrow, indicating
 # Predicting and Assessing the Model 
 
 ```{r}
+
+library(ggthemes)
+
 # Prediction
 train$prediction <- predict( model, newdata = train, type = "response" )
 test$prediction  <- predict( model, newdata = test , type = "response" )
@@ -369,15 +365,6 @@ Cots for false negatives are higher than false positives. acoording to ... 40 to
 
 Total cost of choosing cut off : $ 432840
 
-```{r}
-accuracy_info <- AccuracyCutoffInfo( train = train, 
-                                     test = test, 
-                                     predict = "prediction", 
-                                     actual = 'HeartDisease' )
-# define the theme for the next plot
-ggthemr("light")
-plot(accuracy_info$plot)
-```
 # Confusion Matrix 
 
 ```{r}
@@ -402,6 +389,7 @@ Using a classification algorithm like logistic regression in this example enable
 
 There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
 
+# Accuracy Stuff
 
 
 ################ END OF SECTION ###########################
@@ -623,4 +611,15 @@ https://www.statisticssolutions.com/free-resources/directory-of-statistical-anal
  model.matrix(~0+., data=heart) %>% 
      cor(use="pairwise.complete.obs") %>% 
    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
+```
+
+# Freq plot for Heart Disease
+```{r}
+library(ggplot2)
+library(ggpubr)
+theme_set(theme_pubr())
+ggplot(heart, aes(HeartDisease),fill=HeartDisease) +
+  geom_bar() +
+  theme_pubclean()
+
 ```
