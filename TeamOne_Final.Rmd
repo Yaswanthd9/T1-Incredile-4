@@ -385,6 +385,8 @@ After obtaining the predicted values that an individual will have heart disease 
 
 # user-defined different cost for false negative and false positive
 
+source('unbalanced_functions.R')
+
 roc_info <- ROCInfo( data = test, 
                      predict = "prediction", 
 					           actual = "HeartDisease", 
@@ -401,14 +403,14 @@ Cots for false negatives are higher than false positives.
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
 loadPkg("regclass")
-xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+xkabledply( confusion_matrix(model), title = "Confusion Matrix from Logit Model" )
 unloadPkg("regclass")
 
 # 
 cm_info <- ConfusionMatrixInfo( data = test, 
                                 predict = "prediction", 
-                                actual = 'HeartDisease', 
-                                cutoff = .30 )
+                                actual  = 'HeartDisease', 
+                                cutoff  = .30 )
 #ggthemr("flat")
 plot(cm_info$plot)
 
@@ -794,4 +796,8 @@ ggplot(heart, aes(HeartDisease),fill=HeartDisease) +
   geom_bar() +
   theme_pubclean()
 
+fitted.results <- predict(model_lr,newdata = test, type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$HeartDisease)
+print(paste('Accuracy',1-misClasificError))
 ```
