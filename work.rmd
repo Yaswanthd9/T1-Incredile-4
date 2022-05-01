@@ -206,6 +206,28 @@ plot(HD~PhysicalActivity,data=heart)
 plot(HD~DiffWalking,data=heart)
 ```
 
+```{r, results = 'markup'}
+# Subset Male & Female with and without Heart Disease
+female <- subset(heart, Sex== "Female")
+male  <- subset (heart, Sex == "Male")
+
+# T-test of BMI between Genders 
+t.test(female$GeneralHealth, male$GeneralHealth)
+```
+The p-value is less than the 5% significance level, allowing us to reject the null hypothesis and conclude that the overall average GeneralHealth is different between the male and female populations. From the mean values, we see that men have a mean GeneralHealth of 3.20 while women have a GeneralHealth of 3.23 A difference of 0.03.
+```{r, results = 'markup'}
+# Subsetting genders based on respondents that have heart disease 
+female_HD<- subset(female, HD==1)
+male_HD<- subset(male, HD== 1)
+```
+
+```{r}
+#T-test
+t.test(female_HD$GeneralHealth, male_HD$GeneralHealth)
+                  
+```
+From the T-test output above, we see that the p-value is 0.60, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
+
 ```{r}
 
 t.test(heart$GeneralHealth, heart$HD)
@@ -284,4 +306,26 @@ theme_economist()
 # Positive instance = 1 = Yes Heart Disease 
 # Negative instance = 0 = No Heart Disease
 ```
+```{r}
 
+# user-defined different cost for false negative and false positive
+
+roc_info <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HD", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+plot(grid.draw(roc_info$plot))
+
+```
+
+
+```{r}
+accuracy_info <- AccuracyCutoffInfo( train = train, 
+                                     test = test, 
+                                     predict = "prediction", 
+                                     actual = 'HeartDisease' )
+# define the theme for the next plot
+ggthemr("light")
+plot(accuracy_info$plot)
+```
