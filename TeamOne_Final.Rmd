@@ -345,9 +345,9 @@ exp_coeff<- exp(cbind(OR = coef(model), confint(model)))
 knitr::kable(exp_coeff,caption='Odds Ratio & Confidence Interval of Model')
 ```
 
-Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
+Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
 
-According to the model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds ratios for age increases as an individual gets older, i.e. older individuals are more likely to suffer poor health that leads to heart disease.  
+According to the model, the odds for getting heart disease increases by 2.11 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health, drinking, sleep and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds of getting heart disease for age increases as an individual gets older.
 
 Also note, the confidence intervals for all the variables are narrow, indicating that they are good predictors of heart disease. However, the confidence intervals for age gets wider as we increase an individuals age. Although the uncertainty is greater at higher age ranges, there still may be enough precision to inform a patient about preventative measures, when considering their lifestyle choices.
 
@@ -372,15 +372,8 @@ theme_economist()
 # Negative instance = 0 = No Heart Disease
 ```
 
-After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions.  
+After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions. Since we split our data evenly, the negative instances are skewed to the left while the positive instances are skewed to the right. 
 
-For a ideal double density plot you want the distribution of scores to be separated, with the score of the negative instances to be on the left and the score of the positive instance to be on the right.   
-In the current case, both distributions are slight skewed to the left. Not only is the predicted probability for the negative outcomes low, but the probability for the positive outcomes are also lower than it should be. The reason for this is because our dataset only consists of 16 percent of positive instances ( employees that left ). Thus our predicted scores sort of gets pulled towards a lower number because of the majority of the data being negative instances.
-
-A slight digression, when developing models for prediction, we all know that we want the model to be as accurate as possible, or in other words, to do a good job in predicting the target variable on out of sample observations.
-
-Our *skewed* double density plot, however, can actually tell us a very important thing: **Accuracy will not be a suitable measurement for this model.** 
-**Section Takeaway:** Accuracy is not the suitable indicator for the model when you have unbalanced distribution or costs
 
 # ROC-AUC 
 ```{r}
@@ -396,13 +389,11 @@ plot(grid.draw(roc_info$plot))
 
 ```
 
-Cots for false negatives are higher than false positives. acoording to ... 40 to 80 thou annual cost so will be those values 
-
-Total cost of choosing cut off : $ 432840
+Cots for false negatives are higher than false positives. 
 
 # Confusion Matrix 
 
-```{r}
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
 loadPkg("regclass")
 xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
@@ -424,7 +415,7 @@ Using a classification algorithm like logistic regression in this example enable
 
 There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
 
-# Accuracy Stuff
+
 
 
 ################ END OF SECTION ###########################
