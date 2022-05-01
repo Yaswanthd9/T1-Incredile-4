@@ -319,17 +319,6 @@ xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Mo
 
 ```{r}
 
-library("corrplot")
-
-y <- cor(total)
-co_matrix<-cor(total)
-co_matrix
-corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
-
-```
-
-```{r}
-
 train_prediction11<- predict( model_lr2, newdata = train, type = "response" )
 test_prediction1   <- predict( model_lr2, newdata = test , type = "response" )
 ```
