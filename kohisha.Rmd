@@ -107,14 +107,12 @@ summary(lm2)
 ```
 
 
-
 ```{r}
 lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
 xkabledply(lm3, title = paste("Model :", format(formula(lm3)) ) )
 xkablevif(lm3)
 summary(lm3)
 ```
-
 
 
 ```{r}
@@ -190,14 +188,14 @@ summary(total)
 
 ```{r}
 set.seed(123)
-train_rows <- sample(1:nrow(heartsub), 0.7*nrow(heartsub))
+train_rows <- sample(c(TRUE, FALSE), nrow(heartsub), replace=TRUE, prob=c(0.8,0.2))
 train <- heartsub[train_rows, ]
 test <- heartsub[-train_rows, ]
 ```
 
 ```{r}
 
-model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking, data = total , family = "binomial")
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking, data = train , family = "binomial")
 summary(model_lr)
 xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
 ```
@@ -222,6 +220,7 @@ xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
 ```{r confusionMatrix, results='markup'}
 loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+
 ```
 #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
 
@@ -233,10 +232,20 @@ h <- roc(HeartDisease ~ model2, data=total)
 auc(h) 
 plot(h)
 ```
-```{r}
 
+```{r}
+#install.packages("caret")
+#install.packages("optimal.cutpoints()")
+#install.packages("InformationValue")
+#library(caret)
+#use model to predict probability of default
 train_prediction <- predict( model_lr, newdata = train, type = "response" )
 test_prediction  <- predict( model_lr, newdata = test , type = "response" )
+#find optimal cutoff probability to use to maximize accuracy
+#optimal <- optimalCutoff(test$total, predicted)[1]
+#optimalCutoff(actuals, predictedScores, optimiseFor = "misclasserror", returnDiagnostics = FALSE)
+
+confusionMatrix(test$total, as.factor(train_prediction))
 ```
 
 
