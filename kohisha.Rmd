@@ -51,15 +51,15 @@ Checking if there are any missing values in the dataset project.
 we can see that there are no missing values for smoking and alcoholdrinking.
 
 ```{r}
-barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$Smoking, project1$HeartDisease)), col =(c("orange", "blue")), main = "Barplot for Heartdisease and Smoking")
+barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$Smoking, project1$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
 
 ```{r}
-barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$AlcoholDrinking, project1$HeartDisease)), col =(c("red", "darkblue")), main = "Barplot for Heartdisease and Alcoholdrinking")
+barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$AlcoholDrinking, project1$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
 ```
 
 ```{r}
-barplot(table(project1$HeartDisease,project1$Diabetic), legend= rownames(table(project1$HeartDisease,project1$Diabetic)), col =(c("green", "brown")),main = "Barplot for Heartdisease and Diabetic")
+barplot(table(project1$HeartDisease,project1$Diabetic), legend= rownames(table(project1$HeartDisease,project1$Diabetic)), col =(c("green", "brown")),xlab="Heartdiease",ylab="Diabetic", main = "Barplot for Heartdisease and Diabetic")
 ```
 
 ```{r}
