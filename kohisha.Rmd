@@ -243,9 +243,13 @@ xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
 #### Confusion matrix 
 
 ```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
-xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
 
+xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+cor_matrix<-cor(project)
+cor_matrix
+model.matrix(~0+., data=project) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 ```
 #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
 
