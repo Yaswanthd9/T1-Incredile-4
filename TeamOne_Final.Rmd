@@ -423,6 +423,53 @@ There's actual more to this HR example. We know who is more likely to leave and 
 ### Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
 
+```{r, results='markup'}
+patient <- subset(heart,HeartDisease==1)
+head(patient)
+na_patient <- subset(heart,HeartDisease==0)
+```
+
+#barplot of HeartDisease vs Diabetic
+```{r, results='markup'}
+library(ggplot2)
+ggplot(patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")
+dia_pa<-subset(patient,Diabetic==1)
+nrow(dia_pa)
+ggplot(na_patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")+ scale_y_continuous(labels = scales::comma)
+dia_pa1<-subset(na_patient,Diabetic==1)
+nrow(dia_pa1)
+```
+
+#barplot of HeartDisease vs Asthma
+```{r, results='markup'}
+ggplot(patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1")
+ast_pa<-subset(patient,Asthma==1)
+nrow(ast_pa)
+ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1" )+ scale_y_continuous(labels = scales::comma)
+ast_pa1<-subset(na_patient,Asthma==1)
+nrow(ast_pa1)
+```
+
+#barplot of HeartDisease vs KidneyDisease
+```{r, results='markup'}
+ggplot(patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")
+kid_pa<-subset(patient,KidneyDisease==1)
+nrow(kid_pa)
+ggplot(na_patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")+ scale_y_continuous(labels =scales::comma)
+kid_pa1<-subset(na_patient,KidneyDisease==1)
+nrow(kid_pa1)
+```
+
+#barplot of HeartDisease vs SkinCancer
+```{r, results='markup'}
+ggplot(patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")
+skin_pa<-subset(patient,SkinCancer==1)
+nrow(skin_pa)
+ggplot(na_patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")+ scale_y_continuous(labels = scales::comma)
+skin_pa1<-subset(na_patient,SkinCancer==1)
+nrow(skin_pa1)
+```
+
 
 ```{r}
 # We are seperating our desired variables to test them in an easier way.
@@ -457,6 +504,7 @@ model.matrix(~0+., data=diseases) %>%
     ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 
 ```
+
 From the above correlation test we can see that overall Correlations are not particularly strong. Heartdisease has more correlation with stroke than any other secondary illnesses(Which is not a surprise generally). Diabetes is correlated with heart disease and Kidney disease, Less with Stroke. Skin cancer shows negligible correlation with all other diseases. overall, we can see that only stroke, diabetes and kidney disease have considerable correlation with heart disease.
 Not only from our correlation test, but as per center for disease control and prevention, Common heart disorders can increase your risk for stroke. For example, coronary artery disease increases your risk for stroke, because plaque builds up in the arteries and blocks the flow of oxygen-rich blood to the brain. Also diabetes increases your risk for stroke(Stroke vs Diabetes in our correlation plot ).Diabetes causes sugars to build up in the blood and prevent oxygen and nutrients from getting to the various parts of your body, including your brain. High blood pressure is also common in people with diabetes. High blood pressure is the leading cause of stroke and is the main cause for increased risk of stroke among people with diabetes (CDC Stroke Fact sheet).
 (https://www.cdc.gov/stroke/conditions.htm#:~:text=Common%20heart%20disorders%20can%20increase,rich%20blood%20to%20the%20brain.)
@@ -554,10 +602,6 @@ test_roc <- roc(heart_test$HeartDisease ~ test_prob, plot = TRUE, print.auc = TR
 ```
 
 ```{r}
-# head(predict(mod1, type = "response"))
-# trn_pred <- ifelse(predict(mod1, type = "response") > 0.5, "1", "0")
-# head(trn_pred)
-
 fittedheartTrain=ifelse(train_prob<0.5,0,1 )
 ConfMatTrain=table(heart_train$HeartDisease,fittedheartTrain)
 TrainAccuracy=(ConfMatTrain[1,1]+ConfMatTrain[2,2])/sum(ConfMatTrain)
@@ -576,6 +620,23 @@ print(cbind(TestAccuracy, TestTPR, TestFPR))
 ```
 
 #Decision tree model
+```{r}
+set.seed(1)
+library(rpart)
+library(rpart.plot)
+tree<-rpart(HeartDisease~.,method = "class",data =heart_train)
+rpart.plot(tree)
+```
+
+```{r}
+probabilities <- predict(tree, heart_test)
+tree_pred <- ifelse(probabilities[,2] > 0.5,1,0)
+table(Actual = heart_test$HeartDisease,Predicted = tree_pred )
+```
+
+Accuarcy-66.7
+
+################ END OF SECTION ###########################
 
 ### Smokers Vs Alcoholic Drinkers 
 

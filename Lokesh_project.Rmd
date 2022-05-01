@@ -39,13 +39,7 @@ heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
 heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
 heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
-```{r}
-heart$GenHealth <- ifelse(heart$GenHealth == 'Poor',0,
-               ifelse(heart$GenHealth == 'Fair',1,
-                 ifelse(heart$GenHealth == 'Good',2,
-                        ifelse(heart$GenHealth=='Very good',3,4
-                        ))))
-```
+
 #Exploratory data analysis
 ```{r, results='markup'}
 library(ggplot2)
@@ -129,7 +123,7 @@ chi_4=chisq.test(hea_skin)
 chi_4
 ```
 For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. Every secondary illness(Diabetic,Asthma, Kidney disease and skin cancer) is dependent on heart disease.
-
+###################
 ```{r}
 model1 = lm(HeartDisease~Stroke + Diabetic + Asthma + KidneyDisease 
               + SkinCancer, data=heart)
@@ -320,4 +314,4 @@ heart_predict<- predict (mod1, heart_test)
 table = table(heart_predict, heart_test$HeartDisease)
 mean(as.character(heart_predict) != as.character(heart_test$HeartDisease))
 ```
-
+############
