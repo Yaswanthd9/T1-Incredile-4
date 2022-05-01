@@ -29,13 +29,23 @@ str(project)
 
 
 ```{r}
+library(tidyr)
+
 sum(is.na(project$AlcoholDrinking))
 sum(is.na(project$Smoking))
 sum(is.na(project$HeartDisease))
 sum(is.na(project$Diabetic))
-project[is.na(project) | project=="Inf"] = NA
-missing_val<- subset(project, is.na(HeartDisease)==TRUE) # eliminating the missing values
-summary(missing_val)
+#project[is.na(project) | project=="Inf"] = NA
+#project$HeartDisease<- subset(project, is.na(HeartDisease)==FALSE) # eliminating the missing values
+#summary(project$HeartDisease)
+#project[is.na(project) | project=="Inf"] = NA
+#project$Diabetic<- subset(project, is.na(Diabetic)==FALSE) # eliminating the missing values
+#summary(project$Diabetic)
+
+project %>% drop_na(Diabetic)
+project %>% drop_na(Smoking)
+project %>% drop_na(AlcoholDrinking)
+#is.na(project)
 ```
 Checking if there are any missing values in the dataset project.
 we can see that there are no missing values for smoking and alcoholdrinking.
@@ -137,13 +147,19 @@ summary(cor_hd_smoke)
 ```
 
 ```{r}
-contable  <- table(project$HeartDisease, project$Smoking)
+contable  <- table(project1$HeartDisease, project1$Smoking)
 summary(contable ) 
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
 ```
 
 ```{r}
-contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
+contable2 <- table(project1$HeartDisease, project1$AlcoholDrinking)
 summary(contable2) 
+prop <-prop.table(contable2)
+percent <- round(prop*100, 2)
+xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
 ```
 
 ```{r chisq}
@@ -220,6 +236,9 @@ xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Mo
 library("corrplot")
 
 y <- cor(project)
+co_matrix<-cor(project)
+co_matrix
 corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
 
 ```
+
