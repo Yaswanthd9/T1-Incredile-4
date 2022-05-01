@@ -273,24 +273,41 @@ ezids::xkablevif(reg_3, wide=FALSE)
 
 From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is above 5 for whites and other races, race as a variable will be dropped. We will train and test the model to see the cost analysis of our predictions. 
 
-## Logistic Regression  ** Don't split randomly 
+## Logistic Regression  
+
+*** We created another dataframe that had equal proportions of 0 & 1 HD and used that for our training set... 
+The nukmbers not used for the training were used for the test set ## Fix language 
 
 # Model Training 
 ```{r}
 
+# Creating a new dataframe (called total) with equal proportions of Heart Disease values 
+newdata1<- subset(heart, HeartDisease==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HeartDisease==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+#nrow(total)
+summary(total)
+freq(total$HeartDisease)
+
+
 # Convert to factor variables 
-heart$HeartDisease<-factor(heart$HeartDisease)
-heart$Sex<-factor(heart$Sex)
+total$HeartDisease<-factor(total$HeartDisease)
+total$Sex<-factor(total$Sex)
 
 # Split into 80-20 train-test sets
+
 set.seed(1234) 
 
-sample <- sample.int(n = nrow(heart), size = floor(.80*nrow(heart)), replace = F)
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
 train <- heart[sample, ]
 test  <- heart[-sample, ]
 
 # Logit Model Training
-model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
+model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data= train, family='binomial')
 summary(model)
 
 #Chi-squared test for model fit 
@@ -352,11 +369,27 @@ Cots for false negatives are higher than false positives. acoording to ... 40 to
 
 Total cost of choosing cut off : $ 432840
 
-# Confusion Matrix 
 ```{r}
+accuracy_info <- AccuracyCutoffInfo( train = train, 
+                                     test = test, 
+                                     predict = "prediction", 
+                                     actual = 'HeartDisease' )
+# define the theme for the next plot
+ggthemr("light")
+accuracy_info$plot
+```
+# Confusion Matrix 
+
+```{r}
+
+loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+
 # Default 0.5 cut off
-cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", 
-                                actual = 1, cutoff = .39 )
+cm_info <- ConfusionMatrixInfo( data = total, 
+                                predict = "prediction", 
+                                actual = 1, cutoff = .5 )
 ggthemr("flat")
 cm_info$plot
 
