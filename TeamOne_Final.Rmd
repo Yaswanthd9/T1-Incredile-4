@@ -336,12 +336,14 @@ Our *skewed* double density plot, however, can actually tell us a very important
 ```{r}
 
 # user-defined different cost for false negative and false positive
-cost_fp <- 40
-cost_fn <- 80
+
 roc_info <- ROCInfo( data = test, 
                      predict = "prediction", 
-					           actual = "HeartDisease", cost.fp = cost_fp, cost.fn = cost_fn )
+					           actual = "HeartDisease", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
 grid.draw(roc_info$plot)
+
 ```
 
 Cots for false negatives are higher than false positives. acoording to ... 40 to 80 thou annual cost so will be those values 
