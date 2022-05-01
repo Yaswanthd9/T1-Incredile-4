@@ -514,6 +514,7 @@ According to the study and analysis, patients with early heart disease are more 
 barplot(table(heart$Smoking, heart$HeartDisease), legend= rownames(table(heart$Smoking, heart$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
 
+
 ```{r}
 barplot(table(heart$AlcoholDrinking, heart$HeartDisease), legend= rownames(table(heart$AlcoholDrinking, heart$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
 ```
@@ -523,7 +524,7 @@ barplot(table(heart$HeartDisease, heart$Diabetic), legend= rownames(table(heart$
 ```
 
 ```{r}
-lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = heart)
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking , data = heart)
 xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
@@ -537,12 +538,7 @@ summary(lm2)
 
 ```
 
-```{r}
-lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = heart)
-xkabledply(lm3, title = paste("Model :", format(formula(lm3)) ) )
-xkablevif(lm3)
-summary(lm3)
-```
+
 
 ```{r}
 library(dyn)
@@ -554,11 +550,6 @@ xkabledply(anovaRes1, title = "ANOVA result summary")
 
 ```
 
-```{r}
-percent <- xtabs(~ heart$AlcoholDrinking+ heart$Smoking)
-ftable(prop.table(percent))* 100
-
-```
 
 ```{r}
 cor_ad_smoke <- cor(heart$AlcoholDrinking, heart$Smoking)
@@ -670,11 +661,17 @@ auc
 
 ```{r}
 
-model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic:Smoking, data = train , family = "binomial")
+model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Diabetic:Smoking + Diabetic:AlcoholDrinking, data = train , family = "binomial")
 summary(model_lr2)
 xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
 ```
+```{r}
+fitted.results <- predict(model_lr2,newdata = test, type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$HeartDisease)
+print(paste('Accuracy',1-misClasificError))
 
+```
 
 ```{r, results='hold'}
 
