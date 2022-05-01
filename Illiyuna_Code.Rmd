@@ -1,0 +1,57 @@
+
+
+
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. 
+
+# VIF Table to select variables 
+```{r}
+ezids::xkablevif(reg_3, wide=FALSE)
+```
+
+From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is pretty above 5 for whites and other races, race as a variable will be dropped. 
+
+## Logistic Regression  
+
+# Model 1: HeartDisease~ Sex+ BMI
+```{r}
+# Change variables to factors 
+heart$HeartDisease<-factor(heart$HeartDisease)
+heart$Sex<-factor(heart$Sex)
+
+# Logit Model 1
+model_1<- glm(HeartDisease~ Sex+ BMI, data=heart, family='binomial')
+#summary(model)
+
+# Chi-square for Model 1
+1-pchisq(186906 - 184556, df=(319794-319792))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model_1), confint(model_1)))
+
+```
+
+Calculating the chi-squared p-value of the difference between the null and residual deviance will tell us how "useful" the model is. Since, the chi-squared p-value of 0 is less than 0.05, we can conclude that the logit model with sex and BMI as predictors is good fit model for predicting the probability of getting heart disease. 
+
+According to model 1, the log odds for getting heart disease increases by 1.64 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.02. 
+
+# Model 2: HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory
+```{r}
+
+# Logit Model 2 
+model_2<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=heart, family='binomial')
+#summary(model_2)
+
+#Chi-squared test for model fit 
+1-pchisq(186906 - 157118, df=(319794-319772))
+
+# Exponential Coefficients  & Confidence Interval 
+exp(cbind(OR = coef(model_2), confint(model_2)))
+```
+
+Just like before, all the coefficient p-values for our second model is significant and the chi-squared test is indicating that model 2 is also a good fit. This will be our preferred model for this section because it has a lower AIC score than model 1. 
+
+
+did not have enough lifestyle variables, 
+death variables: bevause of previous reference about women dying more 
+
+# Cost Analysis 
