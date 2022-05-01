@@ -54,6 +54,7 @@ we can see that there are no missing values for smoking and alcoholdrinking.
 barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$Smoking, project1$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
 
+
 ```{r}
 barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$AlcoholDrinking, project1$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
 ```
@@ -64,6 +65,15 @@ barplot(table(project1$HeartDisease, project1$Diabetic), legend= rownames(table(
 
 ```{r}
 library(plyr)
+project$Diabetic<- replace (project$Diabetic, project$Diabetic== "No, borderline diabetes" , "Yes")
+project$Diabetic[project$Diabetic== "Yes (during pregnancy)"] <- "No"  
+
+#project$HeartDisease<-ifelse(project$HeartDisease=="Yes",1,0)
+#project$Smoking<-ifelse(project$Smoking=="Yes",1,0)
+#project$AlcoholDrinking<-ifelse(project$AlcoholDrinking=="Yes",1,0)
+#project$Diabetic<-ifelse(project$Diabetic=="Yes",1,0)
+
+
 project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
 project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
 project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("Yes"=1))
@@ -72,6 +82,9 @@ project$Smoking <- revalue(project$Smoking, c("Yes"=1))
 project$Smoking <- revalue(project$Smoking, c("No"=0))
 project$Diabetic  <- revalue(project$Diabetic , c("Yes"=1))
 project$Diabetic  <- revalue(project$Diabetic , c("No"=0))
+project$Diabetic  <- revalue(project$Diabetic , c("No,borderline diabetes"="No"))
+project$Diabetic  <- revalue(project$Diabetic , c("Yes (during pregnancy)"="Yes"))
+
 
 project
 
@@ -99,7 +112,7 @@ plot(lm1)
 ```
 
 ```{r}
-lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = project)
+lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = total)
 xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
 xkablevif(lm2)
 summary(lm2)
@@ -107,28 +120,26 @@ summary(lm2)
 ```
 
 
-
 ```{r}
-lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
+lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = total)
 xkabledply(lm3, title = paste("Model :", format(formula(lm3)) ) )
 xkablevif(lm3)
 summary(lm3)
 ```
 
 
-
 ```{r}
 library(dyn)
-anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=project)
+anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=total)
 xkabledply(anovaRes, title = "ANOVA result summary")
 
-anovaRes1 = aov(HeartDisease ~ Smoking, data=project)
+anovaRes1 = aov(HeartDisease ~ Smoking, data=total)
 xkabledply(anovaRes1, title = "ANOVA result summary")
 
 ```
 
 ```{r}
-percent <- xtabs(~project$AlcoholDrinking+ project$Smoking + project$HeartDisease)
+percent <- xtabs(~total$AlcoholDrinking+ total$Smoking + total$HeartDisease)
 ftable(prop.table(percent))* 100
 
 ```
@@ -136,18 +147,18 @@ ftable(prop.table(percent))* 100
 # Correlation coefficient 
 
 ```{r}
-cor_ad_smoke <- cor(project$AlcoholDrinking, project$Smoking)
+cor_ad_smoke <- cor(total$AlcoholDrinking, total$Smoking)
 summary(cor_ad_smoke)
-cor_as_hd <- cor(project$AlcoholDrinking, project$HeartDisease)
+cor_as_hd <- cor(total$AlcoholDrinking, total$HeartDisease)
 summary(cor_as_hd)
-cor_hd_smoke <- cor(project$HeartDisease, project$Smoking)
+cor_hd_smoke <- cor(total$HeartDisease, total$Smoking)
 summary(cor_hd_smoke)
 
 
 ```
 
 ```{r}
-contable  <- table(project$HeartDisease, project$Smoking)
+contable  <- table(total$HeartDisease, total$Smoking)
 summary(contable ) 
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
@@ -155,7 +166,7 @@ xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Pe
 ```
 
 ```{r}
-contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
+contable2 <- table(total$HeartDisease, total$AlcoholDrinking)
 summary(contable2) 
 prop <-prop.table(contable2)
 percent <- round(prop*100, 2)
@@ -190,16 +201,28 @@ summary(total)
 
 ```{r}
 set.seed(123)
-train_rows <- sample(1:nrow(heartsub), 0.7*nrow(heartsub))
+train_rows <- sample(c(TRUE, FALSE), nrow(heartsub), replace=TRUE, prob=c(0.8,0.2))
 train <- heartsub[train_rows, ]
 test <- heartsub[-train_rows, ]
 ```
 
 ```{r}
 
-model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking, data = total , family = "binomial")
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking, data = train , family = "binomial")
 summary(model_lr)
 xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
+```
+
+```{r}
+anova(model_lr, test="Chisq")
+```
+
+```{r}
+fitted.results <- predict(model_lr,newdata = test, type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$HeartDisease)
+print(paste('Accuracy',1-misClasificError))
+
 ```
 
 ```{r}
@@ -220,8 +243,13 @@ xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
 #### Confusion matrix 
 
 ```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
+
 xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+cor_matrix<-cor(project)
+cor_matrix
+model.matrix(~0+., data=project) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 ```
 #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
 
@@ -229,22 +257,49 @@ xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Mod
 loadPkg("pROC") 
 
 model2 = predict(model_lr, type = "response" )
-h <- roc(HeartDisease ~ model2, data=total)
+#h <- roc(HeartDisease ~ model_lr, data=total)
 auc(h) 
 plot(h)
-```
-```{r}
+library(ROCR)
+p <- predict(model_lr, newdata=test, type="response")
+pr <- prediction(p, test$HeartDisease)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
 
+
+```
+
+```{r}
+#install.packages("caret")
+#install.packages("optimal.cutpoints()")
+#install.packages("InformationValue")
+#library(caret)
+#use model to predict probability of default
 train_prediction <- predict( model_lr, newdata = train, type = "response" )
 test_prediction  <- predict( model_lr, newdata = test , type = "response" )
+#find optimal cutoff probability to use to maximize accuracy
+#optimal <- optimalCutoff(test$total, predicted)[1]
+#optimalCutoff(actuals, predictedScores, optimiseFor = "misclasserror", returnDiagnostics = FALSE)
+
+#confusionMatrix(test$total, as.factor(train_prediction))
 ```
 
 
 ```{r}
 
-model_lr2 <- glm(Diabetic ~ Smoking + AlcoholDrinking  + Smoking:Diabetic + Diabetic:AlcoholDrinking, data = total , family = "binomial")
+model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking  + Diabetic + Smoking:Diabetic , data = total , family = "binomial")
 summary(model_lr2)
 xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
+```
+```{r}
+fitted.results2 <- predict(model_lr2,newdata = test, type='response')
+fitted.results2 <- ifelse(fitted.results2 > 0.5,1,0)
+misClasificError2 <- mean(fitted.results2 != test$HeartDisease)
+print(paste('Accuracy',1-misClasificError2))
+
 ```
 
 ```{r, results='hold'}
@@ -264,20 +319,24 @@ xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Mo
 
 ```{r}
 
-library("corrplot")
-
-y <- cor(total)
-co_matrix<-cor(total)
-co_matrix
-corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
-
-```
-
-```{r}
-
 train_prediction11<- predict( model_lr2, newdata = train, type = "response" )
 test_prediction1   <- predict( model_lr2, newdata = test , type = "response" )
 ```
 
+```{r}
+loadPkg("pROC") 
+
+
+library(ROCR)
+p1 <- predict(model_lr2, newdata=test, type="response")
+pr1 <- prediction(p1, test$HeartDisease)
+prf1 <- performance(pr2, measure = "tpr", x.measure = "fpr")
+plot(prf1)
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+
+```
 
 
