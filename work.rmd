@@ -124,13 +124,6 @@ heart$Ethnicity<-sapply(heart$Race,unclass)
 # Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
 
 ```{r}
-
- model.matrix(~0+., data=heart) %>% 
-     cor(use="pairwise.complete.obs") %>% 
-   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
-```
-
-```{r}
 loadPkg("corrplot")
 cor(heart$HD,heart$GeneralHealth)
 
@@ -138,16 +131,32 @@ cor(heart$HD,heart$GeneralHealth)
 
 ```{r}
 
-contable = table(heart$GeneralHealth, heart$PhysicalActivity)
-xkabledply(contable, title="Contingency Table for heart Disease and Sex")
+contable = table(heart$GeneralHealth, heart$HD)
+xkabledply(contable, title="Contingency Table for Heart Disease and GeneralHealth")
 addmargins(contable)
 
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
 
-print ("Contingency Table for heart Disease and Sex in Percentage")
+print ("Contingency Table for heart Disease and General Health in Percentage")
 print (percent)
-barplot(with(heart, table(GeneralHealth, PhysicalActivity)), main="heart Disease & Sex", beside=T, col=3:2)
+barplot(with(heart, table(GeneralHealth, HD)), main="heart Disease & GeneralHealth", beside=T, col=3:2)
+```
+
+```{r}
+contable = table(heart$GeneralHealth, heart$HD)
+xkabledply(contable, title="Contingency Table for heart Disease and GeneralHealth")
+addmargins(contable)
+
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for heart Disease and General Health in Percentage")
+print (percent)
+barplot(with(heart, 
+             table(GeneralHealth, HD)), 
+        main="heart Disease & GeneralHealth", 
+        beside=T )
 ```
 
 ```{r}
@@ -165,24 +174,26 @@ plot(HD~DiffWalking,data=heart)
 ```{r}
 
 t.test(heart$GeneralHealth, heart$HD)
-t.test(heart$GeneralHealth, heart$Ethnicity)
+t.test(heart$PhysicalActivity, heart$HD)
 ```
 
 ```{r}
 Genh_HD=table(heart$GeneralHealth,heart$HD)
 chi_1=chisq.test(Genh_HD)
 chi_1
-HD_Eth=table(heart$GeneralHealth,heart$Ethnicity)
+HD_Eth=table(heart$PhysicalActivity,heart$HD)
 chi_2=chisq.test(HD_Eth)
 chi_2
 ```
+For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+Every GeneralHealth,PhysicalActivity has a relationship with heart Disease. 
 
 Logistic regressiob for Q.no 4
 ```{r}
 library(aod)
 library(ggplot2)
-summary(heart)
-mylogit <- glm(HD ~ GeneralHealth+PhysicalActivity , data = heart, family = "binomial")
+#summary(heart)
+mylogit <- glm(HD ~ GeneralHealth+PhysicalActivity , data = total, family = "binomial")
 summary(mylogit)
 confint(mylogit)
 confint.default(mylogit)
@@ -193,16 +204,7 @@ newdata1 <- with(heart, data.frame(GeneralHealth = mean(GeneralHealth), Physical
 newdata1$rankP <- predict(mylogit, newdata = newdata1, type = "response")
 ```
 
-Logistic regressiob for Q.no 2
-```{r}
-library(aod)
-library(ggplot2)
-summary(heart)
-mylogit <- glm(HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic , data = heart, family = "binomial")
-summary(mylogit)
-confint(mylogit)
-confint.default(mylogit)
-```
+
 
 Logistic regressiob for Q.no 4
 ```{r}

@@ -57,18 +57,11 @@ library(grid)
 library(broom)
 library(caret)
 library(tidyr)
-library(dplyr)
 library(scales)
-library(ggplot2)
 # ggthemr is not on CRAN. Need to install from console using 
-devtools::install_github('cttobin/ggthemr')
-# Might need to install devtools first if not already on system
-# Follow prompt. Use 1 or 2 to install/update other dependencies. 
-# Choose "no" to install those without needing to compile
-# Nevermind, still failed. Not working for R 4.1.2 (202204 - EL)
-# library(ggthemr)
-library(ggthemr)
-library(ggthemes)
+#devtools::install_github('cttobin/ggthemr')
+#library(ggthemr)
+#library(ggthemes)
 library(gridExtra)
 library(data.table)
 
@@ -137,7 +130,7 @@ percent <- round(prop*100, 2)
 
 print ("Contingency Table for Heart Disease and Sex in Percentage")
 print (percent)
-barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease & Sex", beside=T, col=3:2)
+barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease Among Male & Female", beside=T, col=3:2)
 ```
 
 
@@ -212,7 +205,7 @@ t.test  (male_HD$MentalHealth,
 female_HD$MentalHealth)
 ```
 
-The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men. The cyclical nature of mental health and exercise has been covered extensively (Mikkelsen 2017; Raglin 1990); which assert that individuals struggling with mental health issues often are unable to complete physically demanding tasks, further making matters worse. This is because exercise has been shown to produce beneficial hormones that are associated with imporvements in mental health. 
+The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men. The cyclical nature of mental health and exercise has been covered extensively (Mikkelsen 2017; Raglin 1990); which assert that individuals struggling with mental health issues often are unable to complete physically demanding tasks, further making matters worse. This is because exercise has been shown to produce beneficial hormones that are associated with improvements in mental health. 
 
 # Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
 ```{r, results = 'markup'}
@@ -224,14 +217,42 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     scale_fill_brewer(palette = 'Set1', name = 'Gender')
 
 t.test  (male_HD$SleepTime,
-female_HD$SleepTime)
+          female_HD$SleepTime)
 ```
 
 Men and women have statistically different sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep effects are known to be cumulative. A study conducted by Robbins et al. in 2021 "examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus". The study found that curtailing sleep below the recommended seven hours increases the risk for viral infection "nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest" (Robbins et al, 2021). 
 
 This lack of sleep could explain why we see that women in our data on average report feeling sick more often and could also be a contributing factors is why women are more likely to die from heart attacks than men (Noel Bairey Merz).
 
-When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. However, it should be noted that the survey is voluntary and there is no way to ensure that the respondents are being truthful. 
+#Smoking:Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
+```{r}
+#Smoking 
+ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    ggtitle(' Have you smoked at least 100 cigarettes in your entire life?') +
+    xlab('Heart Disease') + 
+    ylab('Smoking')+ 
+    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+
+t.test  ( male_HD$Smoking,
+        female_HD$Smoking)
+
+
+```
+
+#Drinking: How many drinks have you had this week? 
+```{r}
+ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    ggtitle('How many drinks have you had this week?') +
+    xlab('Heart Disease') + 
+    ylab('Alcohol Consumption')+ 
+    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+
+t.test  ( male_HD$AlcoholDrinking,
+        female_HD$AlcoholDrinking)
+```
+Heavy drinkers (adult men having more than 14 drinks per week and adult women having more than 7 drinks per week
 
 # Age, Race, General Health
 ```{r, results = 'markup'}
@@ -258,12 +279,12 @@ reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=
 BIC(reg_2)
 summary (reg_2)
 
-reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + Smoking + AlcoholDrinking+ SleepTime + AgeCategory + Race, data=heart)
 BIC(reg_3)
 summary (reg_3)
 ```
 
-With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 40-44 years age category has insignificant p-values. Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
 
 
 # VIF Table to select variables 
@@ -271,12 +292,15 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 ezids::xkablevif(reg_3, wide=FALSE)
 ```
 
-From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is above 5 for whites and other races, race as a variable will be dropped. We will train and test the model to see the cost analysis of our predictions. 
+From, the VIF table, the VIF value for smoking is 11.28, this is undesirable and thus will be dropped. Therefore our preferred model is as follows:
+
+HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory 
+
+We will train and test the model to see the cost analysis of our predictions. 
 
 ## Logistic Regression  
 
-*** We created another dataframe that had equal proportions of 0 & 1 HD and used that for our training set... 
-The nukmbers not used for the training were used for the test set ## Fix language 
+In order to address the unbalanced classification, we subsetted our original data frame to create a new one (called total) that had equal proportions of the Heart Disease category. The new dataset, called total, has over 54000 observation that have been split into train and test sets.  
 
 # Model Training 
 ```{r}
@@ -303,29 +327,36 @@ total$Sex<-factor(total$Sex)
 set.seed(1234) 
 
 sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
-train <- heart[sample, ]
-test  <- heart[-sample, ]
+train <- total[sample, ]
+test  <- total[-sample, ]
 
 # Logit Model Training
-model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data= train, family='binomial')
-summary(model)
+model<- glm(HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory, data= train, family='binomial')
+#summary(model)
+
+library(lemon)
+knit_print.data.frame <- lemon_print
 
 #Chi-squared test for model fit 
 anova(model, test = 'Chisq')
 
 # Exponential Coefficients  & Confidence Interval 
-exp(cbind(OR = coef(model), confint(model)))
+exp_coeff<- exp(cbind(OR = coef(model), confint(model)))
+knitr::kable(exp_coeff,caption='Odds Ratio & Confidence Interval of Model')
 ```
 
-Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
+Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
 
-According to the model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds ratios for age increases as an individual gets older, i.e. older individuals are more likely to suffer poor health that leads to heart disease.  
+According to the model, the odds for getting heart disease increases by 2.11 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health, drinking, sleep and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds of getting heart disease for age increases as an individual gets older.
 
 Also note, the confidence intervals for all the variables are narrow, indicating that they are good predictors of heart disease. However, the confidence intervals for age gets wider as we increase an individuals age. Although the uncertainty is greater at higher age ranges, there still may be enough precision to inform a patient about preventative measures, when considering their lifestyle choices.
 
 # Predicting and Assessing the Model 
 
 ```{r}
+
+library(ggthemes)
+
 # Prediction
 train$prediction <- predict( model, newdata = train, type = "response" )
 test$prediction  <- predict( model, newdata = test , type = "response" )
@@ -341,15 +372,8 @@ theme_economist()
 # Negative instance = 0 = No Heart Disease
 ```
 
-After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions.  
+After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions. Since we split our data evenly, the negative instances are skewed to the left while the positive instances are skewed to the right. 
 
-For a ideal double density plot you want the distribution of scores to be separated, with the score of the negative instances to be on the left and the score of the positive instance to be on the right.   
-In the current case, both distributions are slight skewed to the left. Not only is the predicted probability for the negative outcomes low, but the probability for the positive outcomes are also lower than it should be. The reason for this is because our dataset only consists of 16 percent of positive instances ( employees that left ). Thus our predicted scores sort of gets pulled towards a lower number because of the majority of the data being negative instances.
-
-A slight digression, when developing models for prediction, we all know that we want the model to be as accurate as possible, or in other words, to do a good job in predicting the target variable on out of sample observations.
-
-Our *skewed* double density plot, however, can actually tell us a very important thing: **Accuracy will not be a suitable measurement for this model.** 
-**Section Takeaway:** Accuracy is not the suitable indicator for the model when you have unbalanced distribution or costs
 
 # ROC-AUC 
 ```{r}
@@ -361,45 +385,36 @@ roc_info <- ROCInfo( data = test,
 					           actual = "HeartDisease", 
 					           cost.fp = 100,
 					           cost.fn = 200 )
-grid.draw(roc_info$plot)
+plot(grid.draw(roc_info$plot))
 
 ```
 
-Cots for false negatives are higher than false positives. acoording to ... 40 to 80 thou annual cost so will be those values 
+Cots for false negatives are higher than false positives. 
 
-Total cost of choosing cut off : $ 432840
-
-```{r}
-accuracy_info <- AccuracyCutoffInfo( train = train, 
-                                     test = test, 
-                                     predict = "prediction", 
-                                     actual = 'HeartDisease' )
-# define the theme for the next plot
-ggthemr("light")
-accuracy_info$plot
-```
 # Confusion Matrix 
 
-```{r}
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
 loadPkg("regclass")
 xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
 unloadPkg("regclass")
 
-# Default 0.5 cut off
-cm_info <- ConfusionMatrixInfo( data = total, 
+# 
+cm_info <- ConfusionMatrixInfo( data = test, 
                                 predict = "prediction", 
-                                actual = 1, cutoff = .5 )
-ggthemr("flat")
-cm_info$plot
+                                actual = 'HeartDisease', 
+                                cutoff = .30 )
+#ggthemr("flat")
+plot(cm_info$plot)
 
 ```
 
 the cost associated with FN is `r cost_fn/cost_fp` times higher than a false positive (FP). 
 
-Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this doucmentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
+Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this documentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
 
 There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
+
 
 
 
@@ -587,7 +602,6 @@ Next Steps:
 Next steps are to use what we learned in our dataset and develop a linear model. And try to create a model which is helpful for everyone. As we all know Health is Wealth and without health, we can't achieve heights so we tend to develop a model which we can use to know which variables are developing heart disease and with that, we can try to decrease the effect on Heart Disease.
 
 
-
 ## References 
 
 Ara S. A literature review of cardiovascular disease management programs in managed care populations. Journal of Managed Care Pharmacy 2004; 10(4): 326-344.
@@ -623,4 +637,15 @@ https://www.statisticssolutions.com/free-resources/directory-of-statistical-anal
  model.matrix(~0+., data=heart) %>% 
      cor(use="pairwise.complete.obs") %>% 
    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
+```
+
+# Freq plot for Heart Disease
+```{r}
+library(ggplot2)
+library(ggpubr)
+theme_set(theme_pubr())
+ggplot(heart, aes(HeartDisease),fill=HeartDisease) +
+  geom_bar() +
+  theme_pubclean()
+
 ```
