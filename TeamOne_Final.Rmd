@@ -136,6 +136,11 @@ barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease Among Male & 
 
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
 
+#Distribution of heart disease over age
+```{r}
+count = table(heart$HeartDisease, heart$AgeCategory)
+barplot(count, col = c("green","red"), legend.text = c("no", "yes"), args.legend = list(x = "topright"), xlab = "Age category", ylab = "count")
+```
 
 # BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
 
