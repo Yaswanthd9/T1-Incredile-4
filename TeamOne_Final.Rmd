@@ -381,7 +381,7 @@ After obtaining the predicted values that an individual will have heart disease 
 
 
 # ROC-AUC 
-```{r}
+```{r, error=False}
 
 # user-defined different cost for false negative and false positive
 
@@ -427,6 +427,13 @@ There's actual more to this HR example. We know who is more likely to leave and 
 
 ### Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
+
+#Exploratory data analysis
+```{r, results='markup'}
+library(ggplot2)
+ggplot(heart, aes(HeartDisease)) +
+  geom_bar(color="black",fill="aquamarine4")
+```
 
 ```{r, results='markup'}
 patient <- subset(heart,HeartDisease==1)
