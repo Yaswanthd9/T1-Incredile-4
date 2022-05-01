@@ -508,7 +508,7 @@ To determine if there is a link between heart disease and drug use, researchers 
 According to statistics from the countrywide veterans affairs healthcare and veterans with premaTure AtheroscLerosis (VITAL) registry (2014-2015). There are 7716 patients who are having extremely premature heart disease , and they discovered this by comparing them to those who do not have premature heart disease.
 
 According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent )
-\
+
 
 ```{r}
 barplot(table(heart$Smoking, heart$HeartDisease), legend= rownames(table(heart$Smoking, heart$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
@@ -555,7 +555,7 @@ xkabledply(anovaRes1, title = "ANOVA result summary")
 ```
 
 ```{r}
-percent <- xtabs(~heart$AlcoholDrinking+ heart$Smoking + heart$HeartDisease)
+percent <- xtabs(~ heart$AlcoholDrinking+ heart$Smoking)
 ftable(prop.table(percent))* 100
 
 ```
@@ -670,18 +670,11 @@ auc
 
 ```{r}
 
-model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic, data = train , family = "binomial")
+model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic:Smoking, data = train , family = "binomial")
 summary(model_lr2)
 xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
 ```
 
-```{r}
-test$model_prob <- predict(model_lr2, test, type = "response")
-
-test <- test %>% mutate(accurate = 1*(model_prob == HeartDisease))
-sum(test$accurate)/nrow(test)
-
-```
 
 ```{r, results='hold'}
 
@@ -698,16 +691,7 @@ loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
 
-```{r}
 
-library("corrplot")
-
-y <- cor(total)
-co_matrix<-cor(total)
-co_matrix
-corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
-
-```
 
 ```{r}
 loadPkg("pROC") 
@@ -716,7 +700,7 @@ loadPkg("pROC")
 library(ROCR)
 p1 <- predict(model_lr2, newdata=test, type="response")
 pr1 <- prediction(p1, test$HeartDisease)
-prf1 <- performance(pr2, measure = "tpr", x.measure = "fpr")
+prf1 <- performance(pr1, measure = "tpr", x.measure = "fpr")
 plot(prf1)
 auc <- performance(pr, measure = "auc")
 auc <- auc@y.values[[1]]
