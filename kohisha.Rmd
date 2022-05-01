@@ -41,6 +41,18 @@ Checking if there are any missing values in the dataset project.
 we can see that there are no missing values for smoking and alcoholdrinking.
 
 ```{r}
+barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$Smoking, project1$HeartDisease)), col =(c("orange", "blue")))
+```
+
+```{r}
+barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$AlcoholDrinking, project1$HeartDisease)), col =(c("red", "darkblue")))
+```
+
+```{r}
+barplot(table(project1$HeartDisease,project1$Diabetic), legend= rownames(table(project1$HeartDisease,project1$Diabetic)), col =(c("green", "brown")))
+```
+
+```{r}
 library(plyr)
 project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
 project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
@@ -63,16 +75,6 @@ project$Diabetic <- as.numeric(project$Diabetic)
 str(project)
 ```
 
-```{r}
-
-library("corrplot")
-
-  
-
-y <- cor(project)
-corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
-
-```
 
 ```{r}
 
@@ -83,7 +85,6 @@ summary(lm1)
 ```
 
 ```{r}
-
 plot(lm1)
 ```
 
@@ -98,10 +99,10 @@ summary(lm2)
 
 
 ```{r}
-lm4 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
-xkabledply(lm4, title = paste("Model :", format(formula(lm4)) ) )
-xkablevif(lm4)
-summary(lm4)
+lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
+xkabledply(lm3, title = paste("Model :", format(formula(lm3)) ) )
+xkablevif(lm3)
+summary(lm3)
 ```
 
 
@@ -126,8 +127,11 @@ ftable(prop.table(percent))* 100
 
 ```{r}
 cor_ad_smoke <- cor(project$AlcoholDrinking,project$Smoking)
+summary(cor_ad_smoke)
 cor_as_hd <- cor(project$AlcoholDrinking,project$HeartDisease)
+summary(cor_as_hd)
 cor_hd_smoke <- cor(project$HeartDisease,project$Smoking)
+summary(cor_hd_smoke)
 
 
 ```
@@ -156,6 +160,7 @@ model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrin
 summary(model_lr)
 xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
 ```
+
 ```{r}
 expcoeff = exp(coef(model_lr))
 xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
@@ -177,6 +182,17 @@ xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
 loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
 ```
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+
+```{r}
+loadPkg("pROC") 
+
+model2 = predict(model_lr, type = "response" )
+h <- roc(HeartDisease ~ model2, data=project)
+auc(h) 
+plot(h)
+```
+
 ```{r}
 
 model_lr2 <- glm(Diabetic ~ Smoking + AlcoholDrinking  + Smoking:AlcoholDrinking, data = project , family = "binomial")
@@ -198,32 +214,12 @@ xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
 
-#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
 
 ```{r}
-loadPkg("pROC") 
 
-model2 = predict(model_lr, type = "response" )
-h <- roc(HeartDisease ~ model2, data=project)
-auc(h) 
-plot(h)
-```
+library("corrplot")
 
+y <- cor(project)
+corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
 
-```{r}
-library(ggplot2)
-#ggplot(project, aes(x = HeartDisease, y= Smoking, fill = group, inherit.aes = FALSE)) + 
-  
-
-ggplot(project, aes(x = HeartDisease)) + 
-  geom_bar(stat = "identity") +
-  scale_fill_manual(values = c("#DADAEB", "#9E9AC8"))
-```
-
-```{r}
-barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$HeartDisease,project1$Smoking)), col =(c("red", "darkblue")))
-
-barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$HeartDisease,project1$AlcoholDrinking)), col =(c("red", "darkblue")))
-
-barplot(table(project1$HeartDisease,project1$Diabetic), legend= rownames(table(project1$HeartDisease,project1$Diabetic)), col =(c("red", "darkblue")))
 ```
