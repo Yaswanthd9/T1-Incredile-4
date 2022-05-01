@@ -335,11 +335,15 @@ test  <- total[-sample, ]
 model<- glm(HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory, data= train, family='binomial')
 #summary(model)
 
+library(lemon)
+knit_print.data.frame <- lemon_print
+
 #Chi-squared test for model fit 
 anova(model, test = 'Chisq')
 
 # Exponential Coefficients  & Confidence Interval 
-exp(cbind(OR = coef(model), confint(model)))
+exp_coeff<- exp(cbind(OR = coef(model), confint(model)))
+knitr::kable(exp_coeff,caption='Odds Ratio & Confidence Interval of Model')
 ```
 
 Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
@@ -409,7 +413,7 @@ unloadPkg("regclass")
 cm_info <- ConfusionMatrixInfo( data = test, 
                                 predict = "prediction", 
                                 actual = 'HeartDisease', 
-                                cutoff = .31 )
+                                cutoff = .30 )
 ggthemr("flat")
 cm_info$plot
 
