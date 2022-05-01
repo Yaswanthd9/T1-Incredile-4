@@ -606,6 +606,9 @@ Accuracy - It determines the overall predicted accuracy of the model. It is calc
 Accuracy-66.2
 
 ```{r}
+loadPkg("pROC")
+library(pROC)
+library(ROCR)
 test_prob <- predict(mod1, newdata = heart_test, type = "response")
 train_prob <-predict(mod1, newdata = heart_train, type = "response")
 test_roc <- roc(heart_test$HeartDisease ~ test_prob, plot = TRUE, print.auc = TRUE)
