@@ -181,6 +181,19 @@ barplot(with(heart,
         beside=T )
 ```
 
+```{r, results = 'markup'}
+# Subsetting genders based on respondents that have heart disease 
+female_HD<- subset(female, HD==1)
+male_HD<- subset(male, HD== 1)
+```
+
+```{r}
+#T-test
+t.test(female_HD$GeneralHealth, male_HD$GeneralHealth)
+t.test(female_HD$PhysicalActivity, male_HD$PhysicalActivity)                  
+```
+
+
 ```{r}
 boxplot(HD~GeneralHealth,data=heart)
 ```
