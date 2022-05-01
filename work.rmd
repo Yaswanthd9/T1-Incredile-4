@@ -277,6 +277,11 @@ nrow(total)
 summary(total)
 ```
 
+
+```{r}
+freq(total)
+```
+
 ```{r}
 # Split into 80-20 train-test sets
 
