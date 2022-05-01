@@ -1,0 +1,225 @@
+---
+title: "R - Assignment"
+author: "Kohisha Aruganti"
+date: "March 21 2022"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes a lot of the helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# Once installed, load the library.
+library(ezids)
+```
+
+```{r init, include=F}
+project1 = data.frame(read.csv("heart_2020_cleaned.csv"))
+project <- subset(project1,select = -c(BMI,Stroke,PhysicalHealth,MentalHealth,DiffWalking,Sex,AgeCategory,Race,PhysicalActivity,GenHealth,SleepTime,Asthma,KidneyDisease, SkinCancer))
+str(project)
+```
+
+
+```{r}
+sum(is.na(project$AlcoholDrinking))
+sum(is.na(project$Smoking))
+sum(is.na(project$HeartDisease))
+sum(is.na(project$Diabetic))
+project[is.na(project) | project=="Inf"] = NA
+missing_val<- subset(project, is.na(HeartDisease)==TRUE) # eliminating the missing values
+summary(missing_val)
+```
+Checking if there are any missing values in the dataset project.
+we can see that there are no missing values for smoking and alcoholdrinking.
+
+```{r}
+barplot(table(project1$Smoking, project1$HeartDisease), legend= rownames(table(project1$Smoking, project1$HeartDisease)), col =(c("orange", "blue")))
+```
+
+```{r}
+barplot(table(project1$AlcoholDrinking, project1$HeartDisease), legend= rownames(table(project1$AlcoholDrinking, project1$HeartDisease)), col =(c("red", "darkblue")))
+```
+
+```{r}
+barplot(table(project1$HeartDisease,project1$Diabetic), legend= rownames(table(project1$HeartDisease,project1$Diabetic)), col =(c("green", "brown")))
+```
+
+```{r}
+library(plyr)
+project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
+project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
+project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("Yes"=1))
+project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("No"=0))
+project$Smoking <- revalue(project$Smoking, c("Yes"=1))
+project$Smoking <- revalue(project$Smoking, c("No"=0))
+project$Diabetic  <- revalue(project$Diabetic , c("Yes"=1))
+project$Diabetic  <- revalue(project$Diabetic , c("No"=0))
+
+project
+
+```
+
+```{r}
+project$HeartDisease <- as.numeric(project$HeartDisease)
+project$Smoking <- as.numeric(project$Smoking)
+project$AlcoholDrinking <- as.numeric(project$AlcoholDrinking)
+project$Diabetic <- as.numeric(project$Diabetic)
+str(project)
+```
+
+
+```{r}
+
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = project)
+xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
+xkablevif(lm1)
+summary(lm1)
+```
+
+```{r}
+plot(lm1)
+```
+
+```{r}
+lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = project)
+xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
+xkablevif(lm2)
+summary(lm2)
+
+```
+
+
+
+```{r}
+lm3 <- lm(Diabetic ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking,data = project)
+xkabledply(lm3, title = paste("Model :", format(formula(lm3)) ) )
+xkablevif(lm3)
+summary(lm3)
+```
+
+
+
+```{r}
+library(dyn)
+anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=project)
+xkabledply(anovaRes, title = "ANOVA result summary")
+
+anovaRes1 = aov(HeartDisease ~ Smoking, data=project)
+xkabledply(anovaRes1, title = "ANOVA result summary")
+
+```
+
+```{r}
+percent <- xtabs(~project$AlcoholDrinking+ project$Smoking + project$HeartDisease)
+ftable(prop.table(percent))* 100
+
+```
+
+# Correlation coefficient 
+
+```{r}
+cor_ad_smoke <- cor(project$AlcoholDrinking,project$Smoking)
+summary(cor_ad_smoke)
+cor_as_hd <- cor(project$AlcoholDrinking,project$HeartDisease)
+summary(cor_as_hd)
+cor_hd_smoke <- cor(project$HeartDisease,project$Smoking)
+summary(cor_hd_smoke)
+
+
+```
+
+```{r}
+contable  <- table(project$HeartDisease, project$Smoking)
+summary(contable ) 
+```
+
+```{r}
+contable2 <- table(project$HeartDisease, project$AlcoholDrinking)
+summary(contable2) 
+```
+
+```{r chisq}
+
+chitest1 = chisq.test(contable)
+chitest1
+chitest2 = chisq.test(contable2)
+chitest2
+```
+
+```{r}
+
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Smoking : AlcoholDrinking, data = project , family = "binomial")
+summary(model_lr)
+xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
+```
+
+```{r}
+expcoeff = exp(coef(model_lr))
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+### Using Confidence Intervals
+
+```{r, results='hold'}
+
+
+xkabledply(confint(model_lr), title = "CIs using profiled log-likelihood" )
+xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
+```
+
+### Model evaluation
+#### Confusion matrix 
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+```
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+
+```{r}
+loadPkg("pROC") 
+
+model2 = predict(model_lr, type = "response" )
+h <- roc(HeartDisease ~ model2, data=project)
+auc(h) 
+plot(h)
+```
+
+```{r}
+
+model_lr2 <- glm(Diabetic ~ Smoking + AlcoholDrinking  + Smoking:AlcoholDrinking, data = project , family = "binomial")
+summary(model_lr2)
+xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
+```
+
+```{r, results='hold'}
+
+
+xkabledply(confint(model_lr2), title = "CIs using profiled log-likelihood" )
+xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
+```
+### Model evaluation
+#### Confusion matrix 
+
+```{r confusionMatrix, results='markup'}
+#loadPkg("regclass")
+xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
+```
+
+
+```{r}
+
+library("corrplot")
+
+y <- cor(project)
+corrplot(y,method="number",title = "Correlation of numberical variables",mar = c(1,0,2,0))
+
+```
