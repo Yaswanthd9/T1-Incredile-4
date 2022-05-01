@@ -275,22 +275,39 @@ From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable a
 
 ## Logistic Regression  
 
+*** We created another dataframe that had equal proportions of 0 & 1 HD and used that for our training set... 
+The nukmbers not used for the training were used for the test set ## Fix language 
+
 # Model Training 
 ```{r}
 
+# Creating a new dataframe (called total) with equal proportions of Heart Disease values 
+newdata1<- subset(heart, HeartDisease==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HeartDisease==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+#nrow(total)
+summary(total)
+freq(total$HeartDisease)
+
+
 # Convert to factor variables 
-heart$HeartDisease<-factor(heart$HeartDisease)
-heart$Sex<-factor(heart$Sex)
+total$HeartDisease<-factor(total$HeartDisease)
+total$Sex<-factor(total$Sex)
 
 # Split into 80-20 train-test sets
+
 set.seed(1234) 
 
-sample <- sample.int(n = nrow(heart), size = floor(.80*nrow(heart)), replace = F)
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
 train <- heart[sample, ]
 test  <- heart[-sample, ]
 
 # Logit Model Training
-model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data=train, family='binomial')
+model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data= train, family='binomial')
 summary(model)
 
 #Chi-squared test for model fit 
@@ -302,7 +319,7 @@ exp(cbind(OR = coef(model), confint(model)))
 
 Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
 
-According to the model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds ratios for age increases as an individual gets older, i.e. elder individuals are more likely to suffer poor health that leads to heart disease.  
+According to the model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds ratios for age increases as an individual gets older, i.e. older individuals are more likely to suffer poor health that leads to heart disease.  
 
 Also note, the confidence intervals for all the variables are narrow, indicating that they are good predictors of heart disease. However, the confidence intervals for age gets wider as we increase an individuals age. Although the uncertainty is greater at higher age ranges, there still may be enough precision to inform a patient about preventative measures, when considering their lifestyle choices.
 
@@ -324,7 +341,7 @@ theme_economist()
 # Negative instance = 0 = No Heart Disease
 ```
 
-For this section we start off by obtaining the predicted value that an individual will have heart dosease on both training and testing set, after that we'll perform a quick evaluation on the training set by plotting the probability (score) estimated by our model with a double density plot. 
+After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions.  
 
 For a ideal double density plot you want the distribution of scores to be separated, with the score of the negative instances to be on the left and the score of the positive instance to be on the right.   
 In the current case, both distributions are slight skewed to the left. Not only is the predicted probability for the negative outcomes low, but the probability for the positive outcomes are also lower than it should be. The reason for this is because our dataset only consists of 16 percent of positive instances ( employees that left ). Thus our predicted scores sort of gets pulled towards a lower number because of the majority of the data being negative instances.
@@ -352,11 +369,27 @@ Cots for false negatives are higher than false positives. acoording to ... 40 to
 
 Total cost of choosing cut off : $ 432840
 
-# Confusion Matrix 
 ```{r}
+accuracy_info <- AccuracyCutoffInfo( train = train, 
+                                     test = test, 
+                                     predict = "prediction", 
+                                     actual = 'HeartDisease' )
+# define the theme for the next plot
+ggthemr("light")
+accuracy_info$plot
+```
+# Confusion Matrix 
+
+```{r}
+
+loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+
 # Default 0.5 cut off
-cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", 
-                                actual = 1, cutoff = .39 )
+cm_info <- ConfusionMatrixInfo( data = total, 
+                                predict = "prediction", 
+                                actual = 1, cutoff = .5 )
 ggthemr("flat")
 cm_info$plot
 
