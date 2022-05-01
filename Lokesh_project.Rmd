@@ -123,35 +123,237 @@ chi_4=chisq.test(hea_skin)
 chi_4
 ```
 For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. Every secondary illness(Diabetic,Asthma, Kidney disease and skin cancer) is dependent on heart disease.
-###################
+
+
+#
+<!-- model1 = lm(HeartDisease~Stroke + Diabetic + Asthma + KidneyDisease  -->
+<!--               + SkinCancer, data=heart) -->
+<!-- sum_md1 = summary(model1) # also for later use on inline codes -->
+<!-- sum_md1 -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- heartsub <- data.frame(heart) -->
+<!-- heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")] -->
+<!-- head(heartsub) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- newdata1<- subset(heartsub, HeartDisease==1) -->
+<!-- newdata1_1<-head(newdata1,20000) -->
+<!-- nrow(newdata1_1) -->
+<!-- newdata0<- subset(heartsub, HeartDisease==0) -->
+<!-- newdata0_1<-head(newdata0,20000) -->
+<!-- nrow(newdata0_1) -->
+<!-- total <- rbind(newdata1_1, newdata0_1) -->
+<!-- nrow(total) -->
+<!-- summary(total) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!--  mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease  -->
+<!--               + SkinCancer, -->
+<!--               data=heart,family = binomial) -->
+<!-- summary(mod1) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) )) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- predicted<- predict(mod1, heart, type = "response") -->
+
+<!-- hist(predicted) -->
+<!-- ``` -->
+
+<!-- ```{r growthDecayFactors, results='markup', collapse=F} -->
+<!-- expcoeff = exp(coef(mod1)) -->
+<!-- # expcoeff -->
+<!-- xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" ) -->
+<!-- ``` -->
+
+<!-- ### Model evaluation -->
+<!-- #### Confusion matrix  -->
+<!-- ```{r confusionMatrix, results='markup'} -->
+<!-- loadPkg("regclass") -->
+<!-- # confusion_matrix -->
+<!-- xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" ) -->
+<!-- unloadPkg("regclass") -->
+<!-- ``` -->
+
+<!-- Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives) -->
+
+<!-- Accuracy-91.45 -->
+<!-- #### Hosmer and Lemeshow test   -->
+
+<!-- The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit.  -->
+
+<!-- ```{r HosmerLemeshow} -->
+<!-- loadPkg("ResourceSelection") # function hoslem.test( ) for logit model evaluation -->
+<!-- heartLogitHoslem = hoslem.test(heart$HeartDisease, fitted(mod1)) # Hosmer and Lemeshow test, a chi-squared test -->
+<!-- unloadPkg("ResourceSelection")  -->
+<!-- ``` -->
+
+<!-- The result is shown here:   -->
+<!-- ```{r HosmerLemeshowRes, results='markup', collapse=F} -->
+<!-- heartLogitHoslem -->
+<!-- # Have not found a good way to display it. -->
+<!-- ``` -->
+
+<!-- #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC) -->
+
+<!-- Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC) measures the true positive rate (or sensitivity) against the false positive rate (or specificity). The area-under-curve is always between 0.5 and 1. Values higher than 0.8 is considered good model fit.   -->
+<!-- ```{r roc_auc} -->
+<!-- loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out. -->
+<!-- prob=predict(mod1, type = "response" ) -->
+<!-- heart$prob=prob -->
+<!-- h <- roc(HeartDisease~prob, data=heart) -->
+<!-- auc(h) # area-under-curve prefer 0.8 or higher. -->
+<!-- plot(h) -->
+<!-- # unloadPkg("pROC") -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- library(pROC) -->
+<!-- # Compute AUC for predicting Class with the variable CreditHistory.Critical -->
+<!-- f1 = roc(HeartDisease~prob, data=heart)  -->
+<!-- plot(f1, col="red") -->
+<!-- ##  -->
+<!-- ## Call: -->
+<!-- ## roc.formula(formula = Class ~ CreditHistory.Critical, data = training) -->
+<!-- ##  -->
+<!-- ## Data: CreditHistory.Critical in 180 controls (Class Bad) < 420 cases (Class Good). -->
+<!-- ## Area under the curve: 0.5944 -->
+<!-- library(ROCR) -->
+<!-- # Compute AUC for predicting Class with the model -->
+<!-- prob <- predict(mod1, newdata=heart, type="response") -->
+<!-- pred <- prediction(prob, heart$HeartDisease) -->
+<!-- perf <- performance(pred, measure = "tpr", x.measure = "fpr") -->
+<!-- plot(perf) -->
+<!-- auc <- performance(pred, measure = "auc") -->
+<!-- auc <- auc@y.values[[1]] -->
+<!-- auc -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- heartsub <- data.frame(heart) -->
+<!-- heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")] -->
+<!-- head(heartsub) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- set.seed(1) -->
+<!-- heart_train_rows = sample(1:nrow(heartsub),     #<- from 1 to the number of rows in the data set -->
+<!--                               round(0.8 * nrow(heartsub), 0),  #<- multiply the number of rows by 0.8 and round the decimals -->
+<!--                               replace = FALSE)   -->
+<!-- heart_train = heartsub[heart_train_rows, ]  -->
+<!-- heart_test = heartsub[-heart_train_rows, ] -->
+<!-- nrow(heart_train) -->
+<!-- nrow(heart_test) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- install.packages("class")  -->
+<!-- loadPkg("class") -->
+
+<!-- # k-Nearest Neighbor is a randomized algorithm, so make sure to -->
+<!-- # use set.seed() to make your results repeatable. -->
+<!-- set.seed(1) -->
+<!-- heart_3NN = knn(train = heart_train[, c("Stroke", "Diabetic", "Asthma","KidneyDisease","SkinCancer")],  #<- training set cases -->
+<!--                test = heart_test[, c("Stroke", "Diabetic", "Asthma","KidneyDisease","SkinCancer")],    #<- test set cases -->
+<!--                cl = heart_train[, "HeartDisease"],                         #<- category for true classification -->
+<!--                k = 3) #,                                                    #<- number of neighbors considered -->
+<!--                # use.all = TRUE)                                            #<- control ties between class assignments -->
+<!--                                                                             #   If true, all distances equal to the k-th largest are included -->
+
+<!-- # View the output. -->
+<!-- str(heart_3NN) -->
+<!-- length(heart_3NN) -->
+<!-- table(heart_3NN) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- set.seed(100) -->
+<!-- heart_train_rows <- sample(1:nrow(heartsub), 0.5*nrow(heartsub)) -->
+<!-- heart_train <- heartsub[heart_train_rows, ] -->
+<!-- heart_test <- heartsub[-heart_train_rows, ] -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!--  mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease  -->
+<!--               + SkinCancer, -->
+<!--               data=heart_train,family = "binomial") -->
+<!-- summary(mod1) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- head(predict(mod1, type = "response")) -->
+<!-- trn_pred <- ifelse(predict(mod1, type = "response") > 0.5, "1", "0") -->
+<!-- head(trn_pred) -->
+
+<!-- fittedSamplesTrain=predict(mod1, newdata=heart_train, type="response") -->
+<!-- fittedGenderTrain=ifelse(fittedSamplesTrain<0.5,0,1 ) -->
+<!-- ConfMatTrain=table(heart_train$HeartDisease,fittedGenderTrain) -->
+<!-- TrainAccuracy=(ConfMatTrain[1,1]+ConfMatTrain[2,2])/sum(ConfMatTrain) -->
+<!-- TrainTPR=72/(72+11) -->
+<!-- TrainFPR=10/(10+79) -->
+
+<!-- print(cbind(TrainAccuracy, TrainTPR, TrainFPR)) -->
+
+<!-- fittedSamplesTest=predict(mod1, newdata=heart_test, type="response") -->
+<!-- fittedGenderTest=ifelse(fittedSamplesTest<0.5,0,1 ) -->
+<!-- ConfMatTest=table(heart_test$HeartDisease,fittedGenderTest) -->
+<!-- TestAccuracy=(ConfMatTest[1,1]+ConfMatTest[2,2])/sum(ConfMatTest) -->
+<!-- TestTPR=45/(45+10) -->
+<!-- TestFPR=1-52/(52+7) ## expressed as 1-true negative rate -->
+
+<!-- print(cbind(TestAccuracy, TestTPR, TestFPR)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- heart_predict<- predict (mod1, heart_test) -->
+<!-- table = table(heart_predict, heart_test$HeartDisease) -->
+<!-- mean(as.character(heart_predict) != as.character(heart_test$HeartDisease)) -->
+<!-- ``` -->
+#
+
+## Logistic Regression Model
+
 ```{r}
-model1 = lm(HeartDisease~Stroke + Diabetic + Asthma + KidneyDisease 
-              + SkinCancer, data=heart)
-sum_md1 = summary(model1) # also for later use on inline codes
-sum_md1
-```
-```{r}
+library(tidyverse)
+library(caret)
 heartsub <- data.frame(heart)
 heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")]
-head(heartsub)
+
+newdata1<- subset(heartsub, HeartDisease==1)
+newdata1_1<-head(newdata1,20000)
+
+newdata0<- subset(heartsub, HeartDisease==0)
+newdata0_1<-head(newdata0,20000)
+
+total <- rbind(newdata1_1, newdata0_1)
+
+set.seed(100)
+heart_train_rows <- sample(1:nrow(total), 0.7*nrow(total))
+heart_train <- total[heart_train_rows, ]
+heart_test <- total[-heart_train_rows, ]
 ```
 
 ```{r}
-newdata1<- subset(heartsub, HeartDisease==1)
-newdata1_1<-head(newdata1,20000)
-nrow(newdata1_1)
-newdata0<- subset(heartsub, HeartDisease==0)
-newdata0_1<-head(newdata0,20000)
-nrow(newdata0_1)
-total <- rbind(newdata1_1, newdata0_1)
-nrow(total)
-summary(total)
+<<<<<<< Updated upstream
+mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
+=======
+set.seed(100)
+heart_train_rows <- sample(1:nrow(total), 0.7*nrow(total))
+heart_train <- total[heart_train_rows, ]
+heart_test <- total[-heart_train_rows, ]
 ```
 
 ```{r}
  mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
+>>>>>>> Stashed changes
               + SkinCancer,
-              data=heart,family = binomial)
+              data=heart_train,family = "binomial")
 summary(mod1)
 ```
 
@@ -159,45 +361,49 @@ summary(mod1)
 xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
 ```
 
+<<<<<<< Updated upstream
+=======
 ```{r}
-predicted<- predict(mod1, heart, type = "response")
+predicted<- predict(mod1, heart_test, type = "response")
 
 hist(predicted)
 ```
+```{r}
+pre_mod1 <- as.numeric(predicted > 0.50)
 
+table(heart_test$HeartDisease, pre_mod1, dnn = c("Actual", "Predicted"))
+```
+```{r}
+mean(heart_test$HeartDisease == pre_mod1)
+```
+
+>>>>>>> Stashed changes
 ```{r growthDecayFactors, results='markup', collapse=F}
 expcoeff = exp(coef(mod1))
 # expcoeff
 xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
 ```
 
-### Model evaluation
 #### Confusion matrix 
 ```{r confusionMatrix, results='markup'}
 loadPkg("regclass")
 # confusion_matrix
 xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+# unloadPkg("regclass")
 ```
 
 Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
 
-Accuracy-91.45
-#### Hosmer and Lemeshow test  
+<<<<<<< Updated upstream
+Accuracy-66.2
 
-The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit. 
+```{r}
+test_prob <- predict(mod1, newdata = heart_test, type = "response")
+train_prob <-predict(mod1, newdata = heart_train, type = "response")
+test_roc <- roc(heart_test$HeartDisease ~ test_prob, plot = TRUE, print.auc = TRUE)
+=======
+Accuracy-66.2(test and train)
 
-```{r HosmerLemeshow}
-loadPkg("ResourceSelection") # function hoslem.test( ) for logit model evaluation
-heartLogitHoslem = hoslem.test(heart$HeartDisease, fitted(mod1)) # Hosmer and Lemeshow test, a chi-squared test
-unloadPkg("ResourceSelection") 
-```
-
-The result is shown here:  
-```{r HosmerLemeshowRes, results='markup', collapse=F}
-heartLogitHoslem
-# Have not found a good way to display it.
-```
 
 #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
 
@@ -205,8 +411,8 @@ Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC) measures
 ```{r roc_auc}
 loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
 prob=predict(mod1, type = "response" )
-heart$prob=prob
-h <- roc(HeartDisease~prob, data=heart)
+total$prob=prob
+h <- roc(HeartDisease~prob, data=total)
 auc(h) # area-under-curve prefer 0.8 or higher.
 plot(h)
 # unloadPkg("pROC")
@@ -241,77 +447,47 @@ head(heartsub)
 ```
 
 ```{r}
-set.seed(1)
-heart_train_rows = sample(1:nrow(heartsub),     #<- from 1 to the number of rows in the data set
-                              round(0.8 * nrow(heartsub), 0),  #<- multiply the number of rows by 0.8 and round the decimals
-                              replace = FALSE)  
-heart_train = heartsub[heart_train_rows, ] 
-heart_test = heartsub[-heart_train_rows, ]
-nrow(heart_train)
-nrow(heart_test)
-```
-
-```{r}
-install.packages("class") 
-loadPkg("class")
-
-# k-Nearest Neighbor is a randomized algorithm, so make sure to
-# use set.seed() to make your results repeatable.
-set.seed(1)
-heart_3NN = knn(train = heart_train[, c("Stroke", "Diabetic", "Asthma","KidneyDisease","SkinCancer")],  #<- training set cases
-               test = heart_test[, c("Stroke", "Diabetic", "Asthma","KidneyDisease","SkinCancer")],    #<- test set cases
-               cl = heart_train[, "HeartDisease"],                         #<- category for true classification
-               k = 3) #,                                                    #<- number of neighbors considered
-               # use.all = TRUE)                                            #<- control ties between class assignments
-                                                                            #   If true, all distances equal to the k-th largest are included
-
-# View the output.
-str(heart_3NN)
-length(heart_3NN)
-table(heart_3NN)
-```
-
-
-```{r}
-set.seed(100)
-heart_train_rows <- sample(1:nrow(heartsub), 0.5*nrow(heartsub))
-heart_train <- heartsub[heart_train_rows, ]
-heart_test <- heartsub[-heart_train_rows, ]
-```
-
-```{r}
  mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
               + SkinCancer,
               data=heart_train,family = "binomial")
 summary(mod1)
+>>>>>>> Stashed changes
 ```
 
 ```{r}
-head(predict(mod1, type = "response"))
-trn_pred <- ifelse(predict(mod1, type = "response") > 0.5, "1", "0")
-head(trn_pred)
-
-fittedSamplesTrain=predict(mod1, newdata=heart_train, type="response")
-fittedGenderTrain=ifelse(fittedSamplesTrain<0.5,0,1 )
-ConfMatTrain=table(heart_train$HeartDisease,fittedGenderTrain)
+fittedheartTrain=ifelse(train_prob<0.5,0,1 )
+ConfMatTrain=table(heart_train$HeartDisease,fittedheartTrain)
 TrainAccuracy=(ConfMatTrain[1,1]+ConfMatTrain[2,2])/sum(ConfMatTrain)
 TrainTPR=72/(72+11)
 TrainFPR=10/(10+79)
 
 print(cbind(TrainAccuracy, TrainTPR, TrainFPR))
 
-fittedSamplesTest=predict(mod1, newdata=heart_test, type="response")
-fittedGenderTest=ifelse(fittedSamplesTest<0.5,0,1 )
-ConfMatTest=table(heart_test$HeartDisease,fittedGenderTest)
+fittedheartTest=ifelse(test_prob<0.5,0,1 )
+ConfMatTest=table(heart_test$HeartDisease,fittedheartTest)
 TestAccuracy=(ConfMatTest[1,1]+ConfMatTest[2,2])/sum(ConfMatTest)
 TestTPR=45/(45+10)
 TestFPR=1-52/(52+7) ## expressed as 1-true negative rate
 
 print(cbind(TestAccuracy, TestTPR, TestFPR))
 ```
+
+<<<<<<< Updated upstream
+#Decision tree model
 ```{r}
-heart_predict<- predict (mod1, heart_test)
-table = table(heart_predict, heart_test$HeartDisease)
-mean(as.character(heart_predict) != as.character(heart_test$HeartDisease))
+set.seed(1)
+library(rpart)
+library(rpart.plot)
+tree<-rpart(HeartDisease~.,method = "class",data =heart_train)
+rpart.plot(tree)
 ```
-############
+
+```{r}
+probabilities <- predict(tree, heart_test)
+tree_pred <- ifelse(probabilities[,2] > 0.5,1,0)
+table(Actual = heart_test$HeartDisease,Predicted = tree_pred )
+```
+=======
+>>>>>>> Stashed changes
+
+Accuarcy-66.7
