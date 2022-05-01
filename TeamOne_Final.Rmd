@@ -300,9 +300,9 @@ anova(model, test = 'Chisq')
 exp(cbind(OR = coef(model), confint(model)))
 ```
 
-Loking at the anova chi-squared results, we can conclude that the logit model (HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values are also significant. 
+Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
 
-According to the model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the log odds for heart disease by 1.032. Mental health and Physical health also affect your chances of getting heart disease. As expected, the odds ratios for age increases as an individual gets older, i.e. elder individuals are more likely to suffer poor health that leads to heart disease.  
+According to the model, the odds ratio for getting heart disease increases by 2.07 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds ratios for age increases as an individual gets older, i.e. elder individuals are more likely to suffer poor health that leads to heart disease.  
 
 Also note, the confidence intervals for all the variables are narrow, indicating that they are good predictors of heart disease. However, the confidence intervals for age gets wider as we increase an individuals age. Although the uncertainty is greater at higher age ranges, there still may be enough precision to inform a patient about preventative measures, when considering their lifestyle choices.
 
