@@ -144,6 +144,22 @@ barplot(with(heart, table(GeneralHealth, HD)), main="heart Disease & GeneralHeal
 ```
 
 ```{r}
+contable = table(heart$GeneralHealth, heart$HD)
+xkabledply(contable, title="Contingency Table for heart Disease and GeneralHealth")
+addmargins(contable)
+
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for heart Disease and General Health in Percentage")
+print (percent)
+barplot(with(heart, 
+             table(GeneralHealth, HD)), 
+        main="heart Disease & GeneralHealth", 
+        beside=T )
+```
+
+```{r}
 boxplot(HD~GeneralHealth,data=heart)
 ```
 
