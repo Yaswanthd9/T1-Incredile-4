@@ -136,6 +136,23 @@ model1 = lm(HeartDisease~Stroke + Diabetic + Asthma + KidneyDisease
 sum_md1 = summary(model1) # also for later use on inline codes
 sum_md1
 ```
+```{r}
+heartsub <- data.frame(heart)
+heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")]
+head(heartsub)
+```
+
+```{r}
+newdata1<- subset(heartsub, HeartDisease==1)
+newdata1_1<-head(newdata1,20000)
+nrow(newdata1_1)
+newdata0<- subset(heartsub, HeartDisease==0)
+newdata0_1<-head(newdata0,20000)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+```
 
 ```{r}
  mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
@@ -169,6 +186,9 @@ xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" 
 unloadPkg("regclass")
 ```
 
+Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
+
+Accuracy-91.45
 #### Hosmer and Lemeshow test  
 
 The Hosmer and Lemeshow Goodness of Fit test can be used to evaluate logistic regression fit. 
@@ -219,11 +239,13 @@ auc <- performance(pred, measure = "auc")
 auc <- auc@y.values[[1]]
 auc
 ```
+
 ```{r}
 heartsub <- data.frame(heart)
 heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")]
 head(heartsub)
 ```
+
 ```{r}
 set.seed(1)
 heart_train_rows = sample(1:nrow(heartsub),     #<- from 1 to the number of rows in the data set
@@ -258,7 +280,7 @@ table(heart_3NN)
 
 ```{r}
 set.seed(100)
-heart_train_rows <- sample(1:nrow(heartsub), 0.7*nrow(heartsub))
+heart_train_rows <- sample(1:nrow(heartsub), 0.5*nrow(heartsub))
 heart_train <- heartsub[heart_train_rows, ]
 heart_test <- heartsub[-heart_train_rows, ]
 ```
@@ -266,7 +288,7 @@ heart_test <- heartsub[-heart_train_rows, ]
 ```{r}
  mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
               + SkinCancer,
-              data=heart_train,family = binomial)
+              data=heart_train,family = "binomial")
 summary(mod1)
 ```
 
@@ -274,21 +296,18 @@ summary(mod1)
 head(predict(mod1, type = "response"))
 trn_pred <- ifelse(predict(mod1, type = "response") > 0.5, "1", "0")
 head(trn_pred)
-```
-```{r}
+
 fittedSamplesTrain=predict(mod1, newdata=heart_train, type="response")
-fittedGenderTrain=ifelse(fittedSamplesTrain<0.5,"Yes","No" )
+fittedGenderTrain=ifelse(fittedSamplesTrain<0.5,0,1 )
 ConfMatTrain=table(heart_train$HeartDisease,fittedGenderTrain)
 TrainAccuracy=(ConfMatTrain[1,1]+ConfMatTrain[2,2])/sum(ConfMatTrain)
 TrainTPR=72/(72+11)
 TrainFPR=10/(10+79)
 
 print(cbind(TrainAccuracy, TrainTPR, TrainFPR))
-```
 
-```{r}
 fittedSamplesTest=predict(mod1, newdata=heart_test, type="response")
-fittedGenderTest=ifelse(fittedSamplesTest<0.5,"Yes","No" )
+fittedGenderTest=ifelse(fittedSamplesTest<0.5,0,1 )
 ConfMatTest=table(heart_test$HeartDisease,fittedGenderTest)
 TestAccuracy=(ConfMatTest[1,1]+ConfMatTest[2,2])/sum(ConfMatTest)
 TestTPR=45/(45+10)
@@ -296,5 +315,9 @@ TestFPR=1-52/(52+7) ## expressed as 1-true negative rate
 
 print(cbind(TestAccuracy, TestTPR, TestFPR))
 ```
-
+```{r}
+heart_predict<- predict (mod1, heart_test)
+table = table(heart_predict, heart_test$HeartDisease)
+mean(as.character(heart_predict) != as.character(heart_test$HeartDisease))
+```
 
