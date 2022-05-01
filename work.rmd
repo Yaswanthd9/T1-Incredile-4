@@ -140,11 +140,13 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```{r}
 heart$Race<-as.factor(heart$Race)
 heart$Ethnicity<-sapply(heart$Race,unclass)
-freq(heart$)
 ```
 
 
 # Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
+```{r}
+freq(heart$Ethnicity)
+```
 
 ```{r}
 loadPkg("corrplot")
@@ -177,9 +179,9 @@ percent <- round(prop*100, 2)
 print ("Contingency Table for heart Disease and General Health in Percentage")
 print (percent)
 barplot(with(heart, 
-             table(GeneralHealth, HD)), 
+             table(Ethnicity, HD)), 
         main="heart Disease & GeneralHealth", 
-        beside=T )
+        beside=T,col = 3:5 )
 ```
 
 ```{r}
@@ -188,6 +190,10 @@ boxplot(HD~GeneralHealth,data=heart)
 
 ```{r}
 plot(HD~PhysicalActivity,data=heart)
+```
+
+```{r}
+plot(HD~Ethnicity,data=heart)
 ```
 
 ```{r}
@@ -332,3 +338,52 @@ cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'H
 plot(cm_info$plot)
 
 ```
+
+```{r}
+# Split into 80-20 train-test sets
+library(caret)
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+
+```{r}
+### Linear SVM
+svm_linear <- train(HD ~GeneralHealth+Ethnicity, data = train, method = "svmLinear", trControl=trainControl(method = "repeatedcv", number = 10, repeats = 3), preProcess = c("center", "scale"), tuneLength = 10)
+svm_linear
+```
+
+```{r}
+### Confusion Matrix
+test_pred<-predict(svm_linear,test)
+confusionMatrix(table(test_pred,test$HD))
+```
+
+```{r}
+### griding for obtaining best C value
+svm_grid<-train(HD ~GeneralHealth+Ethnicity, data = train, method = "svmLinear", trControl=trainControl("cv", number = 10), tuneGrid = expand.grid(C=seq(0,2,length=20)), preProcess = c("center", "scale"))
+```
+
+{r}
+# plot model accuracy vs different values of cost
+plot(svm_grid)
+svm_grid$bestTune
+test_predgrid<-predict(svm_grid,test_data)
+
+
+{r}
+# Accuracy after finding best parameter
+confusionMatrix(table(test_predgrid,test_data$filtered_joined_churn_df.Churn.Label))
+
+
+
+{r results='markup'}
+### ROC Curve
+library(pROC)
+roc_svm_test <-plot(roc(as.numeric(test_data$filtered_joined_churn_df.Churn.Label),as.numeric(test_pred)),main="Comparaison ",col="#1c61b6")
+plot(roc_svm_test, add = TRUE,col = "red", print.auc=TRUE, print.auc.x = 0.5, print.auc.y = 0.3)
+legend(0.3, 0.2, legend = c("test-svm"), lty = c(1), col = c("blue"))
+
