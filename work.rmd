@@ -188,16 +188,7 @@ newdata1 <- with(heart, data.frame(GeneralHealth = mean(GeneralHealth), Physical
 newdata1$rankP <- predict(mylogit, newdata = newdata1, type = "response")
 ```
 
-Logistic regressiob for Q.no 2
-```{r}
-library(aod)
-library(ggplot2)
-summary(heart)
-mylogit <- glm(HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic , data = heart, family = "binomial")
-summary(mylogit)
-confint(mylogit)
-confint.default(mylogit)
-```
+
 
 Logistic regressiob for Q.no 4
 ```{r}
