@@ -588,7 +588,6 @@ Next Steps:
 Next steps are to use what we learned in our dataset and develop a linear model. And try to create a model which is helpful for everyone. As we all know Health is Wealth and without health, we can't achieve heights so we tend to develop a model which we can use to know which variables are developing heart disease and with that, we can try to decrease the effect on Heart Disease.
 
 
-
 ## References 
 
 Ara S. A literature review of cardiovascular disease management programs in managed care populations. Journal of Managed Care Pharmacy 2004; 10(4): 326-344.
