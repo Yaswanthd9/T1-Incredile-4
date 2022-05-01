@@ -292,7 +292,7 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 ezids::xkablevif(reg_3, wide=FALSE)
 ```
 
-From, the VIF table, The VIF value for smoking is 11.28, this is undesirable and thus will be dropped. Therefore our preferred model is as follows:
+From, the VIF table, the VIF value for smoking is 11.28, this is undesirable and thus will be dropped. Therefore our preferred model is as follows:
 
 HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory 
 
@@ -300,8 +300,7 @@ We will train and test the model to see the cost analysis of our predictions.
 
 ## Logistic Regression  
 
-*** We created another dataframe that had equal proportions of 0 & 1 HD and used that for our training set... 
-The nukmbers not used for the training were used for the test set ## Fix language 
+In order to address the unbalanced classification, we subsetted our original data frame to create a new one (called total) that had equal proportions of the Heart Disease category. The new dataset, called total, has over 54000 observation that have been split into train and test sets.  
 
 # Model Training 
 ```{r}
@@ -414,8 +413,8 @@ cm_info <- ConfusionMatrixInfo( data = test,
                                 predict = "prediction", 
                                 actual = 'HeartDisease', 
                                 cutoff = .30 )
-ggthemr("flat")
-cm_info$plot
+#ggthemr("flat")
+plot(cm_info$plot)
 
 ```
 
