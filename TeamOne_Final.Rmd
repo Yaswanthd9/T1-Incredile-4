@@ -418,10 +418,6 @@ Using a classification algorithm like logistic regression in this example enable
 There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
 
 
-
-
-################ END OF SECTION ###########################
-
 ### Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
 
@@ -638,7 +634,6 @@ table(Actual = heart_test$HeartDisease,Predicted = tree_pred )
 
 Accuarcy-66.7
 
-################ END OF SECTION ###########################
 
 ### Smokers Vs Alcoholic Drinkers 
 
@@ -773,26 +768,3 @@ https://statsandr.com/blog/chi-square-test-of-independence-in-r/
 
 https://www.statisticssolutions.com/free-resources/directory-of-statistical-analyses/chi-square/
 
-# #### CODE CEMETERY ######
-
-# Correlation Plots of All Variables ###DELETE since every section has theire own 
-```{r, results = 'markup'}
- model.matrix(~0+., data=heart) %>% 
-     cor(use="pairwise.complete.obs") %>% 
-   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
-```
-
-# Freq plot for Heart Disease
-```{r}
-library(ggplot2)
-library(ggpubr)
-theme_set(theme_pubr())
-ggplot(heart, aes(HeartDisease),fill=HeartDisease) +
-  geom_bar() +
-  theme_pubclean()
-
-fitted.results <- predict(model_lr,newdata = test, type='response')
-fitted.results <- ifelse(fitted.results > 0.5,1,0)
-misClasificError <- mean(fitted.results != test$HeartDisease)
-print(paste('Accuracy',1-misClasificError))
-```
