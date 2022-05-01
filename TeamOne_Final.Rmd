@@ -303,8 +303,8 @@ total$Sex<-factor(total$Sex)
 set.seed(1234) 
 
 sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
-train <- heart[sample, ]
-test  <- heart[-sample, ]
+train <- total[sample, ]
+test  <- total[-sample, ]
 
 # Logit Model Training
 model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data= train, family='binomial')
@@ -361,7 +361,7 @@ roc_info <- ROCInfo( data = test,
 					           actual = "HeartDisease", 
 					           cost.fp = 100,
 					           cost.fn = 200 )
-grid.draw(roc_info$plot)
+plot(grid.draw(roc_info$plot))
 
 ```
 
@@ -376,7 +376,7 @@ accuracy_info <- AccuracyCutoffInfo( train = train,
                                      actual = 'HeartDisease' )
 # define the theme for the next plot
 ggthemr("light")
-accuracy_info$plot
+plot(accuracy_info$plot)
 ```
 # Confusion Matrix 
 
@@ -386,10 +386,11 @@ loadPkg("regclass")
 xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
 unloadPkg("regclass")
 
-# Default 0.5 cut off
-cm_info <- ConfusionMatrixInfo( data = total, 
+# 
+cm_info <- ConfusionMatrixInfo( data = test, 
                                 predict = "prediction", 
-                                actual = 1, cutoff = .5 )
+                                actual = 'HeartDisease', 
+                                cutoff = .31 )
 ggthemr("flat")
 cm_info$plot
 
