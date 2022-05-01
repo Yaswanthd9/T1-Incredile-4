@@ -68,22 +68,22 @@ library(plyr)
 project$Diabetic<- replace (project$Diabetic, project$Diabetic== "No, borderline diabetes" , "Yes")
 project$Diabetic[project$Diabetic== "Yes (during pregnancy)"] <- "No"  
 
-project$HeartDisease<-ifelse(heart$HeartDisease=="Yes",1,0)
-project$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
-project$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
-project$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+#project$HeartDisease<-ifelse(project$HeartDisease=="Yes",1,0)
+#project$Smoking<-ifelse(project$Smoking=="Yes",1,0)
+#project$AlcoholDrinking<-ifelse(project$AlcoholDrinking=="Yes",1,0)
+#project$Diabetic<-ifelse(project$Diabetic=="Yes",1,0)
 
 
-#project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
-#project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
-#project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("Yes"=1))
-#project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("No"=0))
-#project$Smoking <- revalue(project$Smoking, c("Yes"=1))
-#project$Smoking <- revalue(project$Smoking, c("No"=0))
-#project$Diabetic  <- revalue(project$Diabetic , c("Yes"=1))
-#project$Diabetic  <- revalue(project$Diabetic , c("No"=0))
-#project$Diabetic  <- revalue(project$Diabetic , c("No,borderline diabetes"="No"))
-#project$Diabetic  <- revalue(project$Diabetic , c("Yes (during pregnancy)"="Yes"))
+project$HeartDisease <- revalue(project$HeartDisease, c("Yes"=1))
+project$HeartDisease<- revalue(project$HeartDisease, c("No"=0))
+project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("Yes"=1))
+project$AlcoholDrinking <- revalue(project$AlcoholDrinking, c("No"=0))
+project$Smoking <- revalue(project$Smoking, c("Yes"=1))
+project$Smoking <- revalue(project$Smoking, c("No"=0))
+project$Diabetic  <- revalue(project$Diabetic , c("Yes"=1))
+project$Diabetic  <- revalue(project$Diabetic , c("No"=0))
+project$Diabetic  <- revalue(project$Diabetic , c("No,borderline diabetes"="No"))
+project$Diabetic  <- revalue(project$Diabetic , c("Yes (during pregnancy)"="Yes"))
 
 
 project
@@ -101,7 +101,7 @@ str(project)
 
 ```{r}
 
-lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = total)
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking + AlcoholDrinking:Smoking, data = project)
 xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
