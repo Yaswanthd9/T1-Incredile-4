@@ -28,11 +28,14 @@ str(project)
 ```
 
 ```{r}
+heartsub <- data.frame(project)
+heartsub <- heartsub[, c("HeartDisease","Diabetic","Smoking", "AlcoholDrinking")]
+head(heartsub)
 
-newdata1<- subset(project, HeartDisease==1)
+newdata1<- subset(heartsub, HeartDisease==1)
 newdata1_1<-head(newdata1,27373)
 nrow(newdata1_1)
-newdata0<- subset(project, HeartDisease==0)
+newdata0<- subset(heartsub, HeartDisease==0)
 newdata0_1<-head(newdata0,27373)
 nrow(newdata0_1)
 total <- rbind(newdata1_1, newdata0_1)
