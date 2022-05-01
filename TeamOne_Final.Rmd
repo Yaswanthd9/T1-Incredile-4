@@ -205,7 +205,7 @@ t.test  (male_HD$MentalHealth,
 female_HD$MentalHealth)
 ```
 
-The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men. The cyclical nature of mental health and exercise has been covered extensively (Mikkelsen 2017; Raglin 1990); which assert that individuals struggling with mental health issues often are unable to complete physically demanding tasks, further making matters worse. This is because exercise has been shown to produce beneficial hormones that are associated with imporvements in mental health. 
+The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men. The cyclical nature of mental health and exercise has been covered extensively (Mikkelsen 2017; Raglin 1990); which assert that individuals struggling with mental health issues often are unable to complete physically demanding tasks, further making matters worse. This is because exercise has been shown to produce beneficial hormones that are associated with improvements in mental health. 
 
 # Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
 ```{r, results = 'markup'}
@@ -217,14 +217,42 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     scale_fill_brewer(palette = 'Set1', name = 'Gender')
 
 t.test  (male_HD$SleepTime,
-female_HD$SleepTime)
+          female_HD$SleepTime)
 ```
 
 Men and women have statistically different sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep effects are known to be cumulative. A study conducted by Robbins et al. in 2021 "examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus". The study found that curtailing sleep below the recommended seven hours increases the risk for viral infection "nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest" (Robbins et al, 2021). 
 
 This lack of sleep could explain why we see that women in our data on average report feeling sick more often and could also be a contributing factors is why women are more likely to die from heart attacks than men (Noel Bairey Merz).
 
-When looking at other lifestyle factors such as smoking or alcohol drinking, we see that there is no statistical difference that can be measured between the sexes and those that have heart disease. However, it should be noted that the survey is voluntary and there is no way to ensure that the respondents are being truthful. 
+#Smoking:Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
+```{r}
+#Smoking 
+ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    ggtitle(' Have you smoked at least 100 cigarettes in your entire life?') +
+    xlab('Heart Disease') + 
+    ylab('Smoking')+ 
+    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+
+t.test  ( male_HD$Smoking,
+        female_HD$Smoking)
+
+
+```
+
+#Drinking: How many drinks have you had this week? 
+```{r}
+ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
+    geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
+    ggtitle('How many drinks have you had this week?') +
+    xlab('Heart Disease') + 
+    ylab('Alcohol Consumption')+ 
+    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+
+t.test  ( male_HD$AlcoholDrinking,
+        female_HD$AlcoholDrinking)
+```
+Heavy drinkers (adult men having more than 14 drinks per week and adult women having more than 7 drinks per week
 
 # Age, Race, General Health
 ```{r, results = 'markup'}
@@ -251,12 +279,12 @@ reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=
 BIC(reg_2)
 summary (reg_2)
 
-reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime + AgeCategory + Race, data=heart)
+reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + Smoking + AlcoholDrinking+ SleepTime + AgeCategory + Race, data=heart)
 BIC(reg_3)
 summary (reg_3)
 ```
 
-With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 25 to 39 years age category has insignificant p-values. Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 40-44 years age category has insignificant p-values. Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
 
 
 # VIF Table to select variables 
@@ -264,7 +292,11 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 ezids::xkablevif(reg_3, wide=FALSE)
 ```
 
-From, the VIF table, The VIF value for sleep time is 11.3, this is undesirable and thus will be dropped. Race is above 5 for whites and other races, race as a variable will be dropped. We will train and test the model to see the cost analysis of our predictions. 
+From, the VIF table, The VIF value for smoking is 11.28, this is undesirable and thus will be dropped. Therefore our preferred model is as follows:
+
+HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory 
+
+We will train and test the model to see the cost analysis of our predictions. 
 
 ## Logistic Regression  
 
@@ -300,8 +332,8 @@ train <- total[sample, ]
 test  <- total[-sample, ]
 
 # Logit Model Training
-model<- glm(HeartDisease~ Sex+ BMI + PhysicalHealth + MentalHealth +  AgeCategory, data= train, family='binomial')
-summary(model)
+model<- glm(HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory, data= train, family='binomial')
+#summary(model)
 
 #Chi-squared test for model fit 
 anova(model, test = 'Chisq')
@@ -385,7 +417,7 @@ cm_info$plot
 
 the cost associated with FN is `r cost_fn/cost_fp` times higher than a false positive (FP). 
 
-Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this doucmentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
+Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this documentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
 
 There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
 
