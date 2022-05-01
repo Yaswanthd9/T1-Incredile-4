@@ -496,6 +496,86 @@ chi_5
 
 From the output and from `test$p.value` we see that the p-value is less than the significance level of 5%. Like any other statistical test, if the p-value is less than the significance level, we can reject the null hypothesis.Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with heart Disease.
 
+## Logistic Regression Model
+
+```{r}
+library(tidyverse)
+library(caret)
+heartsub <- data.frame(heart)
+heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")]
+
+newdata1<- subset(heartsub, HeartDisease==1)
+newdata1_1<-head(newdata1,20000)
+
+newdata0<- subset(heartsub, HeartDisease==0)
+newdata0_1<-head(newdata0,20000)
+
+total <- rbind(newdata1_1, newdata0_1)
+
+set.seed(100)
+heart_train_rows <- sample(1:nrow(total), 0.7*nrow(total))
+heart_train <- total[heart_train_rows, ]
+heart_test <- total[-heart_train_rows, ]
+```
+
+```{r}
+mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
+              + SkinCancer,
+              data=heart_train,family = "binomial")
+summary(mod1)
+```
+
+```{r}
+xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
+```
+
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(mod1))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+#### Confusion matrix 
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+# confusion_matrix
+xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+
+Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
+
+Accuracy-66.2
+
+```{r}
+test_prob <- predict(mod1, newdata = heart_test, type = "response")
+train_prob <-predict(mod1, newdata = heart_train, type = "response")
+test_roc <- roc(heart_test$HeartDisease ~ test_prob, plot = TRUE, print.auc = TRUE)
+```
+
+```{r}
+# head(predict(mod1, type = "response"))
+# trn_pred <- ifelse(predict(mod1, type = "response") > 0.5, "1", "0")
+# head(trn_pred)
+
+fittedheartTrain=ifelse(train_prob<0.5,0,1 )
+ConfMatTrain=table(heart_train$HeartDisease,fittedheartTrain)
+TrainAccuracy=(ConfMatTrain[1,1]+ConfMatTrain[2,2])/sum(ConfMatTrain)
+TrainTPR=72/(72+11)
+TrainFPR=10/(10+79)
+
+print(cbind(TrainAccuracy, TrainTPR, TrainFPR))
+
+fittedheartTest=ifelse(test_prob<0.5,0,1 )
+ConfMatTest=table(heart_test$HeartDisease,fittedheartTest)
+TestAccuracy=(ConfMatTest[1,1]+ConfMatTest[2,2])/sum(ConfMatTest)
+TestTPR=45/(45+10)
+TestFPR=1-52/(52+7) ## expressed as 1-true negative rate
+
+print(cbind(TestAccuracy, TestTPR, TestFPR))
+```
+
+#Decision tree model
 
 ### Smokers Vs Alcoholic Drinkers 
 
