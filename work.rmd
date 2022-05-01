@@ -1,0 +1,569 @@
+---
+title: "work"
+author: "Yaswanth"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+# Title Info 
+
+# Introduction
+
+# Libraries 
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(funModeling)
+library(ezids)
+library(ggplot2)
+library(ggcorrplot)
+library(corrr)
+```
+
+
+# Load the Data and Rename dataframe 
+```{r}
+
+ heart<-read.csv("heart_2020_cleaned.csv")
+
+```
+# Lets take a look at our data
+```{r}
+nrow (heart)
+```
+
+
+# Descrpitive Statistics  
+```{r}
+status (heart)
+```
+
+From the table we can see that Physical and Mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set are not physically active while about 60% of the respondents do not report having mental health issues. 
+
+We can also see that there are no N/A values in our data set. This is not surprising because our source data was cleaned before. 
+
+# Now to see which variables are categorical and which are numerical 
+```{r}
+data_integrity(heart)
+```
+# Description of every variable 
+```{r error= TRUE}
+describe (heart)
+```
+
+Converting HeartDIsease categorical into Numerical Variable
+
+```{r}
+heart$HD<-ifelse(heart$HeartDisease=="Yes",1,0)
+```
+#Converting General Health as numericals
+Finding the mean of numerical variables grouped by Gen Health
+```{r }
+#plot_num(heart)
+heart$GenHealth<-as.factor(heart$GenHealth)
+heart$GeneralHealth<-sapply(heart$GenHealth,unclass)
+heart %>%
+  group_by(HeartDisease) %>%
+  summarise_at(vars("GeneralHealth"), mean)
+```
+
+#5-Very good,4-poor,3-Good,2-fair,1-excellent
+
+There is very less differnce in General Health, Even people are healthy (normal GeneralHealth) people have No heartDisease by 3.22 times than people wih people with non general health get by 3.12 
+# Frequency distributions of all our categorical variables 
+```{r}
+freq(heart)
+```
+
+
+# Changing Diabetes bordeline and pregnancy categories to Yes/No
+```{r}
+heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
+heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
+```
+
+
+#Checking if diabetic has been changed 
+```{r}
+describe (heart$Diabetic)
+freq(heart$Diabetic)
+```
+
+# Changing all the categorical variables to numerical dummies 
+```{r}
+
+heart$Smoking<-ifelse(heart$Smoking=="Yes",1,0)
+heart$AlcoholDrinking<-ifelse(heart$AlcoholDrinking=="Yes",1,0)
+heart$Stroke<-ifelse(heart$Stroke=="Yes",1,0)
+heart$DiffWalking<-ifelse(heart$DiffWalking=="Yes",1,0)
+heart$PhysicalActivity<-ifelse(heart$PhysicalActivity=="Yes",1,0)
+heart$KidneyDisease<-ifelse(heart$KidneyDisease=="Yes",1,0)
+heart$SkinCancer<-ifelse(heart$SkinCancer=="Yes",1,0)
+heart$Diabetic<-ifelse(heart$Diabetic=="Yes",1,0)
+heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
+```
+
+# Changing race variable to numerical variable
+```{r}
+heart$Race<-as.factor(heart$Race)
+heart$Ethnicity<-sapply(heart$Race,unclass)
+```
+
+
+# Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
+
+```{r}
+loadPkg("corrplot")
+cor(heart$HD,heart$GeneralHealth)
+
+```
+
+```{r}
+
+contable = table(heart$GeneralHealth, heart$HD)
+xkabledply(contable, title="Contingency Table for Heart Disease and GeneralHealth")
+addmargins(contable)
+
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for heart Disease and General Health in Percentage")
+print (percent)
+barplot(with(heart, table(GeneralHealth, HD)), main="heart Disease & GeneralHealth", beside=T, col=3:2)
+```
+
+```{r}
+contable = table(heart$GeneralHealth, heart$HD)
+xkabledply(contable, title="Contingency Table for heart Disease and GeneralHealth")
+addmargins(contable)
+
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for heart Disease and General Health in Percentage")
+print (percent)
+barplot(with(heart, 
+             table(GeneralHealth, HD)), 
+        main="heart Disease & GeneralHealth", 
+        beside=T )
+```
+
+```{r}
+boxplot(HD~GeneralHealth,data=heart)
+```
+
+```{r}
+plot(HD~PhysicalActivity,data=heart)
+```
+
+```{r}
+plot(HD~DiffWalking,data=heart)
+```
+
+```{r}
+
+t.test(heart$GeneralHealth, heart$HD)
+t.test(heart$PhysicalActivity, heart$HD)
+```
+
+```{r}
+Genh_HD=table(heart$GeneralHealth,heart$HD)
+chi_1=chisq.test(Genh_HD)
+chi_1
+HD_Eth=table(heart$PhysicalActivity,heart$HD)
+chi_2=chisq.test(HD_Eth)
+chi_2
+```
+For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+Every GeneralHealth,PhysicalActivity has a relationship with heart Disease. 
+
+Logistic regressiob for Q.no 4
+```{r}
+library(aod)
+library(ggplot2)
+#summary(heart)
+mylogit <- glm(HD ~ GeneralHealth+PhysicalActivity , data = total, family = "binomial")
+summary(mylogit)
+confint(mylogit)
+confint.default(mylogit)
+wald.test(b = coef(mylogit), Sigma = vcov(mylogit), Terms = 1:2)
+exp(coef(mylogit))
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+newdata1 <- with(heart, data.frame(GeneralHealth = mean(GeneralHealth), PhysicalActivity = mean(PhysicalActivity), rank = factor(1:2)))
+newdata1$rankP <- predict(mylogit, newdata = newdata1, type = "response")
+```
+
+
+
+Logistic regressiob for Q.no 4
+```{r}
+install.packages('caTools')
+library(caTools)
+set.seed(88)
+#split <- sample.split(heart$HD, SplitRatio = 0.75)
+#dresstrain <- subset(heart, split == TRUE)
+#dresstest <- (heart)
+#train_sample<-createDataPartition(y = heart$HD, p= 0.7, list = FALSE)
+#train_data<-heart[train_sample, ]
+#test_data<-heart[-train_sample, ]
+
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data = total, family = "binomial")
+summary(model)
+predict <- predict(model, type = 'response')
+table(total$HD, predict > 0.5)
+#ROCR Curve
+library(ROCR)
+ROCRpred <- prediction(predict, total$HD)
+ROCRperf <- performance(ROCRpred, 'tpr','fpr')
+plot(ROCRperf, colorize = TRUE, text.adj = c(-0.2,1.7))
+#plot glm
+library(ggplot2)
+ggplot(train_data, aes(x=GeneralHealth+PhysicalActivity, y=HD)) + geom_point() + 
+stat_smooth(method="glm", family="binomial", se=FALSE)
+loadPkg("regclass")
+confusion_matrix(model)
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+For on e increase in Heart Disease General Health decrease by -0.019 and decrease in -0.74 in Physical activity.
+
+
+
+Logistic regressiob for Q.no 4
+
+```{r}
+
+model <- glm (HD ~ GeneralHealth+PhysicalActivity+Ethnicity, data =heart, family = "binomial")
+summary(model)
+```
+
+```{r results='markup'}
+xkabledply(model, title = paste("Logistic Regression :", format(formula(model)) ))
+```
+
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(model))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+```{r logit_fitted_value}
+p_fitted = model$fitted.value# this is the model predicated value p-hat for the first data row (not the actual data point p)  
+```  
+
+```{r}
+# This gives you the predicted values of the data points inside the model.
+predict(model)  # the is from the model, which gives you the value for logit(p) or ln(p/q) 
+```
+
+```{r}
+newdata1 <- data.frame(GeneralHealth=4, PhysicalActivity=0,Ethnicity=1) # new data frame with 1 row
+predict(model, newdata = newdata1)
+# The default option is "link", with gives you the value of the link function, 
+# in this case, logit(p) or log(p/1-p) value
+predict(model, newdata = newdata1, type = "link") -> pred_link # same as predict(model, newdata = newdata1)
+paste("This is pred_link: ",pred_link) 
+
+predict(model, newdata = newdata1, type = "response") -> pred_response 
+paste("This is pred_response: ",pred_response)
+
+predict(model, newdata = newdata1, type = "term") -> pred_term
+paste("This is pred_term, which is a vector with three values, plus the y-intercept term, called `attribute`")
+pred_term 
+# attr(pred_term,"constant")
+```
+
+
+
+```{r}
+# But this is not "y-value" p that we want to compare to.  
+# These three things are the same: 
+# 1. using the response option:
+predict(model, newdata = newdata1, type = "response")
+# 2. Using the link function value (default), to calculate the probability p-hat: 
+1/(1+exp(-predict(model, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
+# 3. Find the odds-ratio first, then calculate the probability p-hat: 
+oddsratio = exp( predict(model, newdata = newdata1, type="link"))
+oddsratio / (oddsratio+1)
+```
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model, type = "response" )
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model, type = "response" )
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
+
+ 
+```{r}
+unloadPkg("pROC")
+```
+ 
+Logistic regressiob for Q.no 2
+```{r}
+
+model1<- glm (HD ~ SkinCancer+KidneyDisease+Asthma+Diabetic, data =heart, family = "binomial")
+summary(model1)
+```
+
+```{r results='markup'}
+xkabledply(model1, title = paste("Logistic Regression :", format(formula(model)) ))
+```
+
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(model1))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+```{r logit_fitted_value}
+p_fitted = model1$fitted.values[1] # this is the model predicated value p-hat for the first data row (not the actual data point p)  
+```  
+
+```{r}
+# This gives you the predicted values of the data points inside the model.
+predict(model1)  # the is from the model, which gives you the value for logit(p) or ln(p/q) 
+```
+
+```{r}
+newdata1 <- data.frame(SkinCancer=1,KidneyDisease=1,Asthma=1,Diabetic=1) # new data frame with 1 row
+predict(model1, newdata = newdata1)
+# The default option is "link", with gives you the value of the link function, 
+# in this case, logit(p) or log(p/1-p) value
+predict(model1, newdata = newdata1, type = "link") -> pred_link # same as predict(admitLogit, newdata = newdata1)
+paste("This is pred_link: ",pred_link) 
+
+predict(model1, newdata = newdata1, type = "response") -> pred_response 
+paste("This is pred_response: ",pred_response)
+
+predict(model1, newdata = newdata1, type = "term") -> pred_term
+paste("This is pred_term, which is a vector with three values, plus the y-intercept term, called `attribute`")
+pred_term 
+# attr(pred_term,"constant")
+```
+
+
+
+```{r}
+# But this is not "y-value" p that we want to compare to.  
+# These three things are the same: 
+# 1. using the response option:
+predict(model1, newdata = newdata1, type = "response")
+# 2. Using the link function value (default), to calculate the probability p-hat: 
+1/(1+exp(-predict(model1, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
+# 3. Find the odds-ratio first, then calculate the probability p-hat: 
+oddsratio = exp( predict(model1, newdata = newdata1, type="link"))
+oddsratio / (oddsratio+1)
+```
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+xkabledply( confusion_matrix(model1), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model1, type = "response" )
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
+
+```{r}
+loadPkg("rpart") # Classification trees, rpart(formula, data=, method=,control=) 
+```
+
+```{r, echo = T, fig.dim=c(6,4)}
+set.seed(1)
+HDfit <- rpart(HD ~ GeneralHealth + PhysicalActivity+Ethnicity , data=heart, method="class", control = list(maxdepth = 4) )
+# kyphosisfit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, method="class", control = {rpart.control list} )
+# rpart.control(maxdepth = 30, minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, ...)
+printcp(HDfit) # display the results 
+plotcp(HDfit) # visualize cross-validation results 
+summary(HDfit) # detailed summary of splits
+```
+
+# plot tree 
+plot(HDfit, uniform=TRUE, main="Classification Tree for Kyphosis")
+text(HDfit, use.n=TRUE, all=TRUE, cex=.8)
+
+
+```{r}
+# create attractive postcript plot of tree 
+post(HDfit, file = "kythosisTree2.ps", title = "Classification Tree for Kythosis")
+```
+
+```{r}
+newdata1<- subset(heart, HD==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HD==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+```
+
+
+```{r}
+
+model <- glm (HD ~ GeneralHealth+PhysicalActivity, data =total, family = "binomial")
+summary(model)
+```
+
+```{r results='markup'}
+xkabledply(model, title = paste("Logistic Regression :", format(formula(model)) ))
+```
+
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(model))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+```{r logit_fitted_value}
+p_fitted = model$fitted.value# this is the model predicated value p-hat for the first data row (not the actual data point p)  
+```  
+
+```{r}
+# This gives you the predicted values of the data points inside the model.
+predict(model)  # the is from the model, which gives you the value for logit(p) or ln(p/q) 
+```
+
+```{r}
+newdata1 <- data.frame(GeneralHealth=4, PhysicalActivity=0) # new data frame with 1 row
+predict(model, newdata = newdata1)
+# The default option is "link", with gives you the value of the link function, 
+# in this case, logit(p) or log(p/1-p) value
+predict(model, newdata = newdata1, type = "link") -> pred_link # same as predict(model, newdata = newdata1)
+paste("This is pred_link: ",pred_link) 
+
+predict(model, newdata = newdata1, type = "response") -> pred_response 
+paste("This is pred_response: ",pred_response)
+
+predict(model, newdata = newdata1, type = "term") -> pred_term
+paste("This is pred_term, which is a vector with three values, plus the y-intercept term, called `attribute`")
+pred_term 
+# attr(pred_term,"constant")
+```
+
+
+
+```{r}
+# But this is not "y-value" p that we want to compare to.  
+# These three things are the same: 
+# 1. using the response option:
+predict(model, newdata = newdata1, type = "response")
+# 2. Using the link function value (default), to calculate the probability p-hat: 
+1/(1+exp(-predict(model, newdata = newdata1))) # 1/(1+exp(-predict(model, newdata = newdata1, type="link")))
+# 3. Find the odds-ratio first, then calculate the probability p-hat: 
+oddsratio = exp( predict(model, newdata = newdata1, type="link"))
+oddsratio / (oddsratio+1)
+```
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model, type = "response" )
+total$prob=prob
+h <- roc(HD~prob, data=total)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
+```{r roc_auc}
+loadPkg("pROC") # receiver operating characteristic curve, gives the diagnostic ability of a binary classifier system as its discrimination threshold is varied. The curve is on sensitivity/recall/true-positive-rate vs false_alarm/false-positive-rate/fall-out.
+prob=predict(model, type = "response" )
+heart$prob=prob
+h <- roc(HD~prob, data=heart)
+auc(h) # area-under-curve prefer 0.8 or higher.
+plot(h)
+# unloadPkg("pROC")
+```
+
+```{r}
+mod1 <- glm(HD ~ GeneralHealth + PhysicalActivity,data=total,family = "binomial")
+summary(mod1)
+```
+``` {r}
+xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
+```
+```{r}
+predicted<- predict(mod1, total, type = "response")
+hist(predicted)
+```
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(mod1))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+
+```{r confusionMatrix, results='markup'}
+loadPkg("regclass")
+# confusion_matrix
+xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+```
+
+```{r, echo = T, fig.dim=c(6,4)}
+set.seed(1)
+kyphosisfit <- rpart(HD ~ GeneralHealth + PhysicalActivity, data=total, method="class", control = list(maxdepth = 4) )
+# kyphosisfit <- rpart(Kyphosis ~ Age + Number + Start, data=kyphosis, method="class", control = {rpart.control list} )
+# rpart.control(maxdepth = 30, minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10, surrogatestyle = 0, ...)
+printcp(kyphosisfit) # display the results 
+plotcp(kyphosisfit) # visualize cross-validation results 
+summary(kyphosisfit) # detailed summary of splits
+
+# plot tree 
+plot(kyphosisfit, uniform=TRUE, main="Classification Tree for Kyphosis")
+text(kyphosisfit, use.n=TRUE, all=TRUE, cex=.8)
+
+```
+
+```{r}
+# create attractive postcript plot of tree 
+post(kyphosisfit, file = "kythosisTree2.ps", title = "Classification Tree for Kythosis")
+```
