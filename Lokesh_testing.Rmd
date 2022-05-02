@@ -63,6 +63,16 @@ ggplot(na_patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")+ s
 dia_pa1<-subset(na_patient,Diabetic==1)
 nrow(dia_pa1)
 ```
+#barplot of HeartDisease vs Stroke
+```{r, results='markup'}
+library(ggplot2)
+ggplot(patient, aes(x=Stroke)) + geom_bar(color="black",fill="hotpink3")
+str_pa<-subset(patient,Stroke==1)
+nrow(str_pa)
+ggplot(na_patient, aes(x=Stroke)) + geom_bar(color="black",fill="hotpink3")+ scale_y_continuous(labels = scales::comma)
+str_pa1<-subset(na_patient,Stroke==1)
+nrow(dia_pa1)
+```
 #barplot of HeartDisease vs Asthma
 
 ```{r, results='markup'}
@@ -154,7 +164,7 @@ summary(mod1)
 ```
 
 ```{r}
-# xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
+xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
 ```
 
 ```{r growthDecayFactors, results='markup', collapse=F}
@@ -204,19 +214,19 @@ print(cbind(TestAccuracy, TestTPR, TestFPR))
 ```{r}
 
 library(ggthemes)
-source("unbalanced_functions.R")
+
 # Prediction
-heart_train$prediction <- train_prob
-heart_test$prediction  <- test_prob
+heart_test$prediction <- predict(mod1, newdata = heart_test, type = "response")
+heart_train$prediction  <- predict(mod1, newdata = heart_train, type = "response")
 
 # distribution of the prediction score grouped by known outcome
-ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) +
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
 geom_density( size = 1 ) +
-ggtitle( "Training Set's Predicted Score" ) +
-scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
 theme_economist()
 
-# Positive instance = 1 = Yes Heart Disease
+# Positive instance = 1 = Yes Heart Disease 
 # Negative instance = 0 = No Heart Disease
 ```
 

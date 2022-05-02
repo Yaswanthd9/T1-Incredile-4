@@ -441,6 +441,17 @@ head(patient)
 na_patient <- subset(heart,HeartDisease==0)
 ```
 
+#barplot of HeartDisease vs Stroke
+```{r, results='markup'}
+library(ggplot2)
+ggplot(patient, aes(x=Stroke)) + geom_bar(color="black",fill="hotpink3")
+str_pa<-subset(patient,Stroke==1)
+nrow(str_pa)
+ggplot(na_patient, aes(x=Stroke)) + geom_bar(color="black",fill="hotpink3")+ scale_y_continuous(labels = scales::comma)
+str_pa1<-subset(na_patient,Stroke==1)
+nrow(dia_pa1)
+```
+
 #barplot of HeartDisease vs Diabetic
 ```{r, results='markup'}
 library(ggplot2)
@@ -633,23 +644,6 @@ TestFPR=1-52/(52+7) ## expressed as 1-true negative rate
 
 print(cbind(TestAccuracy, TestTPR, TestFPR))
 ```
-
-#Decision tree model
-```{r}
-set.seed(1)
-library(rpart)
-library(rpart.plot)
-tree<-rpart(HeartDisease~.,method = "class",data =heart_train)
-rpart.plot(tree)
-```
-
-```{r}
-probabilities <- predict(tree, heart_test)
-tree_pred <- ifelse(probabilities[,2] > 0.5,1,0)
-table(Actual = heart_test$HeartDisease,Predicted = tree_pred )
-```
-
-Accuarcy-66.7
 
 ################ END OF SECTION ###########################
 
