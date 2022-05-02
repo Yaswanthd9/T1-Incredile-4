@@ -64,6 +64,7 @@ library(scales)
 #library(ggthemes)
 library(gridExtra)
 library(data.table)
+library(regclass)
 
 # Load the Data 
 heart <-read.csv("heart_2020_cleaned.csv")
@@ -399,9 +400,9 @@ Cots for false negatives are higher than false positives.
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
-loadPkg("regclass")
+#loadPkg("regclass")
 xkabledply( confusion_matrix(model), title = "Confusion Matrix from Logit Model" )
-unloadPkg("regclass")
+#unloadPkg("regclass")
 
 # 
 cm_info <- ConfusionMatrixInfo( data = test, 
@@ -587,7 +588,7 @@ xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Re
 ```
 
 #### Confusion matrix 
-```{r confusionMatrix, results='markup'}
+```{r, results='markup'}
 #loadPkg("regclass")
 # confusion_matrix
 xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
@@ -807,8 +808,8 @@ model.matrix(~0+., data=new_heart) %>%
 
 Based on the correlation matrix we can see that smoking is more correlated to heartdisease than alcoholdrinking.
 
-```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
+```{r, results='markup'}
+#loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
 
 ```
@@ -857,7 +858,7 @@ xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
 #### Confusion matrix 
 
 ```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
+#loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
 
@@ -945,8 +946,8 @@ From all the smart questions we can come to conclude that smokers, drinkers, and
 ##GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
 
 ---
-title: "work"
-author: "Yaswanth"
+title: "Keys Factors for Heart Disease"
+author: "Team One"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -1272,32 +1273,29 @@ roc_info1 <- ROCInfo( data = test,
 					           cost.fn = 200 )
 p <- recordPlot()
 dev.off()
-plot(grid.draw(roc_info1$plot))
+grid.draw(roc_info1$plot)
 
 
 ```
 
 
 ```{r}
-accuracy_info <- AccuracyCutoffInfo( train = train, 
-                                     test = test, 
-                                     predict = "prediction", 
-                                     actual = 'HeartDisease' )
+#accuracy_info <- AccuracyCutoffInfo( train = train, test = test, predict = "prediction", actual = 'HeartDisease' )
 # define the theme for the next plot
-ggthemr("light")
-plot(accuracy_info$plot)
+#ggthemr("light")
+#accuracy_info$plot
 ```
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
-loadPkg("regclass")
+#loadPkg("regclass")
 xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+#unloadPkg("regclass")
 
 # 
 cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = .49 )
 #ggthemr("flat")
-plot(cm_info$plot)
+cm_info$plot
 
 ```
 
@@ -1347,32 +1345,29 @@ roc_info2 <- ROCInfo( data = test,
 					           cost.fn = 200 )
 p <- recordPlot()
 dev.off()
-plot(grid.draw(roc_info2$plot))
+grid.draw(roc_info2$plot)
 
 
 ```
 
 
 ```{r}
-accuracy_info <- AccuracyCutoffInfo( train = train, 
-                                     test = test, 
-                                     predict = "prediction", 
-                                     actual = 'HeartDisease' )
+#accuracy_info <- AccuracyCutoffInfo( train = train, test = test, predict = "prediction", actual = 'HeartDisease' )
 # define the theme for the next plot
-ggthemr("light")
-plot(accuracy_info$plot)
+#ggthemr("light")
+#accuracy_info$plot
 ```
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
-loadPkg("regclass")
+#loadPkg("regclass")
 xkabledply( confusion_matrix(model2), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+#unloadPkg("regclass")
 
 # 
 cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = 0.27 )
 #ggthemr("flat")
-plot(cm_info2$plot)
+cm_info2$plot
 
 ```
 
@@ -1418,12 +1413,12 @@ theme_economist()
 
 roc_info3 <- ROCInfo( data = test, 
                      predict = "prediction", 
-					           actual = "HD", 
+					           actual = "HeartDisease", 
 					           cost.fp = 100,
 					           cost.fn = 200 )
 p <- recordPlot()
 dev.off()
-plot(grid.draw(roc_info3$plot))
+grid.draw(roc_info3$plot)
 
 
 ```
@@ -1440,31 +1435,24 @@ legend(0.3, 0.2, legend = c("test-glm"), lty = c(1), col = c("blue"))
 
 
 ```{r}
-accuracy_info <- AccuracyCutoffInfo( train = train, 
-                                     test = test, 
-                                     predict = "prediction", 
-                                     actual = 'HeartDisease' )
+#accuracy_info <- AccuracyCutoffInfo( train = train, test = test, predict = "prediction", actual = 'HeartDisease' )
 # define the theme for the next plot
-ggthemr("light")
-plot(accuracy_info$plot)
+#ggthemr("light")
+#accuracy_info$plot
 ```
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
-loadPkg("regclass")
-xkabledply( confusion_matrix(model3), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+#loadPkg("regclass")
+#xkabledply( confusion_matrix(model3), title = "Confusion matrix from Logit Model" )
+#unloadPkg("regclass")
 
 # 
-cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = 0.27 )
+#cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HeartDisease', cutoff = 0.27 )
 #ggthemr("flat")
-plot(cm_info2$plot)
+#cm_info2$plot
 
 ```
-
-
-
-
 
 
 
