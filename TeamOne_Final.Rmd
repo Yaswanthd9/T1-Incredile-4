@@ -344,6 +344,78 @@ exp_coeff<- exp(cbind(OR = coef(model), confint(model)))
 knitr::kable(exp_coeff,caption='Odds Ratio & Confidence Interval of Model')
 ```
 
+Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
+
+According to the model, the odds for getting heart disease increases by 2.11 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health, drinking, sleep and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds of getting heart disease for age increases as an individual gets older.
+
+Also note, the confidence intervals for all the variables are narrow, indicating that they are good predictors of heart disease. However, the confidence intervals for age gets wider as we increase an individuals age. Although the uncertainty is greater at higher age ranges, there still may be enough precision to inform a patient about preventative measures, when considering their lifestyle choices.
+
+# Predicting and Assessing the Model 
+
+```{r}
+
+library(ggthemes)
+
+# Prediction
+train$prediction <- predict( model, newdata = train, type = "response" )
+test$prediction  <- predict( model, newdata = test , type = "response" )
+
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 1 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+
+After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions. Since we split our data evenly, the negative instances are skewed to the left while the positive instances are skewed to the right. 
+
+
+# ROC-AUC 
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+source('unbalanced_functions.R')
+
+cost.fp = 100
+cost.fn = 200
+
+roc_info <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HeartDisease", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+grid.draw(roc_info$plot)
+
+```
+
+Cots for false negatives are higher than false positives. 
+
+# Confusion Matrix 
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion Matrix from Logit Model" )
+unloadPkg("regclass")
+
+# 
+cm_info <- ConfusionMatrixInfo( data = test, 
+                                predict = "prediction", 
+                                actual  = 'HeartDisease', 
+                                cutoff  = .30 )
+#ggthemr("flat")
+plot(cm_info$plot)
+
+```
+
+
+## End of Section ###
+
 ### Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
 
