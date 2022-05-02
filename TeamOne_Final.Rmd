@@ -587,15 +587,26 @@ According to the study and analysis, patients with early heart disease are more 
 ```{r}
 barplot(table(heart$Smoking, heart$HeartDisease), legend= rownames(table(heart$Smoking, heart$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
-
+0 represents No
+1 represents Yes
+Based on this barplot we can see that people who have heartdisease and smoke have more chances of getting heart disease than people who don't have heartdiseasse but have smoking habit.
 
 ```{r}
 barplot(table(heart$AlcoholDrinking, heart$HeartDisease), legend= rownames(table(heart$AlcoholDrinking, heart$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
 ```
 
+0 represents No
+1 represents Yes
+Based on this barplot we can see that people who have heartdisease and drink have chances but are very less when compared to people who don't have heart disease and drink.
+
 ```{r}
 barplot(table(heart$HeartDisease, heart$Diabetic), legend= rownames(table(heart$HeartDisease, heart$Diabetic)), col =(c("green", "brown")),xlab="Diabetic",ylab="HeartDisease", main = "Barplot for Heartdisease and Diabetic")
 ```
+
+0 represents No
+1 represents Yes
+Based on this barplot we can see that there are 4 variables for Diabetics.
+
 
 ```{r}
 lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking , data = heart)
@@ -603,6 +614,9 @@ xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
 xkablevif(lm1)
 summary(lm1)
 ```
+Based on this model we can see that the p-values are small indicating that there is a correlation between alcoholdrinking, smoking and heartdisease. 
+For example for every one percent increase in smoking there is 0.064 % increase in heart disease.
+When we look at t-value for smoking we can see that 63.8% which indicates that smoking is dependent on the heart disease than in Alcohol Drinking.
 
 ```{r}
 lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = heart)
@@ -612,7 +626,9 @@ summary(lm2)
 
 ```
 
-
+In this model we can see that for the interaction term for alcoholdrinking and diabetic there is high p-value which indicates that there is no correlation between these varaibles and heart disease. 
+For people who have diabetics and smoke have high chance of getting heart disease based on the p-value.
+Based on the t-value we can see that 60.06% for diabetics, which says that diabetics is correlated to heart disease.
 
 ```{r}
 library(dyn)
@@ -644,13 +660,20 @@ percent <- round(prop*100, 2)
 xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
 ```
 
+0 represents No
+1 represents yes
+So, in this contingency table we can see that we got 5% for people who have heartdisease and who smoke which indicates that smoke is more correlated to heartdisease.
+
 ```{r}
 contable2 <- table(heart$HeartDisease, heart$AlcoholDrinking)
 summary(contable2) 
 prop <-prop.table(contable2)
 percent <- round(prop*100, 2)
-xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
+xkabledply(percent, title="Contingency Table for heart Disease and AlcoholDrinking in Percentage")
 ```
+0 represents No
+1 represents yes
+So, in this contingency table we can see that we got 6.45% for people who don't have heartdisease and who drink which indicates that drink is not that more correlated to heartdisease.
 
 ```{r chisq}
 
@@ -660,6 +683,7 @@ chitest2 = chisq.test(contable2)
 chitest2
 ```
 
+Based on the Chi-square test we can say that the variables are dependent on the heartdisease.
 
 ```{r}
 
@@ -667,6 +691,8 @@ model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking , data = train , family
 summary(model_lr)
 xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
 ```
+For this model we can see that the p-values are very small indicating that smoking and alcoholdrinking is related to heartdisease.
+
 
 ```{r}
 anova(model_lr, test="Chisq")
@@ -679,6 +705,8 @@ misClasificError <- mean(fitted.results != test$HeartDisease)
 print(paste('Accuracy',1-misClasificError))
 
 ```
+
+We have got an accuaracy of 0.589 which indicates that the model is pretty decent.
 
 ```{r}
 expcoeff = exp(coef(model_lr))
@@ -710,6 +738,8 @@ model.matrix(~0+., data=new_heart) %>%
     ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=3)
 ```
 
+Based on the correlation matrix we can see that smoking is more correlated to heartdisease than alcoholdrinking.
+
 ```{r confusionMatrix, results='markup'}
 loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
@@ -739,6 +769,8 @@ model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Diabetic:
 summary(model_lr2)
 xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
 ```
+For this model we can see that the p-values are very small indicating that smoking and alcoholdrinking, diabetics and smoking:Diabetic is related to heartdisease.
+
 ```{r}
 fitted.results <- predict(model_lr2,newdata = test, type='response')
 fitted.results <- ifelse(fitted.results > 0.5,1,0)
