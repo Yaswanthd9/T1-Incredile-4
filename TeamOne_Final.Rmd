@@ -219,7 +219,7 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     ggtitle(' On average,how many hours of sleep do you get in a 24-hour period?') +
     xlab('Heart Disease') + 
     ylab('Sleep Time')+ 
-    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+    scale_fill_brewer(palette = 'Set', name = 'Gender')
 
 t.test  (male_HD$SleepTime,
           female_HD$SleepTime)
@@ -237,7 +237,7 @@ ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     ggtitle(' Have you smoked at least 100 cigarettes in your entire life?') +
     xlab('Heart Disease') + 
     ylab('Smoking')+ 
-    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+    scale_fill_brewer(palette = 'Set2', name = 'Gender')
 
 t.test  ( male_HD$Smoking,
         female_HD$Smoking)
@@ -252,7 +252,7 @@ ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     ggtitle('How many drinks have you had this week?') +
     xlab('Heart Disease') + 
     ylab('Alcohol Consumption')+ 
-    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+    scale_fill_brewer(palette = 'Set3', name = 'Gender')
 
 t.test  ( male_HD$AlcoholDrinking,
         female_HD$AlcoholDrinking)
@@ -418,9 +418,7 @@ plot(cm_info$plot)
 
 the cost associated with FN is `r cost_fn/cost_fp` times higher than a false positive (FP). 
 
-Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this documentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
 
-There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
 
 
 ### Heart Disease & Secondary Illnesses 
