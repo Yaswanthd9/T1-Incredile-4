@@ -529,11 +529,6 @@ Based on this barplot we can see that people who have heartdisease and drink hav
 barplot(table(heart$HeartDisease, heart$Diabetic), legend= rownames(table(heart$HeartDisease, heart$Diabetic)), col =(c("green", "brown")),xlab="Diabetic",ylab="HeartDisease", main = "Barplot for Heartdisease and Diabetic")
 ```
 
-0 represents No
-1 represents Yes
-Based on this barplot we can see that there are 4 variables for Diabetics.
-
-
 ```{r}
 lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking , data = heart)
 xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
