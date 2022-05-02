@@ -593,10 +593,10 @@ xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Re
 
 #### Confusion matrix 
 ```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
+#loadPkg("regclass")
 # confusion_matrix
 xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+#unloadPkg("regclass")
 ```
 
 Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
