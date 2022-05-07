@@ -252,6 +252,7 @@ ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
 t.test  ( male_HD$AlcoholDrinking,
         female_HD$AlcoholDrinking)
 ```
+
 Heavy drinkers (adult men having more than 14 drinks per week and adult women having more than 7 drinks per week
 
 # Age, Race, General Health
