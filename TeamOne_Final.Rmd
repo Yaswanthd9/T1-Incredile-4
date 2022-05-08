@@ -677,83 +677,83 @@ Accuarcy-66.7
 
 ### Smokers Vs Alcoholic Drinkers 
 
-First of all does smoking and drinking cause heart attack or heart disease?
+Our problem statement is "Does smoking or drinking increase the risk of heartdisease?, Does having diabetics increase the risk of heartdiseases among smokers or drinkers?
 
-Yes, it is actually one among the reason that can cause heart disease in young people and majority of cases are seen in women according to a most of the publishes articles and researchers.
+We performed some basic EDA through visualizing the dataset by plotting graphs. After priliminary analysis the following obsevations are made:
 
-To determine if there is a link between heart disease and drug use, researchers investigated and discovered that recreational use of nicotine, cannabis, alcohol, and illegal substances such as amphetamine and cocaine may be linked to prematurely clogged arteries.Premature heart disease can arise before the age of 65 in women and 55 in males, and it can be difficult and dangerous.
+Heartdisease varaible is heavily skewed. The percentage of people with no heartdiseases is very high as compared to people with heartdisease. As heartdisease is the target variable this might effect the prediction of the model.
 
-According to statistics from the countrywide veterans affairs healthcare and veterans with premaTure AtheroscLerosis (VITAL) registry (2014-2015). There are 7716 patients who are having extremely premature heart disease , and they discovered this by comparing them to those who do not have premature heart disease.
+In order to fix this we have made some subset of the dataset with equal proportions of yes and no of heart disease varaible.
 
-According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent )
+From the graph between heartdisease and smoking we can say that people who smoke have a high tendency for getting heartdiseases which is true with real life scenarios.
+
+From the graph between heartdisease and drinking we can say the proposition of drinkers among people with heartdisease is less than the people without heartdisease. Ths is contory to real life assumption which assumes that people who drink are more prone to heartdisease.
+
+From the graph people with diabetics shows us that people with diabetics are more prone to heartdiseases.
+
+From the graph between diabetics and smoking we can conclude that the chances of people having diabetics is more among smokers.
+
+From the graph between diabetics and alcoholdrinking, there are less people with diabetics who drinks as compared to people with diabetics.
+
+We have observed the following trends between heartdisease and smoking, alcoholdrinking and diabetics from the premilinary analysis:
+
+The chances of people having heartdiseases is more when they have smoking habit as compared to drinking. people with diabetics are more prone to heartdiseases. Diabetics follows the same trend as heartdisease, where people who smoke are more prone to having diabetics than people who drink.
+
+We built some models to see the statistical correlation between heartdisease and smoking, alcoholdrinking, and diabetic and try to predict the chances of having heartdisease with the above mentioned variables. Further, we checked the chances of having heartdisease has increased or decreased when diabetics is taken into consideration among smokers and drinkers.
+
+
+
+
+
+
+
+
 
 
 ```{r}
-barplot(table(heart$Smoking, heart$HeartDisease), legend= rownames(table(heart$Smoking, heart$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
+
+barplot(table(total$Smoking, total$HeartDisease), legend= rownames(table(total$Smoking, total$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
 0 represents No
 1 represents Yes
-Based on this barplot we can see that people who have heartdisease and smoke have more chances of getting heart disease than people who don't have heartdiseasse but have smoking habit.
+Based on this barplot we can see that people who smoke have more chances of getting heart disease. 
 
 ```{r}
-barplot(table(heart$AlcoholDrinking, heart$HeartDisease), legend= rownames(table(heart$AlcoholDrinking, heart$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
+
+barplot(table(total$AlcoholDrinking, total$HeartDisease), legend= rownames(table(total$AlcoholDrinking, total$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
+
 ```
 
 0 represents No
 1 represents Yes
-Based on this barplot we can see that people who have heartdisease and drink have chances but are very less when compared to people who don't have heart disease and drink.
+Based on this barplot we can see that people who drink have chances of heartdiseasebut are very less when compared to people who don't have heart disease and drink.
 
 ```{r}
-barplot(table(heart$HeartDisease, heart$Diabetic), legend= rownames(table(heart$HeartDisease, heart$Diabetic)), col =(c("green", "brown")),xlab="Diabetic",ylab="HeartDisease", main = "Barplot for Heartdisease and Diabetic")
+barplot(table(total$Diabetic, total$HeartDisease), legend= rownames(table(total$Diabetic, total$HeartDisease)), col =(c("green", "brown")),xlab="HeartDisease",ylab="Diabetics", main = "Barplot for Heartdisease and Diabetic")
 ```
 
 ```{r}
-lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking , data = heart)
-xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
-xkablevif(lm1)
-summary(lm1)
-```
-Based on this model we can see that the p-values are small indicating that there is a correlation between alcoholdrinking, smoking and heartdisease. 
-For example for every one percent increase in smoking there is 0.064 % increase in heart disease.
-When we look at t-value for smoking we can see that 63.8% which indicates that smoking is dependent on the heart disease than in Alcohol Drinking.
-
-```{r}
-lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = heart)
-xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
-xkablevif(lm2)
-summary(lm2)
-
+barplot(table(total$Diabetic, total$Smoking), legend= rownames(table(total$Diabetic, total$Smoking)), col =(c("red", "green")),xlab="Smoking",ylab="Diabetics", main = "Barplot for Smoking and Diabetic")
 ```
 
-In this model we can see that for the interaction term for alcoholdrinking and diabetic there is high p-value which indicates that there is no correlation between these varaibles and heart disease. 
-For people who have diabetics and smoke have high chance of getting heart disease based on the p-value.
-Based on the t-value we can see that 60.06% for diabetics, which says that diabetics is correlated to heart disease.
-
 ```{r}
-library(dyn)
-anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=heart)
-xkabledply(anovaRes, title = "ANOVA result summary")
-
-anovaRes1 = aov(HeartDisease ~ Smoking, data=heart)
-xkabledply(anovaRes1, title = "ANOVA result summary")
-
+barplot(table(total$Diabetic, total$AlcoholDrinking), legend= rownames(table(total$Diabetic, total$AlcoholDrinking)), col =(c("red", "blue")),xlab="AlcoholDrinking",ylab="Diabetics", main = "Barplot for AlcoholDrinking and Diabetic")
 ```
 
 
 ```{r}
 cor_ad_smoke <- cor(heart$AlcoholDrinking, heart$Smoking)
-summary(cor_ad_smoke)
+cor_ad_smoke
 cor_as_hd <- cor(heart$AlcoholDrinking, heart$HeartDisease)
-summary(cor_as_hd)
+cor_as_hd
 cor_hd_smoke <- cor(heart$HeartDisease, heart$Smoking)
-summary(cor_hd_smoke)
+cor_hd_smoke
 
 
 ```
 
 ```{r}
 contable  <- table(heart$HeartDisease, heart$Smoking)
-summary(contable ) 
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
 xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
@@ -765,7 +765,6 @@ So, in this contingency table we can see that we got 5% for people who have hear
 
 ```{r}
 contable2 <- table(heart$HeartDisease, heart$AlcoholDrinking)
-summary(contable2) 
 prop <-prop.table(contable2)
 percent <- round(prop*100, 2)
 xkabledply(percent, title="Contingency Table for heart Disease and AlcoholDrinking in Percentage")
