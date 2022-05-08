@@ -516,5 +516,65 @@ plot(cm_info2$plot)
 
 ```
 
+```{r, results='markup'}
+act <- subset(heart,PhysicalActivity==1)
+head(patient)
+na_act <- subset(heart,PhysicalActivity==0)
+```
+
+```{r}
+ggplot(patient, aes(x=PhysicalActivity)) + geom_bar(color="black",fill="darkblue")
+dia_pa<-subset(act,PhysicalActivity==1)
+nrow(dia_pa)
+ggplot(na_act, aes(x=PhysicalActivity)) + geom_bar(color="black",fill="darkblue")+ scale_y_continuous(labels = scales::comma)
+dia_pa1<-subset(na_act,PhysicalActivity==1)
+nrow(dia_pa1)
+```
 
 
+```{r}
+barplot(table(heart$HeartDisease, heart$PhysicalActivity), legend= rownames(table(heart$HeartDisease, heart$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
+```
+
+```{r}
+barplot(table(heart$HeartDisease, heart$GeneralHealth), legend= rownames(table(heart$HeartDisease, heart$GeneralHealth)), col =(c("blue", "red")), xlab="GeneralHealth", ylab="heartdisease",main = "Barplot for Heartdisease and GeneralHealth")
+```
+
+```{r}
+ggplot(heart,aes(x = PhysicalActivity, fill = HeartDisease)) + geom_bar(position = "fill") +ggtitle("HeartDisease vs PhysicalActivity")
+```
+
+```{r}
+newdata1<- subset(heart, HD==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HD==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+```
+```{r}
+barplot(table(total$PhysicalActivity, total$HeartDisease), legend= rownames(table(total$HeartDisease, total$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(heart, aes(fill=HeartDisease, x=PhysicalActivity, y=HeartDisease)) + 
+  geom_bar(position='stack', stat='identity')
+```
+
+
+
+```{r}
+heart$dummy_HeartDisease <- factor(heart$HeartDisease, labels=c("No", "Yes"))
+ggplot(heart, aes(x=PhysicalActivity, fill=dummy_HeartDisease)) + geom_bar(position="dodge")
+
+```
+
+```{r}
+heart$dummy_HeartDisease <- factor(heart$HeartDisease, labels=c("No", "Yes"))
+ggplot(heart, aes(x=GenHealth, fill=dummy_HeartDisease)) + geom_bar(position="dodge")
+```

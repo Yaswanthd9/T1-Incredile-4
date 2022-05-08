@@ -991,7 +991,7 @@ heart$GeneralHealth<-sapply(heart$GenHealth,unclass)
 #5-Very good,4-poor,3-Good,2-fair,1-excellent
 
 ```{r}
-freq(heart$GeneralHealth)
+freq(heart)
 ```
 
 
@@ -1055,10 +1055,7 @@ female_HD<- subset(female, HD==1)
 male_HD<- subset(male, HD== 1)
 ```
 
-```{r}
-#T-test
-t.test(female_HD$GeneralHealth, male_HD$GeneralHealth)
-```
+
 
 The p-value is less than the 8% significance level, allowing us to reject the null hypothesis and conclude that the overall average GeneralHealth is different between the male and female populations. From the mean values, we see that men have a mean GeneralHealth of 3.12 while women have a GeneralHealth of 3.19. A difference of 0.17. 
 
@@ -1082,13 +1079,6 @@ plot(HD~Ethnicity,data=heart)
 plot(HD~DiffWalking,data=heart)
 ```
  
-
-```{r}
-
-t.test(heart$GeneralHealth, heart$HD)
-t.test(heart$PhysicalActivity, heart$HD)
-t.test(heart$Ethnicity, heart$HD)
-```
 
 ```{r}
 Genh_HD=table(heart$GeneralHealth,heart$HD)
@@ -1170,6 +1160,8 @@ theme_economist()
 # Positive instance = 1 = Yes Heart Disease 
 # Negative instance = 0 = No Heart Disease
 ```
+
+
 ```{r}
 
 # user-defined different cost for false negative and false positive
