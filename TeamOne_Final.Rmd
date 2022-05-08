@@ -1081,13 +1081,6 @@ plot(HD~DiffWalking,data=heart)
  
 
 ```{r}
-
-t.test(heart$GeneralHealth, heart$HD)
-t.test(heart$PhysicalActivity, heart$HD)
-t.test(heart$Ethnicity, heart$HD)
-```
-
-```{r}
 Genh_HD=table(heart$GeneralHealth,heart$HD)
 chi_1=chisq.test(Genh_HD)
 chi_1
@@ -1167,6 +1160,8 @@ theme_economist()
 # Positive instance = 1 = Yes Heart Disease 
 # Negative instance = 0 = No Heart Disease
 ```
+
+
 ```{r}
 
 # user-defined different cost for false negative and false positive
