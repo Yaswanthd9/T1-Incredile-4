@@ -1,6 +1,6 @@
 ---
 title: "Key Risk Factors of Heart Disease in 2020"
-author: "Illiyuna Islam"
+author: "Team One"
 date: May 1, 2022
 output:
   html_document:
@@ -14,20 +14,48 @@ output:
     toc_depth: '3'
 ---
 
+---
+title: "Keys Factors for Heart Disease"
+author: "Team One"
+date: "`r Sys.Date()`"
+output: html_document
+---
 ```{r init, include=FALSE}
 # some of common options (and the defaults) are: 
 # include=T, eval=T, echo=T, collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
 library(ezids)
 # knitr::opts_chunk$set(warning = F, results = "markup", message = F)
-knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+knitr::opts_chunk$set(warning = F, results = "markup", message = F)
 options(scientific=T, digits = 3) 
 # options(scipen=9, digits = 3) 
 # ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
 # use scipen=999 to prevent scientific notation at all times
 
+# Lets load the appropriate libraries
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggcorrplot)
+library(corrr)
+library(corrplot)
+library(ROCR)
+library(grid)
+library(broom)
+library(dplyr)
+library(ggthemr)
+library(ggthemes)
+library(gridExtra)
+library(data.table)
+library(funModeling)
+library(ezids)
+library(caret)
+library(tidyr)
+library(scales)
+library(gridExtra)
+library(data.table)
+library(regclass)
 ```
-
-### Introduction 
+## Introduction 
 
 According to the Center for Disease Control and Prevention (CDC), cardiovascular or heart diseases account for 1 in every 4 deaths in the United States annually. The estimated costs to the nation’s economy amount to about $363 billion annually, which include hospitalizations, after services health care needs as well as lost productivity due to death and disability (SS Virani, 2021).  The CDC also states that given the lifestyle habits of an average American, about half of the population (47%) are reported to have “1 of the 3 key risk factors for heart disease: high blood pressure, high cholesterol, and smoking”. However, the risk factors for developing heart diseases are vast and diverse and tend to vary between most racial and ethnic groups in the United States. 
 
@@ -37,41 +65,18 @@ The beginnings of the current understanding of the interconnected role of risk f
 
 In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases among the US population, so that we may be able to see some of the intermingling between different risk factors.   
 
-### Description of Dataset
+## Description of Dataset
 
 The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2021), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
 
 
 ```{r}
-# Lets load the appropriate libraries
-library(tidyverse)
-library(dplyr)
-library(funModeling)
-library(ezids)
-library(ggplot2)
-library(ggcorrplot)
-library(corrr)
-library(corrplot)
-library(ROCR)
-library(grid)
-library(broom)
-library(caret)
-library(tidyr)
-library(scales)
-# ggthemr is not on CRAN. Need to install from console using 
-#devtools::install_github('cttobin/ggthemr')
-#library(ggthemr)
-#library(ggthemes)
-library(gridExtra)
-library(data.table)
-
 # Load the Data 
 heart <-read.csv("heart_2020_cleaned.csv")
 
 # Descriptive Statistics  
 status (heart)
 ```
-
 From the table we can see that physical and mental health have a higher percentage of zeros. This means that just over 70% of the people in our data set report being  physically sick in a 30 day period while about 60% of the respondents report feeling mentally unwell in that same time period.  
 
 We can also see that there are no N/A values in our data set. This is not surprising given that our data was cleaned before being retrieved.  
@@ -110,36 +115,36 @@ heart$Asthma<-ifelse(heart$Asthma=="Yes",1,0)
 ```
 
 
-### Gender and Lifestyle Factors
+# Gender and Lifestyle Factors
 
 According to Noel Bairey Merz, MD, director of the Barbra Streisand Women’s Heart Center in the Smidt Heart Institute, women experience heart disease more severely than men. Meaning that even though men are more likely to suffer heart attacks, women are more likely to die from a heart attack than a man. 
 
-We started off by trying to see which gender tends to have more heart disease based on symptoms reported just before diagnosis.  From the table below, we can see that we have a lot more data for people without heart disease than with. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
+We started off by trying to see which gender tends to have more heart disease based on symptoms reported just before diagnosis.  From the table below, we can see that we have a lot more data for people without heart disease than with, this will be addressed later. However, even in the percentage table for those who do have heart disease, we see that there are more men with heart disease (about 5%) compared to women (3%). This is in line with our basic theory that men have more heart disease.  However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? Discussions of the relevant variables are provided below. 
 
 
-# Proportion of Heart Disease Among the Genders 
+### Proportion of Heart Disease Among the Genders 
 
 ```{r, results = 'markup'}
 
 contable = table(heart$HeartDisease, heart$Sex)
-xkabledply(contable, title="Contingency Table for heart Disease and Sex")
+xkabledply(contable, title="Contingency Table for Heart Disease and Sex")
 addmargins(contable)
 
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
 
-print ("Contingency Table for Heart Disease and Sex in Percentage")
-print (percent)
+#print ("Contingency Table for Heart Disease and Sex in Percentage")
+print(percent, main="Contingency Table for Heart Disease and Sex in Percentage")
 barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease Among Male & Female", beside=T, col=3:2)
 ```
 
 
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
 
-# BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
+### BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
 
 ```{r, results = 'markup'}
-hist(heart$BMI)
+hist(heart$BMI,main="Histogram of BMI in Data Set", col='pink', xlab="BMI Levels")
 ```
 
 In the histogram, we can see that our data is approximately normal and given the Central Limit Theorem, if n>30, then we can assume normality for the sake of statistical tests.
@@ -157,9 +162,9 @@ t.test(female$BMI, male$BMI)
 
 The p-value is less than the 5% significance level, allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. From the mean values, we see that men have a mean BMI of 28.50 while women have a BMI of 28.16. A difference of 0.34.  
 
-Next, we divided our data frame between men and women who do have heart disease. Once again assuming normality due to the large sample size, we conducted another Welch's T-test to look at the mean BMI difference. 
+Next, we divided our data frame between men and women who do have heart disease. Once again assuming normality due to the large sample size, we conducted another Welch's T-test to look at the mean BMI difference among the population with heart issues. 
 
-# BMI: Is there a difference in average BMI between the sexes with heart disease?
+### BMI: Is there a difference in average BMI between the sexes with heart disease?
 
 ```{r, results = 'markup'}
 # Subsetting genders based on respondents that have heart disease 
@@ -173,7 +178,7 @@ t.test(female_HD$BMI, male_HD$BMI)
 
 From the T-test output above, we see that the p-value is 0.60, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
 
-# Physical Health: How many times in the last 30 days have you felt physically ill? 
+### Physical Health: How many times in the last 30 days have you felt physically ill? 
 
 Earlier, we saw that respondents, who have heart disease, reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. The box plot below shows us that women with heart disease generally report felling unwell more often than men. 
 
@@ -191,7 +196,7 @@ t.test(male_HD$PhysicalHealth, female_HD$PhysicalHealth)
 The t-test also confirms what the box plot is showing. Since the p-value is less than 5%, that there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick about 9 days while men reported just over 6 days. 
 
 
-# Mental Health: How many times in the last 30 days have you felt mentally ill? 
+### Mental Health: How many times in the last 30 days have you felt mentally ill? 
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
     geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
@@ -200,13 +205,12 @@ ggplot(heart, aes(x = factor(HeartDisease), y = MentalHealth))+
     ylab('Mental Health')+
     scale_fill_brewer(palette = 'Set3', name = 'Sex')
 
-t.test  (male_HD$MentalHealth,
-female_HD$MentalHealth)
+t.test  (male_HD$MentalHealth,female_HD$MentalHealth)
 ```
 
 The boxplot shows that women tend to report feeling mentally unwell more often than men.Since the p-value is less than 5%, indicating that there is a difference in the number of days that men and women feel mentally unwell. On average, women reported feeling mentally unwell about twice as many days as men. The cyclical nature of mental health and exercise has been covered extensively (Mikkelsen 2017; Raglin 1990); which assert that individuals struggling with mental health issues often are unable to complete physically demanding tasks, further making matters worse. This is because exercise has been shown to produce beneficial hormones that are associated with improvements in mental health. 
 
-# Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
+### Sleep Time: On average,how many hours of sleep do you get in a 24-hour period?
 ```{r, results = 'markup'}
 ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
@@ -215,17 +219,17 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     ylab('Sleep Time')+ 
     scale_fill_brewer(palette = 'Set', name = 'Gender')
 
-t.test  (male_HD$SleepTime,
-          female_HD$SleepTime)
+t.test(male_HD$SleepTime,female_HD$SleepTime)
 ```
 
-Men and women have statistically different sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep effects are known to be cumulative. A study conducted by Robbins et al. in 2021 "examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus". The study found that curtailing sleep below the recommended seven hours increases the risk for viral infection "nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest" (Robbins et al, 2021). 
+Visually it look like men and women get the same amount of sleep. However, the t-test shows that men and women have statistically different sleep times. Men on average get about 35 more minutes of sleep a week than women. This may not sound like much but sleep effects are known to be cumulative. A study conducted by Robbins et al. in 2021 "examined a group of people who got the recommended seven to eight hours of sleep a night to those who got less (even just 30 minutes less), and exposed them to a norovirus". The study found that curtailing sleep below the recommended seven hours increases the risk for viral infection "nearly four times higher among those who are sleeping poorly or getting insufficient sleep, compared to those who are getting good rest" (Robbins et al, 2021). 
 
 This lack of sleep could explain why we see that women in our data on average report feeling sick more often and could also be a contributing factors is why women are more likely to die from heart attacks than men (Noel Bairey Merz).
 
-#Smoking:Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
+### Smoking:Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes]
 ```{r}
 #Smoking 
+
 ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
     ggtitle(' Have you smoked at least 100 cigarettes in your entire life?') +
@@ -233,27 +237,29 @@ ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     ylab('Smoking')+ 
     scale_fill_brewer(palette = 'Set2', name = 'Gender')
 
-t.test  ( male_HD$Smoking,
-        female_HD$Smoking)
+t.test  ( male_HD$Smoking,female_HD$Smoking)
 
 
 ```
 
-#Drinking: How many drinks have you had this week? 
+The number of men and women smoking in our data set are in equal proportions. However, the t-test shows that men average smoke slightly more than women but this difference does not seem significant. 
+
+### Drinking: How many drinks have you had this week? 
 ```{r}
 ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     geom_boxplot(aes(fill = Sex),outlier.shape = NA)+
     ggtitle('How many drinks have you had this week?') +
     xlab('Heart Disease') + 
     ylab('Alcohol Consumption')+ 
-    scale_fill_brewer(palette = 'Set3', name = 'Gender')
+    scale_fill_brewer(palette = 'Set4', name = 'Gender')
 
 t.test  ( male_HD$AlcoholDrinking,
         female_HD$AlcoholDrinking)
 ```
-Heavy drinkers (adult men having more than 14 drinks per week and adult women having more than 7 drinks per week
 
-# Age, Race, General Health
+Note than in the questionnaire, heavy drinkers are defined as "adult men having more than 14 drinks per week and adult women having more than 7 drinks per week". Even though, the number of drinkers are in equal proportions for both male and female, the number of drinks per between the populations are different. The threshold for being labelled a heavy drinker for women is half of that for a man.Therefore, the mean difference shown in the t-test might look small but on a per drink basis it is significant. Thus, we can conclude that men drink more on a weekly basis than women.  
+
+### Age, Race, General Health
 ```{r, results = 'markup'}
 
 HD <- subset(heart, HeartDisease==1)
@@ -266,19 +272,24 @@ freq(HD$GenHealth)
 
 When looking at the population make-up of respondents who do have heart disease, we see that a higher percentage of respondents are 60 and older, with 82% being of Caucasian descent. At the time of the interview they also said they felt their overall health is good. This may be a limiting factor for future research since, once again, the sample does not have many data points from non-Caucasian individuals.  We also see that most of our respondents with heart disease are older above 60 years of age, this is in-line with theory. 
 
-Even though a logit regression seems more appropriate to estimate whether or not an individual gets heart disease, we can still use a linear regression in our exploratory stages to find the best fitting model. 
+# Modelling
 
-# Liner Regression on Sex
+Even though a logit regression seems more appropriate to estimate whether or not an individual gets heart disease, we have used a linear regression in our exploratory stages to find the best fitting model. 
+
+## Liner Regression on Sex
 ```{r, results = 'markup'}
 reg_1 <- lm(HeartDisease~Sex+BMI, data=heart)
+print('Model One BIC')
 BIC(reg_1)
 summary (reg_1)
 
 reg_2 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + SleepTime, data=heart)
+print('Model Two BIC')
 BIC(reg_2)
 summary (reg_2)
 
 reg_3 <- lm(HeartDisease~Sex+BMI+ PhysicalHealth+MentalHealth + Smoking + AlcoholDrinking+ SleepTime + AgeCategory + Race, data=heart)
+print('Model Three BIC')
 BIC(reg_3)
 summary (reg_3)
 ```
@@ -286,7 +297,7 @@ summary (reg_3)
 With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low. Note that the 40-44 years age category has insignificant p-values. Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
 
 
-# VIF Table to select variables 
+#### VIF Table to select variables 
 ```{r, results='markup'}
 ezids::xkablevif(reg_3, wide=FALSE)
 ```
@@ -299,9 +310,9 @@ We will train and test the model to see the cost analysis of our predictions.
 
 ## Logistic Regression  
 
-In order to address the unbalanced classification, we subsetted our original data frame to create a new one (called total) that had equal proportions of the Heart Disease category. The new dataset, called total, has over 54000 observation that have been split into train and test sets.  
+In order to address the unbalanced classification, we subsetted our original data frame to create a new one (called Total) that had equal proportions of the Heart Disease category. The new dataset, called Total, has over 54000 observations that have been split into an 80-20 train and test sets.  
 
-# Model Training 
+#### Model Training 
 ```{r}
 
 # Creating a new dataframe (called total) with equal proportions of Heart Disease values 
@@ -313,7 +324,7 @@ newdata0_1<-head(newdata0,27373)
 nrow(newdata0_1)
 total <- rbind(newdata1_1, newdata0_1)
 #nrow(total)
-summary(total)
+#summary(total)
 #freq(total$HeartDisease)
 
 
@@ -333,20 +344,19 @@ test  <- total[-sample, ]
 model<- glm(HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory, data= train, family='binomial')
 #summary(model)
 
-library(lemon)
-knit_print.data.frame <- lemon_print
-
 #Chi-squared test for model fit 
 anova(model, test = 'Chisq')
 
-# Exponential Coefficients  & Confidence Interval 
-exp_coeff<- exp(cbind(OR = coef(model), confint(model)))
-knitr::kable(exp_coeff,caption='Odds Ratio & Confidence Interval of Model')
 ```
 
 Looking at the anova chi-squared results, we can conclude that the logit model (HeartDisease ~ Sex + BMI+ PhysicalHealth + MentalHealth + AlcoholDrinking + SleepTime + AgeCategory) used is a good fit model for predicting the probability of getting heart disease. All the coefficient p-values in the model are also significant, except for the 25-39 age range, which is significant at the 10% level.
 
-According to the model, the odds for getting heart disease increases by 2.11 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health, drinking, sleep and Physical health also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds of getting heart disease for age increases as an individual gets older.
+```{r}
+# Exponential Coefficients  & Confidence Interval 
+exp_coeff<- exp(cbind(OR = coef(model), confint(model)))
+knitr::kable(exp_coeff,caption='Odds Ratio & Confidence Interval of Model')
+```
+According to the model, the odds for getting heart disease increases by 2.11 for a man compared to a woman. While an increase in BMI increases the odds for heart disease by 1.03. Mental health,physical health, drinking, and sleep time also affect your chances of getting heart disease but are not the most salient risk factors; they could be used as early indicators. As expected, the odds of getting heart disease for age increases as an individual gets older.
 
 Also note, the confidence intervals for all the variables are narrow, indicating that they are good predictors of heart disease. However, the confidence intervals for age gets wider as we increase an individuals age. Although the uncertainty is greater at higher age ranges, there still may be enough precision to inform a patient about preventative measures, when considering their lifestyle choices.
 
@@ -371,10 +381,10 @@ theme_economist()
 # Negative instance = 0 = No Heart Disease
 ```
 
-After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions. Since we split our data evenly, the negative instances are skewed to the left while the positive instances are skewed to the right. 
+After obtaining the predicted values that an individual will have heart disease on both the training and testing sets, a double density plot was drawn to show those predictions. Since we split our data evenly, the negative instances are skewed to the left while the positive instances are skewed to the right. This is an ideal density plot.  
 
 
-# ROC-AUC 
+### ROC-AUC 
 ```{r}
 
 # user-defined different cost for false negative and false positive
@@ -393,15 +403,15 @@ grid.draw(roc_info$plot)
 
 ```
 
-Cots for false negatives are higher than false positives. 
+From the plots, we can see that our Area Under the Curve is about 79%, which is an acceptable model for our purposes. Specifying our different costs for false positives ($100) and false negatives ($200), we see that our total loss cost is just under $382000.
 
-# Confusion Matrix 
+### Confusion Matrix 
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
 loadPkg("regclass")
 xkabledply( confusion_matrix(model), title = "Confusion Matrix from Logit Model" )
-unloadPkg("regclass")
+#unloadPkg("regclass")
 
 # 
 cm_info <- ConfusionMatrixInfo( data = test, 
@@ -412,5 +422,11 @@ cm_info <- ConfusionMatrixInfo( data = test,
 plot(cm_info$plot)
 
 ```
+Calculated Values for Model:
 
+Accuracy = 0.727
+Mis-classification = 0.27
+Sensitivity = 0.78
+Specificity = 0.66
 
+Using the optimal cut-off value of 0.30 obtained from the ROC-AUC Loss function, we see that our model a is able to calculate more positive values than negative values. The accuracy of the model is about 73%, which is not a good model in the healthcare field but can still be used as a public early detection tool to bring about individual awareness. We see that our model shows high sensitivity and low specificity, this means that our model is great at estimating actual cases of whether an individual will have heart disease but tends to have a high false positive rate. In the grand scheme life, higher false poistives is not as bad as having a false negative rate. For instance, an individual A uses our model and is told that they have a higher likelihood of having heart issues in the future. However, turns out this is a false positive and A just ends up living a bit more healthier than they did before. However, it is the false negatives that we will need to adjust for in the future. 

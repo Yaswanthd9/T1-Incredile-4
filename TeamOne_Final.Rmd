@@ -405,7 +405,7 @@ grid.draw(roc_info$plot)
 
 From the plots, we can see that our Area Under the Curve is about 79%, which is an acceptable model for our purposes. Specifying our different costs for false positives ($100) and false negatives ($200), we see that our total loss cost is just under $382000.
 
-# Confusion Matrix 
+### Confusion Matrix 
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
@@ -432,7 +432,7 @@ Specificity = 0.66
 Using the optimal cut-off value of 0.30 obtained from the ROC-AUC Loss function, we see that our model a is able to calculate more positive values than negative values. The accuracy of the model is about 73%, which is not a good model in the healthcare field but can still be used as a public early detection tool to bring about individual awareness. We see that our model shows high sensitivity and low specificity, this means that our model is great at estimating actual cases of whether an individual will have heart disease but tends to have a high false positive rate. In the grand scheme life, higher false poistives is not as bad as having a false negative rate. For instance, an individual A uses our model and is told that they have a higher likelihood of having heart issues in the future. However, turns out this is a false positive and A just ends up living a bit more healthier than they did before. However, it is the false negatives that we will need to adjust for in the future. 
 
 
-### Heart Disease & Secondary Illnesses 
+# Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
 
 #Exploratory data analysis
