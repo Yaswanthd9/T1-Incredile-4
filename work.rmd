@@ -89,19 +89,20 @@ Converting HeartDIsease categorical into Numerical Variable
 heart$HD<-ifelse(heart$HeartDisease=="Yes",1,0)
 ```
 #Converting General Health as numericals
-Finding the mean of numerical variables grouped by Gen Health
+
 ```{r }
 #plot_num(heart)
 heart$GenHealth<-as.factor(heart$GenHealth)
 heart$GeneralHealth<-sapply(heart$GenHealth,unclass)
-heart %>%
-  group_by(HeartDisease) %>%
-  summarise_at(vars("GeneralHealth"), mean)
 ```
 
 #5-Very good,4-poor,3-Good,2-fair,1-excellent
 
-There is very less differnce in General Health, Even people are healthy (normal GeneralHealth) people have No heartDisease by 3.22 times than people wih people with non general health get by 3.12 
+```{r}
+freq(heart$GeneralHealth)
+```
+
+
 # Frequency distributions of all our categorical variables 
 ```{r}
 freq(heart)
@@ -148,10 +149,26 @@ heart$Ethnicity<-sapply(heart$Race,unclass)
 freq(heart$Ethnicity)
 ```
 
+```{r, results = 'markup' }
+# Finding the mean of numerical variables grouped by heart disease
+plot_num(heart)
+
+heart %>%
+  group_by(HD) %>%
+  summarise_at(vars("GeneralHealth", 
+                    "PhysicalActivity", 
+                    "Ethnicity"), mean)
+```
+
 ```{r}
 loadPkg("corrplot")
 cor(heart$HD,heart$GeneralHealth)
 
+```
+
+```{r}
+hist(heart$GeneralHealth)
+hist(heart$Ethnicity)
 ```
 
 ```{r}
@@ -168,26 +185,15 @@ print (percent)
 barplot(with(heart, table(GeneralHealth, HD)), main="heart Disease & GeneralHealth", beside=T, col=3:2)
 ```
 
-```{r}
-contable = table(heart$GeneralHealth, heart$HD)
-xkabledply(contable, title="Contingency Table for heart Disease and GeneralHealth")
-addmargins(contable)
-
-prop <-prop.table(contable)
-percent <- round(prop*100, 2)
-
-print ("Contingency Table for heart Disease and General Health in Percentage")
-print (percent)
-barplot(with(heart, 
-             table(Ethnicity, HD)), 
-        main="heart Disease & GeneralHealth", 
-        beside=T,col = 3:5 )
+```{r, results = 'markup'}
+# Subset Male & Female with and without Heart Disease
+female <- subset(heart, Sex== "Female")
+male  <- subset (heart, Sex == "Male")
 ```
 
 
-```{r}
-boxplot(heart$Gener)
-```
+
+
 ```{r, results = 'markup'}
 # Subsetting genders based on respondents that have heart disease 
 female_HD<- subset(female, HD==1)
@@ -197,9 +203,13 @@ male_HD<- subset(male, HD== 1)
 ```{r}
 #T-test
 t.test(female_HD$GeneralHealth, male_HD$GeneralHealth)
-t.test(female_HD$PhysicalActivity, male_HD$PhysicalActivity)                  
 ```
 
+The p-value is less than the 8% significance level, allowing us to reject the null hypothesis and conclude that the overall average GeneralHealth is different between the male and female populations. From the mean values, we see that men have a mean GeneralHealth of 3.12 while women have a GeneralHealth of 3.19. A difference of 0.17. 
+
+```{r}
+t.test(female_HD$PhysicalActivity, male_HD$PhysicalActivity)
+```
 
 ```{r}
 boxplot(HD~GeneralHealth,data=heart)
@@ -216,33 +226,13 @@ plot(HD~Ethnicity,data=heart)
 ```{r}
 plot(HD~DiffWalking,data=heart)
 ```
-
-```{r, results = 'markup'}
-# Subset Male & Female with and without Heart Disease
-female <- subset(heart, Sex== "Female")
-male  <- subset (heart, Sex == "Male")
-
-# T-test of BMI between Genders 
-t.test(female$GeneralHealth, male$GeneralHealth)
-```
-The p-value is less than the 5% significance level, allowing us to reject the null hypothesis and conclude that the overall average GeneralHealth is different between the male and female populations. From the mean values, we see that men have a mean GeneralHealth of 3.20 while women have a GeneralHealth of 3.23 A difference of 0.03.
-```{r, results = 'markup'}
-# Subsetting genders based on respondents that have heart disease 
-female_HD<- subset(female, HD==1)
-male_HD<- subset(male, HD== 1)
-```
-
-```{r}
-#T-test
-t.test(female_HD$GeneralHealth, male_HD$GeneralHealth)
-                  
-```
-From the T-test output above, we see that the p-value is 0.60, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. 
+ 
 
 ```{r}
 
 t.test(heart$GeneralHealth, heart$HD)
 t.test(heart$PhysicalActivity, heart$HD)
+t.test(heart$Ethnicity, heart$HD)
 ```
 
 ```{r}
@@ -262,16 +252,18 @@ BIC(Regression)
 summary (Regression)
 ```
 ```{r}
-reg_2 <- lm(HD~GeneralHealth+PhysicalActivity, data=heart)
-BIC(reg_2)
-summary (reg_2)
+Regression2 <- lm(HD~GeneralHealth+Ethnicity, data=heart)
+BIC(Regression2)
+summary (Regression2)
 ```
 
 ```{r}
-reg_3 <- lm(HD~GeneralHealth+PhysicalActivity+DiffWalking, data=heart)
+reg_3 <- lm(HD~GeneralHealth+PhysicalActivity+Ethnicity, data=heart)
 BIC(reg_3)
 summary (reg_3)
 ```
+
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low.Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
 
 ```{r}
 newdata1<- subset(heart, HD==1)
@@ -285,6 +277,12 @@ nrow(total)
 summary(total)
 ```
 
+
+```{r}
+freq(total)
+```
+#model 1
+
 ```{r}
 # Split into 80-20 train-test sets
 
@@ -295,6 +293,7 @@ train <- total[sample, ]
 test  <- total[-sample, ]
 ```
 
+ 
 ```{r}
 # Logit Model Training
 model<- glm(HD~ GeneralHealth, data= train, family="binomial")
@@ -320,14 +319,14 @@ theme_economist()
 
 # user-defined different cost for false negative and false positive
 
-roc_info <- ROCInfo( data = test, 
+roc_info1 <- ROCInfo( data = test, 
                      predict = "prediction", 
 					           actual = "HD", 
 					           cost.fp = 100,
 					           cost.fn = 200 )
 p <- recordPlot()
 dev.off()
-plot(grid.draw(roc_info$plot))
+plot(grid.draw(roc_info1$plot))
 
 
 ```
@@ -350,9 +349,172 @@ xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model"
 unloadPkg("regclass")
 
 # 
-cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = .44 )
+cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = .49 )
 #ggthemr("flat")
 plot(cm_info$plot)
 
 ```
+
+
+# Model 2
+```{r}
+# Split into 80-20 train-test sets
+
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+```{r}
+# Logit Model Training
+model2<- glm(HD~ GeneralHealth+Ethnicity, data= train, family="binomial")
+summary(model2)
+```
+
+# Predicting and Assessing the Model 
+
+```{r}
+# Prediction
+train$prediction <- predict( model2, newdata = train, type = "response" )
+test$prediction  <- predict( model2, newdata = test , type = "response" )
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 2 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+
+
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+roc_info2 <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HD", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+p <- recordPlot()
+dev.off()
+plot(grid.draw(roc_info2$plot))
+
+
+```
+
+
+```{r}
+accuracy_info <- AccuracyCutoffInfo( train = train, 
+                                     test = test, 
+                                     predict = "prediction", 
+                                     actual = 'HeartDisease' )
+# define the theme for the next plot
+ggthemr("light")
+plot(accuracy_info$plot)
+```
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+loadPkg("regclass")
+xkabledply( confusion_matrix(model2), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+
+# 
+cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = 0.27 )
+#ggthemr("flat")
+plot(cm_info2$plot)
+
+```
+
+
+#Model 3
+
+
+```{r}
+# Split into 80-20 train-test sets
+
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+```{r}
+# Logit Model Training
+model3<- glm(HD~ GeneralHealth+Ethnicity+PhysicalActivity, data= train, family="binomial")
+summary(model3)
+```
+
+# Predicting and Assessing the Model 
+
+```{r}
+# Prediction
+train$prediction <- predict( model3, newdata = train, type = "response" )
+test$prediction  <- predict( model3, newdata = test , type = "response" )
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 2 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+roc_info3 <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HD", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+p <- recordPlot()
+dev.off()
+plot(grid.draw(roc_info3$plot))
+
+
+```
+
+``` {r results='markup'}
+### ROC Curve
+library(pROC)
+roc_svm_test <-plot(roc(as.numeric(test$HD),as.numeric(test$prediction)),main="Comparaison ",col="#1c61b6")
+plot(roc_svm_test, add = TRUE,col = "red", print.auc=TRUE, print.auc.x = 0.5, print.auc.y = 0.3)
+legend(0.3, 0.2, legend = c("test-glm"), lty = c(1), col = c("blue"))
+
+
+```
+
+
+```{r}
+accuracy_info <- AccuracyCutoffInfo( train = train, 
+                                     test = test, 
+                                     predict = "prediction", 
+                                     actual = 'HeartDisease' )
+# define the theme for the next plot
+ggthemr("light")
+plot(accuracy_info$plot)
+```
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+loadPkg("regclass")
+xkabledply( confusion_matrix(model3), title = "Confusion matrix from Logit Model" )
+unloadPkg("regclass")
+
+# 
+cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = 0.27 )
+#ggthemr("flat")
+plot(cm_info2$plot)
+
+```
+
+
 

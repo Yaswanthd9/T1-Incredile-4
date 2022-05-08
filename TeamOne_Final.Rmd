@@ -14,6 +14,12 @@ output:
     toc_depth: '3'
 ---
 
+---
+title: "Keys Factors for Heart Disease"
+author: "Team One"
+date: "`r Sys.Date()`"
+output: html_document
+---
 ```{r init, include=FALSE}
 # some of common options (and the defaults) are: 
 # include=T, eval=T, echo=T, collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
@@ -26,26 +32,34 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 
 ```
+# Title Info 
 
-### Introduction 
+# Introduction
 
-According to the Center for Disease Control and Prevention (CDC), cardiovascular or heart diseases account for 1 in every 4 deaths in the United States annually. The estimated costs to the nation’s economy amount to about $363 billion annually, which include hospitalizations, after services health care needs as well as lost productivity due to death and disability (SS Virani, 2021).  The CDC also states that given the lifestyle habits of an average American, about half of the population (47%) are reported to have “1 of the 3 key risk factors for heart disease: high blood pressure, high cholesterol, and smoking”. However, the risk factors for developing heart diseases are vast and diverse and tend to vary between most racial and ethnic groups in the United States. 
-
-Therefore, there is an immediate need to detect the major risk factors early on, so that a wellness-oriented healthcare system can be instituted. Ideally, such a system would assess the intensity of the risk factors (compared to a baseline) and focus efforts on preventing the occurrence of developing heart diseases in the first place rather than minimizing second occurrences (Liau et al, 2010; Giampaoli et al, 2005 ). 
-
-The beginnings of the current understanding of the interconnected role of risk factors was first discussed in the Framingham Heart Study. Started in 1948, the study’s original goal was “ to identify common factors or characteristics that contribute to cardiovascular disease” (Hong 2018). However, today the FHS has morphed into a multigenerational study gathering genetic information that help analyze family patterns of certain diseases, including cardiovascular ailments (National Heart, Lung and Blood Institute). Jumping off from this, current research in the field has focused on using precision medicine algorithms along with computational development technology to assess a patient’s likelihood of developing heart disease given certain lifestyle factors. Most of the studies have focused largely on Caucasian individuals as a sample and indicating that there is a gap in the usefulness of current risk assessment tools working for individuals of different races. 
-
-In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases among the US population, so that we may be able to see some of the intermingling between different risk factors.   
-
-### Description of Dataset
-
-The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2021), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
-
+# Libraries 
 
 ```{r}
 # Lets load the appropriate libraries
 library(tidyverse)
 library(dplyr)
+library(ezids)
+library(ggplot2)
+library(ggcorrplot)
+library(corrr)
+library(corrplot)
+library(ROCR)
+library(grid)
+library(broom)
+library(dplyr)
+# Might need to install devtools first if not already on system
+# Follow prompt. Use 1 or 2 to install/update other dependencies. 
+# Choose "no" to install those without needing to compile
+# Nevermind, still failed. Not working for R 4.1.2 (202204 - EL)
+# library(ggthemr)
+library(ggthemr)
+library(ggthemes)
+library(gridExtra)
+library(data.table)
 library(funModeling)
 library(ezids)
 library(ggplot2)
@@ -64,7 +78,24 @@ library(scales)
 #library(ggthemes)
 library(gridExtra)
 library(data.table)
+library(regclass)
+```
+### Introduction 
 
+According to the Center for Disease Control and Prevention (CDC), cardiovascular or heart diseases account for 1 in every 4 deaths in the United States annually. The estimated costs to the nation’s economy amount to about $363 billion annually, which include hospitalizations, after services health care needs as well as lost productivity due to death and disability (SS Virani, 2021).  The CDC also states that given the lifestyle habits of an average American, about half of the population (47%) are reported to have “1 of the 3 key risk factors for heart disease: high blood pressure, high cholesterol, and smoking”. However, the risk factors for developing heart diseases are vast and diverse and tend to vary between most racial and ethnic groups in the United States. 
+
+Therefore, there is an immediate need to detect the major risk factors early on, so that a wellness-oriented healthcare system can be instituted. Ideally, such a system would assess the intensity of the risk factors (compared to a baseline) and focus efforts on preventing the occurrence of developing heart diseases in the first place rather than minimizing second occurrences (Liau et al, 2010; Giampaoli et al, 2005 ). 
+
+The beginnings of the current understanding of the interconnected role of risk factors was first discussed in the Framingham Heart Study. Started in 1948, the study’s original goal was “ to identify common factors or characteristics that contribute to cardiovascular disease” (Hong 2018). However, today the FHS has morphed into a multigenerational study gathering genetic information that help analyze family patterns of certain diseases, including cardiovascular ailments (National Heart, Lung and Blood Institute). Jumping off from this, current research in the field has focused on using precision medicine algorithms along with computational development technology to assess a patient’s likelihood of developing heart disease given certain lifestyle factors. Most of the studies have focused largely on Caucasian individuals as a sample and indicating that there is a gap in the usefulness of current risk assessment tools working for individuals of different races. 
+
+In this paper, we aim to understand the different risk factors that affect the occurrence of heart diseases among the US population, so that we may be able to see some of the intermingling between different risk factors.   
+
+### Description of Dataset
+
+The original data set can be retrieved from the CDC’s Behavioral Risk Factor Surveillance System (BRFSS) annual health survey. The survey interviews over four hundred thousand individuals in the USA asking questions regarding the risk factors of heart disease. Conducted in 2020 (published on February 15, 2021), the original data set has been cleaned from its original 300 variables to 18 variables by Kamil Pytlak and can be accessed on Kaggle . 
+
+
+```{r}
 # Load the Data 
 heart <-read.csv("heart_2020_cleaned.csv")
 
@@ -135,12 +166,6 @@ barplot(with(heart, table(HeartDisease, Sex)), main="Heart Disease Among Male & 
 
 
 In our exploratory analysis, we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease. 
-
-#Distribution of heart disease over age
-```{r}
-count = table(heart$HeartDisease, heart$AgeCategory)
-barplot(count, col = c("green","red"), legend.text = c("no", "yes"), args.legend = list(x = "topright"), xlab = "Age category", ylab = "count")
-```
 
 # BMI: Is there a difference between the mean BMI of men and woman in the overall population? 
 
@@ -219,7 +244,7 @@ ggplot(heart, aes(x = factor(HeartDisease), y = SleepTime))+
     ggtitle(' On average,how many hours of sleep do you get in a 24-hour period?') +
     xlab('Heart Disease') + 
     ylab('Sleep Time')+ 
-    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+    scale_fill_brewer(palette = 'Set', name = 'Gender')
 
 t.test  (male_HD$SleepTime,
           female_HD$SleepTime)
@@ -237,7 +262,7 @@ ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     ggtitle(' Have you smoked at least 100 cigarettes in your entire life?') +
     xlab('Heart Disease') + 
     ylab('Smoking')+ 
-    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+    scale_fill_brewer(palette = 'Set2', name = 'Gender')
 
 t.test  ( male_HD$Smoking,
         female_HD$Smoking)
@@ -252,11 +277,12 @@ ggplot(heart, aes(x = factor(HeartDisease), y = Smoking))+
     ggtitle('How many drinks have you had this week?') +
     xlab('Heart Disease') + 
     ylab('Alcohol Consumption')+ 
-    scale_fill_brewer(palette = 'Set1', name = 'Gender')
+    scale_fill_brewer(palette = 'Set3', name = 'Gender')
 
 t.test  ( male_HD$AlcoholDrinking,
         female_HD$AlcoholDrinking)
 ```
+
 Heavy drinkers (adult men having more than 14 drinks per week and adult women having more than 7 drinks per week
 
 # Age, Race, General Health
@@ -293,7 +319,7 @@ With each new addition of a variable, we see that the adjusted R-squared is incr
 
 
 # VIF Table to select variables 
-```{r}
+```{r, results='markup'}
 ezids::xkablevif(reg_3, wide=FALSE)
 ```
 
@@ -320,7 +346,7 @@ nrow(newdata0_1)
 total <- rbind(newdata1_1, newdata0_1)
 #nrow(total)
 summary(total)
-freq(total$HeartDisease)
+#freq(total$HeartDisease)
 
 
 # Convert to factor variables 
@@ -381,16 +407,21 @@ After obtaining the predicted values that an individual will have heart disease 
 
 
 # ROC-AUC 
-```{r, error=False}
+```{r}
 
 # user-defined different cost for false negative and false positive
+
+source('unbalanced_functions.R')
+
+cost.fp = 100
+cost.fn = 200
 
 roc_info <- ROCInfo( data = test, 
                      predict = "prediction", 
 					           actual = "HeartDisease", 
 					           cost.fp = 100,
 					           cost.fn = 200 )
-plot(grid.draw(roc_info$plot))
+grid.draw(roc_info$plot)
 
 ```
 
@@ -400,30 +431,22 @@ Cots for false negatives are higher than false positives.
 
 ```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
 
-loadPkg("regclass")
-xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+#loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion Matrix from Logit Model" )
+#unloadPkg("regclass")
 
 # 
 cm_info <- ConfusionMatrixInfo( data = test, 
                                 predict = "prediction", 
-                                actual = 'HeartDisease', 
-                                cutoff = .30 )
+                                actual  = 'HeartDisease', 
+                                cutoff  = .30 )
 #ggthemr("flat")
 plot(cm_info$plot)
 
 ```
 
-the cost associated with FN is `r cost_fn/cost_fp` times higher than a false positive (FP). 
 
-Using a classification algorithm like logistic regression in this example enabled us to detect events that will happen in the future. That is which employees are more likely to leave the company. Based on this information, we can come up with a more efficient strategy to cope with matter at hand. Hopefully, after this documentation, the one thing that you'll still remember is: If the dataset happens to be unbalanced, meaning that there are a lot more negative outcome data than positives, or vice versa, we shouldn't use accuracy as the measurement to evaluate our model's performance. 
-
-There's actual more to this HR example. We know who is more likely to leave and who are ones that we're more interested in retaining, the next question is what should we say to those employees? Is he leaving because the salary is too low or is it because the workload is simply too much and he needs a break? 
-
-
-
-
-################ END OF SECTION ###########################
+## End of Section ###
 
 ### Heart Disease & Secondary Illnesses 
 In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
@@ -607,11 +630,11 @@ xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Re
 ```
 
 #### Confusion matrix 
-```{r confusionMatrix, results='markup'}
-loadPkg("regclass")
+```{r, results='markup'}
+#loadPkg("regclass")
 # confusion_matrix
 xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
-unloadPkg("regclass")
+#unloadPkg("regclass")
 ```
 
 Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
@@ -659,14 +682,232 @@ According to statistics from the countrywide veterans affairs healthcare and vet
 
 According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent )
 
+
 ```{r}
-contable_smoke = table(heart$HeartDisease, heart$Smoking)
+barplot(table(heart$Smoking, heart$HeartDisease), legend= rownames(table(heart$Smoking, heart$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
+```
+0 represents No
+1 represents Yes
+Based on this barplot we can see that people who have heartdisease and smoke have more chances of getting heart disease than people who don't have heartdiseasse but have smoking habit.
 
-prop <-prop.table(contable_smoke)
+```{r}
+barplot(table(heart$AlcoholDrinking, heart$HeartDisease), legend= rownames(table(heart$AlcoholDrinking, heart$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
+```
+
+0 represents No
+1 represents Yes
+Based on this barplot we can see that people who have heartdisease and drink have chances but are very less when compared to people who don't have heart disease and drink.
+
+```{r}
+barplot(table(heart$HeartDisease, heart$Diabetic), legend= rownames(table(heart$HeartDisease, heart$Diabetic)), col =(c("green", "brown")),xlab="Diabetic",ylab="HeartDisease", main = "Barplot for Heartdisease and Diabetic")
+```
+
+```{r}
+lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking , data = heart)
+xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
+xkablevif(lm1)
+summary(lm1)
+```
+Based on this model we can see that the p-values are small indicating that there is a correlation between alcoholdrinking, smoking and heartdisease. 
+For example for every one percent increase in smoking there is 0.064 % increase in heart disease.
+When we look at t-value for smoking we can see that 63.8% which indicates that smoking is dependent on the heart disease than in Alcohol Drinking.
+
+```{r}
+lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = heart)
+xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
+xkablevif(lm2)
+summary(lm2)
+
+```
+
+In this model we can see that for the interaction term for alcoholdrinking and diabetic there is high p-value which indicates that there is no correlation between these varaibles and heart disease. 
+For people who have diabetics and smoke have high chance of getting heart disease based on the p-value.
+Based on the t-value we can see that 60.06% for diabetics, which says that diabetics is correlated to heart disease.
+
+```{r}
+library(dyn)
+anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=heart)
+xkabledply(anovaRes, title = "ANOVA result summary")
+
+anovaRes1 = aov(HeartDisease ~ Smoking, data=heart)
+xkabledply(anovaRes1, title = "ANOVA result summary")
+
+```
+
+
+```{r}
+cor_ad_smoke <- cor(heart$AlcoholDrinking, heart$Smoking)
+summary(cor_ad_smoke)
+cor_as_hd <- cor(heart$AlcoholDrinking, heart$HeartDisease)
+summary(cor_as_hd)
+cor_hd_smoke <- cor(heart$HeartDisease, heart$Smoking)
+summary(cor_hd_smoke)
+
+
+```
+
+```{r}
+contable  <- table(heart$HeartDisease, heart$Smoking)
+summary(contable ) 
+prop <-prop.table(contable)
 percent <- round(prop*100, 2)
-
 xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
 ```
+
+0 represents No
+1 represents yes
+So, in this contingency table we can see that we got 5% for people who have heartdisease and who smoke which indicates that smoke is more correlated to heartdisease.
+
+```{r}
+contable2 <- table(heart$HeartDisease, heart$AlcoholDrinking)
+summary(contable2) 
+prop <-prop.table(contable2)
+percent <- round(prop*100, 2)
+xkabledply(percent, title="Contingency Table for heart Disease and AlcoholDrinking in Percentage")
+```
+0 represents No
+1 represents yes
+So, in this contingency table we can see that we got 6.45% for people who don't have heartdisease and who drink which indicates that drink is not that more correlated to heartdisease.
+
+```{r chisq}
+
+chitest1 = chisq.test(contable)
+chitest1
+chitest2 = chisq.test(contable2)
+chitest2
+```
+
+Based on the Chi-square test we can say that the variables are dependent on the heartdisease.
+
+```{r}
+
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking , data = train , family = "binomial")
+summary(model_lr)
+xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
+```
+For this model we can see that the p-values are very small indicating that smoking and alcoholdrinking is related to heartdisease.
+
+
+```{r}
+anova(model_lr, test="Chisq")
+```
+
+```{r}
+fitted.results <- predict(model_lr,newdata = test, type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$HeartDisease)
+print(paste('Accuracy',1-misClasificError))
+
+```
+
+We have got an accuaracy of 0.589 which indicates that the model is pretty decent.
+
+```{r}
+expcoeff = exp(coef(model_lr))
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+knitr::kable(expcoeff,caption='Odds Ratio & Confidence Interval of Model')
+```
+
+### Using Confidence Intervals
+
+```{r, results='hold'}
+
+
+xkabledply(confint(model_lr), title = "CIs using profiled log-likelihood" )
+xkabledply(confint.default(model_lr), title = "CIs using standard errors" )
+```
+
+### Model evaluation
+
+```{r}
+new_heart <- subset(heart,select = c(HeartDisease, Smoking, AlcoholDrinking, Diabetic))
+```
+
+```{r}
+
+cor_matrix<-cor(new_heart)
+cor_matrix
+model.matrix(~0+., data=new_heart) %>% 
+     cor(use="pairwise.complete.obs") %>% 
+    ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=3)
+```
+
+Based on the correlation matrix we can see that smoking is more correlated to heartdisease than alcoholdrinking.
+
+```{r, results='markup'}
+#loadPkg("regclass")
+xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+
+```
+#### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
+
+```{r}
+loadPkg("pROC") 
+
+
+library(ROCR)
+p <- predict(model_lr, newdata=test, type="response")
+pr <- prediction(p, test$HeartDisease)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+#area of curve is 0.593
+```
+
+```{r}
+
+model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Diabetic:Smoking + Diabetic:AlcoholDrinking, data = train , family = "binomial")
+summary(model_lr2)
+xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
+```
+For this model we can see that the p-values are very small indicating that smoking and alcoholdrinking, diabetics and smoking:Diabetic is related to heartdisease.
+
+```{r}
+fitted.results <- predict(model_lr2,newdata = test, type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$HeartDisease)
+print(paste('Accuracy',1-misClasificError))
+
+```
+
+```{r, results='hold'}
+
+
+xkabledply(confint(model_lr2), title = "CIs using profiled log-likelihood" )
+xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
+```
+
+### Model evaluation
+#### Confusion matrix 
+
+```{r confusionMatrix, results='markup'}
+#loadPkg("regclass")
+xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
+```
+
+
+
+```{r}
+loadPkg("pROC") 
+
+
+library(ROCR)
+p1 <- predict(model_lr2, newdata=test, type="response")
+pr1 <- prediction(p1, test$HeartDisease)
+prf1 <- performance(pr1, measure = "tpr", x.measure = "fpr")
+plot(prf1)
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+
+```
+
+
+
 
 # What is the effect of Smoking and Drinking?
 
@@ -681,20 +922,6 @@ When looked at the cause for smoking there is a high change of risk leading to h
 Some researchers have found that among people who drink have  high changes of smoking most of the times. 
 
 
-
-```{r}
-
-contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
-
-contable_drink = table(heart$HeartDisease, heart$AlcoholDrinking)
-
-
-prop <-prop.table(contable_drink)
-percent <- round(prop*100, 2)
-
-xkabledply(percent, title="Contingency Table for heart Disease and Drinking in Percentage")
-
-```
 # What is the relation between smoking and heart disease ?
 
 So, basically people who tend to smoke have issues related to cardiovascular disease(CVD). CVD occurs when chemicals in cigarettes release then the blood becomes thick and starts forming clots inside veins and arteries. When the blood vessel are completely blocked then it can lead to heart attack and sudden death. Which can lead to death of the person. In the United States, there were reportedly 800,000 people who faced cardiovascular disease and was the mere cause of death in which 8million died of heart attack and other 7 million died of stroke.
@@ -708,13 +935,7 @@ When a person smoke the chemicals substances in the cigarette cause the cells of
 What is the relation between Drinking and heart disease ?
 
 When a person has a habit to drink than to indicate that his health is getting damaged then we have to understand what is the percentage of alcohol being consumed per day and we can weight it in grams/units. On an average the standard practice of people who drink consume 12 to 15grams off alcohol. Based on this practice there are most often low and high risks. Low risk or moderate risk has an average of 1 to 2 drinks per day and high risk can be measured on consuming more than 4 drinks per day.
-```{r chisq}
 
-chisq.test(contable_smoke)
-
-chisq.test(contable_drink)
-
-```
 
 For both the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
 Both drinking and smoking have a relationship with heart Disease. 
@@ -744,6 +965,399 @@ Both drinking and smoking have a relationship with heart disease.
 
 
 From all the smart questions we can come to conclude that smokers, drinkers, and people with secondary illnesses are more prone to develop heart diseases and they are high chances of death rates. However, people with high BMI are unhealthy and most often tend to sick.
+
+
+********************************************************END OF SECTION**************************
+
+##GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
+Converting HeartDIsease categorical into Numerical Variable
+
+```{r}
+heart$HD<-ifelse(heart$HeartDisease=="Yes",1,0)
+```
+#Converting General Health as numericals
+
+```{r }
+#plot_num(heart)
+heart$GenHealth<-as.factor(heart$GenHealth)
+heart$GeneralHealth<-sapply(heart$GenHealth,unclass)
+```
+
+#5-Very good,4-poor,3-Good,2-fair,1-excellent
+
+```{r}
+freq(heart$GeneralHealth)
+```
+
+
+# Changing race variable to numerical variable
+```{r}
+heart$Race<-as.factor(heart$Race)
+heart$Ethnicity<-sapply(heart$Race,unclass)
+```
+
+
+# Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
+```{r}
+freq(heart$Ethnicity)
+```
+
+```{r, results = 'markup' }
+# Finding the mean of numerical variables grouped by heart disease
+plot_num(heart)
+
+heart %>%
+  group_by(HD) %>%
+  summarise_at(vars("GeneralHealth", 
+                    "PhysicalActivity", 
+                    "Ethnicity"), mean)
+```
+
+```{r}
+loadPkg("corrplot")
+cor(heart$HD,heart$GeneralHealth)
+
+```
+
+```{r}
+hist(heart$GeneralHealth)
+hist(heart$Ethnicity)
+```
+
+```{r}
+
+contable = table(heart$GeneralHealth, heart$HD)
+xkabledply(contable, title="Contingency Table for Heart Disease and GeneralHealth")
+addmargins(contable)
+
+prop <-prop.table(contable)
+percent <- round(prop*100, 2)
+
+print ("Contingency Table for heart Disease and General Health in Percentage")
+print (percent)
+barplot(with(heart, table(GeneralHealth, HD)), main="heart Disease & GeneralHealth", beside=T, col=3:2)
+```
+
+```{r, results = 'markup'}
+# Subset Male & Female with and without Heart Disease
+female <- subset(heart, Sex== "Female")
+male  <- subset (heart, Sex == "Male")
+```
+
+```{r, results = 'markup'}
+# Subsetting genders based on respondents that have heart disease 
+female_HD<- subset(female, HD==1)
+male_HD<- subset(male, HD== 1)
+```
+
+```{r}
+#T-test
+t.test(female_HD$GeneralHealth, male_HD$GeneralHealth)
+```
+
+The p-value is less than the 8% significance level, allowing us to reject the null hypothesis and conclude that the overall average GeneralHealth is different between the male and female populations. From the mean values, we see that men have a mean GeneralHealth of 3.12 while women have a GeneralHealth of 3.19. A difference of 0.17. 
+
+```{r}
+t.test(female_HD$PhysicalActivity, male_HD$PhysicalActivity)
+```
+
+```{r}
+boxplot(HD~GeneralHealth,data=heart)
+```
+
+```{r}
+plot(HD~PhysicalActivity,data=heart)
+```
+
+```{r}
+plot(HD~Ethnicity,data=heart)
+```
+
+```{r}
+plot(HD~DiffWalking,data=heart)
+```
+ 
+
+```{r}
+
+t.test(heart$GeneralHealth, heart$HD)
+t.test(heart$PhysicalActivity, heart$HD)
+t.test(heart$Ethnicity, heart$HD)
+```
+
+```{r}
+Genh_HD=table(heart$GeneralHealth,heart$HD)
+chi_1=chisq.test(Genh_HD)
+chi_1
+HD_Eth=table(heart$PhysicalActivity,heart$HD)
+chi_2=chisq.test(HD_Eth)
+chi_2
+```
+For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+Every GeneralHealth,PhysicalActivity has a relationship with heart Disease. 
+
+```{r, results = 'markup'}
+Regression <- lm(HD~GeneralHealth, data=heart)
+BIC(Regression)
+summary (Regression)
+```
+```{r}
+Regression2 <- lm(HD~GeneralHealth+Ethnicity, data=heart)
+BIC(Regression2)
+summary (Regression2)
+```
+
+```{r}
+reg_3 <- lm(HD~GeneralHealth+PhysicalActivity+Ethnicity, data=heart)
+BIC(reg_3)
+summary (reg_3)
+```
+
+With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low.Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
+
+```{r}
+newdata1<- subset(heart, HD==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HD==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+```
+
+
+```{r}
+freq(total)
+```
+#model 1
+
+```{r}
+# Split into 80-20 train-test sets
+
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+ 
+```{r}
+# Logit Model Training
+model<- glm(HD~ GeneralHealth, data= train, family="binomial")
+summary(model)
+```
+
+# Predicting and Assessing the Model 
+
+```{r}
+# Prediction
+train$prediction <- predict( model, newdata = train, type = "response" )
+test$prediction  <- predict( model, newdata = test , type = "response" )
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 2 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+roc_info1 <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HD", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+p <- recordPlot()
+dev.off()
+grid.draw(roc_info1$plot)
+
+
+```
+
+
+```{r}
+#accuracy_info <- AccuracyCutoffInfo( train = train, test = test, predict = "prediction", actual = 'HeartDisease' )
+# define the theme for the next plot
+#ggthemr("light")
+#accuracy_info$plot
+```
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+#loadPkg("regclass")
+xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model" )
+#unloadPkg("regclass")
+
+# 
+cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = .49 )
+#ggthemr("flat")
+cm_info$plot
+
+```
+
+
+# Model 2
+```{r}
+# Split into 80-20 train-test sets
+
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+```{r}
+# Logit Model Training
+model2<- glm(HD~ GeneralHealth+Ethnicity, data= train, family="binomial")
+summary(model2)
+```
+
+# Predicting and Assessing the Model 
+
+```{r}
+# Prediction
+train$prediction <- predict( model2, newdata = train, type = "response" )
+test$prediction  <- predict( model2, newdata = test , type = "response" )
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 2 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+
+
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+roc_info2 <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HD", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+p <- recordPlot()
+dev.off()
+grid.draw(roc_info2$plot)
+
+
+```
+
+
+```{r}
+#accuracy_info <- AccuracyCutoffInfo( train = train, test = test, predict = "prediction", actual = 'HeartDisease' )
+# define the theme for the next plot
+#ggthemr("light")
+#accuracy_info$plot
+```
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+#loadPkg("regclass")
+xkabledply( confusion_matrix(model2), title = "Confusion matrix from Logit Model" )
+#unloadPkg("regclass")
+
+# 
+cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = 0.27 )
+#ggthemr("flat")
+cm_info2$plot
+
+```
+
+
+#Model 3
+
+
+```{r}
+# Split into 80-20 train-test sets
+
+set.seed(1234) 
+
+sample <- sample.int(n = nrow(total), size = floor(.80*nrow(total)), replace = F)
+train <- total[sample, ]
+test  <- total[-sample, ]
+```
+
+```{r}
+# Logit Model Training
+model3<- glm(HD~ GeneralHealth+Ethnicity+PhysicalActivity, data= train, family="binomial")
+summary(model3)
+```
+
+# Predicting and Assessing the Model 
+
+```{r}
+# Prediction
+train$prediction <- predict( model3, newdata = train, type = "response" )
+test$prediction  <- predict( model3, newdata = test , type = "response" )
+# distribution of the prediction score grouped by known outcome
+ggplot( train, aes( prediction, color = as.factor(HeartDisease) ) ) + 
+geom_density( size = 2 ) +
+ggtitle( "Training Set's Predicted Score" ) + 
+scale_color_economist( name = "data", labels = c( "No Heart Disease", "Yes Heart Disease" ) ) + 
+theme_economist()
+# Positive instance = 1 = Yes Heart Disease 
+# Negative instance = 0 = No Heart Disease
+```
+
+```{r}
+
+# user-defined different cost for false negative and false positive
+
+roc_info3 <- ROCInfo( data = test, 
+                     predict = "prediction", 
+					           actual = "HeartDisease", 
+					           cost.fp = 100,
+					           cost.fn = 200 )
+p <- recordPlot()
+dev.off()
+grid.draw(roc_info3$plot)
+
+
+```
+
+``` {r results='markup'}
+### ROC Curve
+library(pROC)
+roc_svm_test <-plot(roc(as.numeric(test$HD),as.numeric(test$prediction)),main="Comparaison ",col="#1c61b6")
+plot(roc_svm_test, add = TRUE,col = "red", print.auc=TRUE, print.auc.x = 0.5, print.auc.y = 0.3)
+legend(0.3, 0.2, legend = c("test-glm"), lty = c(1), col = c("blue"))
+
+
+```
+
+
+```{r}
+#accuracy_info <- AccuracyCutoffInfo( train = train, test = test, predict = "prediction", actual = 'HeartDisease' )
+# define the theme for the next plot
+#ggthemr("light")
+#accuracy_info$plot
+```
+
+```{r, fig.height=7, fig.width=10, message=FALSE, warning=FALSE}
+
+#loadPkg("regclass")
+#xkabledply( confusion_matrix(model3), title = "Confusion matrix from Logit Model" )
+#unloadPkg("regclass")
+
+# 
+#cm_info2 <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HeartDisease', cutoff = 0.27 )
+#ggthemr("flat")
+#cm_info2$plot
+
+```
+
+
 
 #Limitations of Dataset:
 Our dataset contains 18 variables, for the EDA Analysis we have used only a few variables for our analysis and drew some conclusions and we may use all the variables for the final that is building the model.
@@ -780,22 +1394,3 @@ https://statsandr.com/blog/chi-square-test-of-independence-in-r/
 
 https://www.statisticssolutions.com/free-resources/directory-of-statistical-analyses/chi-square/
 
-# #### CODE CEMETERY ######
-
-# Correlation Plots of All Variables ###DELETE since every section has theire own 
-```{r, results = 'markup'}
- model.matrix(~0+., data=heart) %>% 
-     cor(use="pairwise.complete.obs") %>% 
-   ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=1)
-```
-
-# Freq plot for Heart Disease
-```{r}
-library(ggplot2)
-library(ggpubr)
-theme_set(theme_pubr())
-ggplot(heart, aes(HeartDisease),fill=HeartDisease) +
-  geom_bar() +
-  theme_pubclean()
-
-```
