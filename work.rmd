@@ -516,5 +516,145 @@ plot(cm_info2$plot)
 
 ```
 
+```{r, results='markup'}
+act <- subset(heart,PhysicalActivity==1)
+head(patient)
+na_act <- subset(heart,PhysicalActivity==0)
+```
+
+```{r}
+ggplot(patient, aes(x=PhysicalActivity)) + geom_bar(color="black",fill="darkblue")
+dia_pa<-subset(act,PhysicalActivity==1)
+nrow(dia_pa)
+ggplot(na_act, aes(x=PhysicalActivity)) + geom_bar(color="black",fill="darkblue")+ scale_y_continuous(labels = scales::comma)
+dia_pa1<-subset(na_act,PhysicalActivity==1)
+nrow(dia_pa1)
+```
 
 
+```{r}
+barplot(table(heart$HeartDisease, heart$PhysicalActivity), legend= rownames(table(heart$HeartDisease, heart$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
+```
+
+```{r}
+barplot(table(heart$HeartDisease, heart$GeneralHealth), legend= rownames(table(heart$HeartDisease, heart$GeneralHealth)), col =(c("blue", "red")), xlab="GeneralHealth", ylab="heartdisease",main = "Barplot for Heartdisease and GeneralHealth")
+```
+
+```{r}
+ggplot(heart,aes(x = PhysicalActivity, fill = HeartDisease)) + geom_bar(position = "fill") +ggtitle("HeartDisease vs PhysicalActivity")
+```
+
+```{r}
+newdata1<- subset(heart, HD==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HD==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+```
+
+
+```{r}
+barplot(table(total$PhysicalActivity, total$HeartDisease), legend= rownames(table(total$HeartDisease, total$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(heart, aes(fill=HeartDisease, x=PhysicalActivity, y=HeartDisease)) + 
+  geom_bar(position='stack', stat='identity')
+```
+
+
+
+```{r}
+heart$dummy_HeartDisease <- factor(heart$HeartDisease, labels=c("No", "Yes"))
+ggplot(heart, aes(x=PhysicalActivity, fill=dummy_HeartDisease)) + geom_bar(position="dodge")
+
+```
+
+```{r}
+heart$dummy_HeartDisease <- factor(heart$HeartDisease, labels=c("No", "Yes"))
+ggplot(heart, aes(x=GenHealth, fill=dummy_HeartDisease)) + geom_bar(position="dodge")
+```
+
+
+
+```{r}
+newdata1<- subset(heart, HD==1)
+newdata1_1<-head(newdata1,27373)
+nrow(newdata1_1)
+newdata0<- subset(heart, HD==0)
+newdata0_1<-head(newdata0,27373)
+nrow(newdata0_1)
+total <- rbind(newdata1_1, newdata0_1)
+nrow(total)
+summary(total)
+
+set.seed(100)
+sample_train_rows <- sample(1:nrow(total), 0.7*nrow(total))
+train <- total[sample_train_rows, ]
+test <- total[-sample_train_rows, ]
+
+
+
+```
+
+
+
+```{r}
+mod1 <- glm(HD ~ GenHealth+PhysicalActivity,data=train,family = "binomial")
+summary(mod1)
+```
+
+```{r}
+xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
+```
+
+```{r growthDecayFactors, results='markup', collapse=F}
+expcoeff = exp(coef(mod1))
+# expcoeff
+xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
+```
+
+#### Confusion matrix 
+```{r, results='markup'}
+#loadPkg("regclass")
+# confusion_matrix
+xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" )
+#unloadPkg("regclass")
+```
+
+Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
+
+Accuracy-66.2
+
+```{r}
+loadPkg("pROC")
+library(pROC)
+library(ROCR)
+test_prob <- predict(mod1, newdata = test, type = "response")
+train_prob <-predict(mod1, newdata = train, type = "response")
+test_roc <- roc(test$HD ~ test_prob, plot = TRUE, print.auc = TRUE)
+```
+
+```{r}
+fittedheartTrain=ifelse(train_prob<0.5,0,1 )
+ConfMatTrain=table(train$HD,fittedheartTrain)
+TrainAccuracy=(ConfMatTrain[1,1]+ConfMatTrain[2,2])/sum(ConfMatTrain)
+TrainTPR=72/(72+11)
+TrainFPR=10/(10+79)
+
+print(cbind(TrainAccuracy, TrainTPR, TrainFPR))
+
+fittedheartTest=ifelse(test_prob<0.5,0,1 )
+ConfMatTest=table(test$HD,fittedheartTest)
+TestAccuracy=(ConfMatTest[1,1]+ConfMatTest[2,2])/sum(ConfMatTest)
+TestTPR=45/(45+10)
+TestFPR=1-52/(52+7) ## expressed as 1-true negative rate
+
+print(cbind(TestAccuracy, TestTPR, TestFPR))
+```
