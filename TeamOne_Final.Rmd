@@ -1057,12 +1057,6 @@ male_HD<- subset(male, HD== 1)
 
 
 
-The p-value is less than the 8% significance level, allowing us to reject the null hypothesis and conclude that the overall average GeneralHealth is different between the male and female populations. From the mean values, we see that men have a mean GeneralHealth of 3.12 while women have a GeneralHealth of 3.19. A difference of 0.17. 
-
-```{r}
-t.test(female_HD$PhysicalActivity, male_HD$PhysicalActivity)
-```
-
 ```{r}
 boxplot(HD~GeneralHealth,data=heart)
 ```
@@ -1081,21 +1075,25 @@ plot(HD~DiffWalking,data=heart)
  
 
 ```{r}
-Genh_HD=table(heart$GeneralHealth,heart$HD)
+Genh_HD=table(heart$GeneralHealth,heart$HeartDisease)
 chi_1=chisq.test(Genh_HD)
 chi_1
-HD_Eth=table(heart$PhysicalActivity,heart$HD)
+HD_Eth=table(heart$PhysicalActivity,heart$HeartDisease)
 chi_2=chisq.test(HD_Eth)
 chi_2
 ```
 For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
-Every GeneralHealth,PhysicalActivity has a relationship with heart Disease. 
+Every General Health,Physical Activity has a relationship with heart Disease. 
 
 ```{r, results = 'markup'}
-Regression <- lm(HD~GeneralHealth, data=heart)
+Regression <- lm(HeartDisease~GeneralHealth+PhysicalActivity, data=heart)
 BIC(Regression)
 summary (Regression)
 ```
+
+
+
+
 ```{r}
 Regression2 <- lm(HD~GeneralHealth+Ethnicity, data=heart)
 BIC(Regression2)
@@ -1103,12 +1101,14 @@ summary (Regression2)
 ```
 
 ```{r}
-reg_3 <- lm(HD~GeneralHealth+PhysicalActivity+Ethnicity, data=heart)
-BIC(reg_3)
-summary (reg_3)
+Regression3 <- lm(HD~GeneralHealth+PhysicalActivity+Ethnicity, data=heart)
+BIC(Regression3)
+summary (Regression3)
 ```
 
 With each new addition of a variable, we see that the adjusted R-squared is increasing indicating that the model fit is improving. However, the fit statistic is still quite low.Since model 3 has the highest adjusted r-squared and the lowest BIC values, it will be our preferred model. 
+
+
 
 ```{r}
 newdata1<- subset(heart, HD==1)
@@ -1168,7 +1168,7 @@ theme_economist()
 
 roc_info1 <- ROCInfo( data = test, 
                      predict = "prediction", 
-					           actual = "HD", 
+					           actual = "HeartDisease", 
 					           cost.fp = 100,
 					           cost.fn = 200 )
 p <- recordPlot()
@@ -1193,7 +1193,7 @@ xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model"
 #unloadPkg("regclass")
 
 # 
-cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HD', cutoff = .49 )
+cm_info <- ConfusionMatrixInfo( data = test, predict = "prediction", actual = 'HeartDisease', cutoff = .49 )
 #ggthemr("flat")
 cm_info$plot
 
