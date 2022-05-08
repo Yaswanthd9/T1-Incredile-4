@@ -42,7 +42,6 @@ options(scientific=T, digits = 3)
 # Lets load the appropriate libraries
 library(tidyverse)
 library(dplyr)
-library(funModeling)
 library(ezids)
 library(ggplot2)
 library(ggcorrplot)
@@ -51,13 +50,7 @@ library(corrplot)
 library(ROCR)
 library(grid)
 library(broom)
-library(caret)
-library(tidyr)
 library(dplyr)
-library(scales)
-library(ggplot2)
-# ggthemr is not on CRAN. Need to install from console using 
-devtools::install_github('cttobin/ggthemr')
 # Might need to install devtools first if not already on system
 # Follow prompt. Use 1 or 2 to install/update other dependencies. 
 # Choose "no" to install those without needing to compile
@@ -982,16 +975,6 @@ From all the smart questions we can come to conclude that smokers, drinkers, and
 ********************************************************END OF SECTION**************************
 
 ##GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
-
-# Now to see which variables are categorical and which are numerical 
-```{r}
-data_integrity(heart)
-```
-# Description of every variable 
-```{r error= TRUE}
-describe (heart)
-```
-
 Converting HeartDIsease categorical into Numerical Variable
 
 ```{r}
@@ -1010,27 +993,6 @@ heart$GeneralHealth<-sapply(heart$GenHealth,unclass)
 ```{r}
 freq(heart$GeneralHealth)
 ```
-
-
-# Frequency distributions of all our categorical variables 
-```{r}
-freq(heart)
-```
-
-
-# Changing Diabetes bordeline and pregnancy categories to Yes/No
-```{r}
-heart$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
-heart$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
-```
-
-
-#Checking if diabetic has been changed 
-```{r}
-describe (heart$Diabetic)
-freq(heart$Diabetic)
-```
-
 
 
 # Changing race variable to numerical variable
@@ -1086,9 +1048,6 @@ barplot(with(heart, table(GeneralHealth, HD)), main="heart Disease & GeneralHeal
 female <- subset(heart, Sex== "Female")
 male  <- subset (heart, Sex == "Male")
 ```
-
-
-
 
 ```{r, results = 'markup'}
 # Subsetting genders based on respondents that have heart disease 
