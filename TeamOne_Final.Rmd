@@ -923,12 +923,12 @@ auc
 
 Roc curve is slightly better than model_lr.
 
-********************************************************END OF SECTION**************************
-
-##GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
 
 
-#Converting General Health as numericals
+## GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
+
+
+# Converting General Health as numericals
 
 ```{r }
 #plot_num(heart)
@@ -967,8 +967,6 @@ cor(heart$HeartDisease,heart$GeneralHealth)
 As a rule of thumb, a correlation coefficient between 0.25 and 0.5 is considered to be a “weak” correlation between two variables.
 As Heart Disease increase General Health Decreases. It means chances of getting heart disease are high when general health decreases it means going bad.
 
-
-
 ```{r}
 
 contable = table(heart$GeneralHealth, heart$HeartDisease)
@@ -983,13 +981,18 @@ print (percent)
 barplot(with(heart, table(GeneralHealth, HeartDisease)), main="heart Disease & GeneralHealth", beside=T, col=3:2)
 ```
 
-
-
+Contigency plot is made to know the relationship between heart Disease and General Health. For General Health 1 20.43% of people haven’t faced heart Disease and 0.47 have faced HeartDisease,For General HEalth 2  8.63% of people haven’t faced heart Disease and 2.22  have faced HeartDisease. For General Health 3 of people haven’t faced heart Disease and 0.47 have face HD For General HEalth 4 2.33% of people haven’t faced heart Disease and 1.20 have face HD. For General HEalth 5  33.92% of people haven’t faced heart Disease and 1.68 have face Heart disease.
 
 ```{r}
 barplot(table(heart$HeartDisease, heart$GeneralHealth), legend= rownames(table(heart$HeartDisease, heart$GeneralHealth)), col =(c("blue", "red")), xlab="GeneralHealth", ylab="heartdisease",main = "Barplot for Heartdisease and GeneralHealth")
 ```
+A plot is drawn to get relationship with GeneralHealth and HeartDisease. From stacked barplot we can see that people with fair genearl health and good general health tend to have more heart disease than compared to all.
 
+```{r}
+barplot(table(heart$HeartDisease, heart$PhysicalActivity), legend= rownames(table(heart$HeartDisease, heart$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
+```
+
+We have a larger number of observations where the person is physically active. We can take away from this barplot that there is some significance for physical activity in deciding whether or not a person will develop heart disease
 
 ```{r}
 Genh_HD=table(heart$GeneralHealth,heart$HeartDisease)
@@ -999,39 +1002,44 @@ HD_Eth=table(heart$PhysicalActivity,heart$HeartDisease)
 chi_2=chisq.test(HD_Eth)
 chi_2
 ```
-For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
+ For all the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
 Every General Health,Physical Activity has a relationship with heart Disease. 
 
 ```{r}
-newdata1<- subset(heart, HeartDisease==1)
-newdata1_1<-head(newdata1,27373)
-nrow(newdata1_1)
-newdata0<- subset(heart, HeartDisease==0)
-newdata0_1<-head(newdata0,27373)
-nrow(newdata0_1)
-total <- rbind(newdata1_1, newdata0_1)
-nrow(total)
-summary(total)
+modifieddata<- subset(heart, HeartDisease==1)
+modifieddata_1<-head(modifieddata,27373)
+nrow(modifieddata_1)
+modifieddata0<- subset(heart, HeartDisease==0)
+modifieddata_01<-head(modifieddata0,27373)
+nrow(modifieddata_01)
+totaldata <- rbind(modifieddata_1, modifieddata_01)
+nrow(totaldata)
+summary(totaldata)
 
 set.seed(100)
-sample_train_rows <- sample(1:nrow(total), 0.7*nrow(total))
+sample_train_rows <- sample(1:nrow(total), 0.7*nrow(totaldata))
 train <- total[sample_train_rows, ]
 test <- total[-sample_train_rows, ]
 
 ```
 
 
-
+Since most of the data is unbiased. Converted data into equal number of yes(1) and no so that data is biased and we are traing the modified data to 70% and testing data as 30%
 ```{r}
-model <- glm(HeartDisease ~ GenHealth+PhysicalActivity,data=train,family = "binomial")
+model <- glm(HeartDisease ~ GenHealth+PhysicalActivity+SleepTime,data=train,family = "binomial")
 summary(model)
 ```
+
+A model is built on Gen Health, Physical Activity, Sleeptime, Race. All the p-values are less than 0.05 except the RaceAsian remaining all the stastically significant.
 
 ```{r}
 xkabledply(model, title = paste("Logistic Regression :", format(formula(model)) ))
 ```
 
-```{r growthDecayFactors, results='markup', collapse=F}
+
+All the coefficients are found significant (small p-values). All the variables except PhysicalHealth have positive effects on HeartDisease.
+
+```{r}
 expcoeff = exp(coef(model))
 # expcoeff
 xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
@@ -1047,7 +1055,7 @@ xkabledply( confusion_matrix(model), title = "Confusion matrix from Logit Model"
 
 Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
 
-Accuracy-66.2
+Accuracy-66.6
 
 ```{r}
 loadPkg("pROC")
