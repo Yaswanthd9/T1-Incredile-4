@@ -923,34 +923,6 @@ auc
 
 Roc curve is slightly better than model_lr.
 
-
-
-### Limitations
-Telephone interviews- voluntary bias (old retired): Most of the surveys were made telephonic because of the covid and most of the people didn’t want to meet in person to risk their lives for the sake of surveys & Covid. So, they started doing telephonic surveys to find out whether the key indicators like high blood pressure, high cholesterol, and smoking among most racial and ethnic groups to know how they play a crucial role in Heart Disease. Most of the responses were rude and arrogant because they were frustrated with the covid and were not getting out of the home. Few people were very nice to surveys and were cool and they responded by stating to questions they have given relevant answers to and surveys have recorded their responses.
-			
-Liars - We are uncertain about the responses because we found that the responses which were recorded were different at times. We found that when we called them for the survey we got the responses as one and while we called them and said that we may be giving them some medical discounts we found the responses as other.
-
- 
-During the year 2021, the covid was at its peak and most people got affected by covid. Post covid, people’s immune systems got broken down and they became prone to several illnesses like diabetes, Asthma. The death rates with covid were very high and this led to the increase in death rates of heart disease because most of the people got infected with key indicators like high BMI and high cholesterol. Not only did the older people got affected by covid it was the younger people who got affected by covid their death rates were also high. From the noted survey, people tend to develop more secondary illnesses which in turn caused them primary disease which is Heart Disease, And got affected with higher death rates.
-
-
-### Conclusions:
-
-To conclude, we found strong evidence from our EDA that people with higher BMI, high cholesterol, and age affect Heart Disease. Moreover, the variables were Sex, BMI, Physical Health, Mental Health, sleep time, Secondary Illnesses, alcohol, and Drinking.
-
-# Analysis of SMART Questions:
- From the first question one Which gender tends to have more diseases based on BMI, smoking, drinking, and mental health in the year 2020? We concluded that On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in 30 days is slightly higher for people with heart disease than for people without. we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. From the mean values, we see that men have a mean BMI of 28.50 while women have a BMI of 28.16. A difference of 0.34.  From the T-test output, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. Since the p-value is less than 5%, there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick for about 9 days while men reported just over 6 days.  
-
-#From the second smart question Are people with heart diseases more prone to developing secondary illnesses’ or is it the other way around? 
-we concluded that secondary illnesses are significantly dependent on heart diseases. We concluded this based on the Chi-squared test we observed that the p-value<0.05. We can reject the null hypothesis. Every secondary illness (Diabetic, Asthma, Kidney disease, and skin cancer) has a relationship with heart disease. 
-  
-From the third smart question Are smokers or drinkers more prone to developing heart disease? Our analysis was based on the test not to conclude any kind of assumptions or theory we did some chi-squared tests For smoking and drinking the chi^2 tests we performed above, the p-value<0.05. So we can reject the null hypothesis. 
-Both drinking and smoking have a relationship with heart disease.
-
-
-From all the smart questions we can come to conclude that smokers, drinkers, and people with secondary illnesses are more prone to develop heart diseases and they are high chances of death rates. However, people with high BMI are unhealthy and most often tend to sick.
-
-
 ********************************************************END OF SECTION**************************
 
 ##GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
@@ -1010,6 +982,8 @@ print ("Contingency Table for heart Disease and General Health in Percentage")
 print (percent)
 barplot(with(heart, table(GeneralHealth, HeartDisease)), main="heart Disease & GeneralHealth", beside=T, col=3:2)
 ```
+
+
 
 
 ```{r}
@@ -1104,8 +1078,32 @@ print(cbind(TestAccuracy, TestTPR, TestFPR))
 
 
 
-#Limitations of Dataset:
+# Limitations of Dataset:
 Our dataset contains 18 variables, for the EDA Analysis we have used only a few variables for our analysis and drew some conclusions and we may use all the variables for the final that is building the model.
+
+Telephone interviews- voluntary bias (old retired): Most of the surveys were made telephonic because of the covid and most of the people didn’t want to meet in person to risk their lives for the sake of surveys & Covid. So, they started doing telephonic surveys to find out whether the key indicators like high blood pressure, high cholesterol, and smoking among most racial and ethnic groups to know how they play a crucial role in Heart Disease. Most of the responses were rude and arrogant because they were frustrated with the covid and were not getting out of the home. Few people were very nice to surveys and were cool and they responded by stating to questions they have given relevant answers to and surveys have recorded their responses.
+			
+Liars - We are uncertain about the responses because we found that the responses which were recorded were different at times. We found that when we called them for the survey we got the responses as one and while we called them and said that we may be giving them some medical discounts we found the responses as other.
+
+ 
+During the year 2021, the covid was at its peak and most people got affected by covid. Post covid, people’s immune systems got broken down and they became prone to several illnesses like diabetes, Asthma. The death rates with covid were very high and this led to the increase in death rates of heart disease because most of the people got infected with key indicators like high BMI and high cholesterol. Not only did the older people got affected by covid it was the younger people who got affected by covid their death rates were also high. From the noted survey, people tend to develop more secondary illnesses which in turn caused them primary disease which is Heart Disease, And got affected with higher death rates.
+
+
+### Conclusions:
+
+To conclude, we found strong evidence from our EDA that people with higher BMI, high cholesterol, and age affect Heart Disease. Moreover, the variables were Sex, BMI, Physical Health, Mental Health, sleep time, Secondary Illnesses, alcohol, and Drinking.
+
+# Analysis of SMART Questions:
+ From the first question one Which gender tends to have more diseases based on BMI, smoking, drinking, and mental health in the year 2020? We concluded that On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in 30 days is slightly higher for people with heart disease than for people without. we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. From the mean values, we see that men have a mean BMI of 28.50 while women have a BMI of 28.16. A difference of 0.34.  From the T-test output, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. Since the p-value is less than 5%, there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick for about 9 days while men reported just over 6 days.  
+
+#From the second smart question Are people with heart diseases more prone to developing secondary illnesses’ or is it the other way around? 
+we concluded that secondary illnesses are significantly dependent on heart diseases. We concluded this based on the Chi-squared test we observed that the p-value<0.05. We can reject the null hypothesis. Every secondary illness (Diabetic, Asthma, Kidney disease, and skin cancer) has a relationship with heart disease. 
+  
+From the third smart question Are smokers or drinkers more prone to developing heart disease? Our analysis was based on the test not to conclude any kind of assumptions or theory we did some chi-squared tests For smoking and drinking the chi^2 tests we performed above, the p-value<0.05. So we can reject the null hypothesis. 
+Both drinking and smoking have a relationship with heart disease.
+
+
+From all the smart questions we can come to conclude that smokers, drinkers, and people with secondary illnesses are more prone to develop heart diseases and they are high chances of death rates. However, people with high BMI are unhealthy and most often tend to sick.
 
 Next Steps:
 Next steps are to use what we learned in our dataset and develop a linear model. And try to create a model which is helpful for everyone. As we all know Health is Wealth and without health, we can't achieve heights so we tend to develop a model which we can use to know which variables are developing heart disease and with that, we can try to decrease the effect on Heart Disease.
