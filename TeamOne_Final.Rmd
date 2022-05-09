@@ -432,9 +432,13 @@ Specificity = 0.66
 Using the optimal cut-off value of 0.30 obtained from the ROC-AUC Loss function, we see that our model a is able to calculate more positive values than negative values. The accuracy of the model is about 73%, which is not a good model in the healthcare field but can still be used as a public early detection tool to bring about individual awareness. We see that our model shows high sensitivity and low specificity, this means that our model is great at estimating actual cases of whether an individual will have heart disease but tends to have a high false positive rate. In the grand scheme life, higher false poistives is not as bad as having a false negative rate. For instance, an individual A uses our model and is told that they have a higher likelihood of having heart issues in the future. However, turns out this is a false positive and A just ends up living a bit more healthier than they did before. However, it is the false negatives that we will need to adjust for in the future. 
 
 
-# Heart Disease & Secondary Illnesses 
-In this part we are Identifying whether Heart Disease and secondary illnesses have correlation or not(are they dependent or independent?).
-
+# HeartDisease vs sencondary illnesses and health conditions(BMI and difficulty in walking) 
+In this part we are Identifying whether Heart Disease has any relation with secondary illnesses and also health conditions like BMI and Difficulty in Walking
+```{r}
+heart_dum <-read.csv("heart_2020_cleaned.csv")
+heart_dum$Diabetic<- replace (heart$Diabetic, heart$Diabetic== "No, borderline diabetes" , "Yes")
+heart_dum$Diabetic[heart$Diabetic== "Yes (during pregnancy)"] <- "No"  
+```
 #Exploratory data analysis
 ```{r, results='markup'}
 library(ggplot2)
@@ -442,94 +446,67 @@ ggplot(heart, aes(HeartDisease)) +
   geom_bar(color="black",fill="aquamarine4")
 ```
 
-```{r, results='markup'}
-patient <- subset(heart,HeartDisease==1)
-head(patient)
-na_patient <- subset(heart,HeartDisease==0)
+```{r}
+ggplot(data = heart_dum) + 
+geom_bar(mapping = aes(x = Stroke, fill = HeartDisease), position = "fill")+scale_fill_manual(values = c("Yes" = "black", "No" = "orange"))+ggtitle("HeartDisease vs Diabetic")
 ```
 
-#barplot of HeartDisease vs Stroke
-```{r, results='markup'}
-library(ggplot2)
-ggplot(patient, aes(x=Stroke)) + geom_bar(color="black",fill="hotpink3")
-str_pa<-subset(patient,Stroke==1)
-nrow(str_pa)
-ggplot(na_patient, aes(x=Stroke)) + geom_bar(color="black",fill="hotpink3")+ scale_y_continuous(labels = scales::comma)
-str_pa1<-subset(na_patient,Stroke==1)
-nrow(dia_pa1)
+```{r}
+ggplot(data = heart_dum) + 
+geom_bar(mapping = aes(x = Diabetic, fill = HeartDisease), position = "fill")+scale_fill_manual(values = c("Yes" = "black", "No" = "orange"))+ggtitle("HeartDisease vs Diabetic")
 ```
 
-#barplot of HeartDisease vs Diabetic
-```{r, results='markup'}
-library(ggplot2)
-ggplot(patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")
-dia_pa<-subset(patient,Diabetic==1)
-nrow(dia_pa)
-ggplot(na_patient, aes(x=Diabetic)) + geom_bar(color="black",fill="darkblue")+ scale_y_continuous(labels = scales::comma)
-dia_pa1<-subset(na_patient,Diabetic==1)
-nrow(dia_pa1)
+```{r}
+ggplot(data = heart_dum) + 
+geom_bar(mapping = aes(x = KidneyDisease, fill = HeartDisease), position = "fill")+scale_fill_manual(values = c("Yes" = "black", "No" = "orange"))+ggtitle("HeartDisease vs KidneyDisease")
 ```
 
-#barplot of HeartDisease vs Asthma
-```{r, results='markup'}
-ggplot(patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1")
-ast_pa<-subset(patient,Asthma==1)
-nrow(ast_pa)
-ggplot(na_patient, aes(x=Asthma)) + geom_bar(color="black",fill="cadetblue1" )+ scale_y_continuous(labels = scales::comma)
-ast_pa1<-subset(na_patient,Asthma==1)
-nrow(ast_pa1)
+```{r}
+ggplot(data = heart_dum) + 
+geom_bar(mapping = aes(x = SkinCancer, fill = HeartDisease), position = "fill")+scale_fill_manual(values = c("Yes" = "black", "No" = "orange"))+ggtitle("HeartDisease vs SkinCancer")
 ```
 
-#barplot of HeartDisease vs KidneyDisease
-```{r, results='markup'}
-ggplot(patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")
-kid_pa<-subset(patient,KidneyDisease==1)
-nrow(kid_pa)
-ggplot(na_patient, aes(x=KidneyDisease)) + geom_bar(color="black",fill="darkcyan")+ scale_y_continuous(labels =scales::comma)
-kid_pa1<-subset(na_patient,KidneyDisease==1)
-nrow(kid_pa1)
+```{r}
+ggplot(data = heart_dum) + 
+geom_bar(mapping = aes(x = Asthma, fill = HeartDisease), position = "fill")+scale_fill_manual(values = c("Yes" = "black", "No" = "orange"))+ggtitle("HeartDisease vs Asthma")
 ```
 
-#barplot of HeartDisease vs SkinCancer
-```{r, results='markup'}
-ggplot(patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")
-skin_pa<-subset(patient,SkinCancer==1)
-nrow(skin_pa)
-ggplot(na_patient, aes(x=SkinCancer)) + geom_bar(color="black",fill="darkgray")+ scale_y_continuous(labels = scales::comma)
-skin_pa1<-subset(na_patient,SkinCancer==1)
-nrow(skin_pa1)
+```{r}
+ggplot(data = heart_dum) + 
+geom_bar(mapping = aes(x = DiffWalking, fill = HeartDisease), position = "fill")+scale_fill_manual(values = c("Yes" = "black", "No" = "orange"))+ggtitle("HeartDisease vs Difficulty in walking")
 ```
-
 
 ```{r}
 # We are seperating our desired variables to test them in an easier way.
-diseases <- data.frame (heart$HeartDisease,
+causes <- data.frame (heart$HeartDisease,
                         heart$Stroke,
                         heart$Diabetic,
                         heart$Asthma,
                         heart$KidneyDisease,
-                        heart$SkinCancer)
+                        heart$SkinCancer,
+                        heart$DiffWalking)
 
 # Rename columns
 
-names(diseases) <- c ('heart_disease',
+names(causes) <- c ('heart_disease',
                       'stroke',
                       'diabetic',
                       'asthma',
                       'kidney_disease',
-                      'skin_cancer')
+                      'skin_cancer',
+                       'Difficult_walking')
 
 
 ```
 
 # Corellation  Matrix and Correlation Plot Between Diseases
 ```{r}
-cor_matrix<-cor(diseases)
+cor_matrix<-cor(causes)
 cor_matrix
 ```
 
 ```{r}
-model.matrix(~0+., data=diseases) %>% 
+model.matrix(~0+., data=causes) %>% 
      cor(use="pairwise.complete.obs") %>% 
     ggcorrplot(show.diag = F, type="upper", lab=TRUE, lab_size=2)
 
@@ -570,6 +547,9 @@ chi_4
 hea_stroke=table(heart$HeartDisease,heart$Stroke)
 chi_5=chisq.test(hea_stroke)
 chi_5
+hea_walk=table(heart$HeartDisease,heart$DiffWalking)
+chi_6=chisq.test(hea_walk)
+chi_6
 ```
 
 From the output and from `test$p.value` we see that the p-value is less than the significance level of 5%. Like any other statistical test, if the p-value is less than the significance level, we can reject the null hypothesis.Every secondary illness (Diabetic,Asthma, Kidney disease and skin cancer) has a relationship with heart Disease.
@@ -580,7 +560,7 @@ From the output and from `test$p.value` we see that the p-value is less than the
 library(tidyverse)
 library(caret)
 heartsub <- data.frame(heart)
-heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer")]
+heartsub <- heartsub[, c("HeartDisease","Stroke","Diabetic","Asthma","KidneyDisease","SkinCancer","DiffWalking","BMI")]
 
 newdata1<- subset(heartsub, HeartDisease==1)
 newdata1_1<-head(newdata1,20000)
@@ -596,15 +576,12 @@ heart_train <- total[heart_train_rows, ]
 heart_test <- total[-heart_train_rows, ]
 ```
 
-```{r}
-mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
-              + SkinCancer,
-              data=heart_train,family = "binomial")
-summary(mod1)
-```
 
 ```{r}
-xkabledply(mod1, title = paste("Logistic Regression :", format(formula(mod1)) ))
+mod1 <- glm(HeartDisease ~ Stroke + Diabetic + Asthma + KidneyDisease 
+              + SkinCancer+DiffWalking+BMI,
+              data=heart_train,family = "binomial")
+summary(mod1)
 ```
 
 ```{r growthDecayFactors, results='markup', collapse=F}
@@ -622,8 +599,6 @@ xkabledply( confusion_matrix(mod1), title = "Confusion matrix from Logit Model" 
 ```
 
 Accuracy - It determines the overall predicted accuracy of the model. It is calculated as Accuracy  = (True Positives + True Negatives)/(True Positives + True Negatives + False Positives + False Negatives)
-
-Accuracy-66.2
 
 ```{r}
 loadPkg("pROC")
