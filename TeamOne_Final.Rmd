@@ -661,125 +661,138 @@ Accuarcy-66.7
 
 ### Smokers Vs Alcoholic Drinkers 
 
-First of all does smoking and drinking cause heart attack or heart disease?
+Our problem statement is "Does smoking or drinking increase the risk of heartdisease?, Does having diabetics increase the risk of heartdiseases among smokers or drinkers?
 
-Yes, it is actually one among the reason that can cause heart disease in young people and majority of cases are seen in women according to a most of the publishes articles and researchers.
+We performed some basic EDA through visualizing the dataset by plotting graphs. After priliminary analysis the following obsevations are made:
 
-To determine if there is a link between heart disease and drug use, researchers investigated and discovered that recreational use of nicotine, cannabis, alcohol, and illegal substances such as amphetamine and cocaine may be linked to prematurely clogged arteries.Premature heart disease can arise before the age of 65 in women and 55 in males, and it can be difficult and dangerous.
+Heartdisease varaible is heavily skewed. The percentage of people with no heartdiseases is very high as compared to people with heartdisease. As heartdisease is the target variable this might effect the prediction of the model.
 
-According to statistics from the countrywide veterans affairs healthcare and veterans with premaTure AtheroscLerosis (VITAL) registry (2014-2015). There are 7716 patients who are having extremely premature heart disease , and they discovered this by comparing them to those who do not have premature heart disease.
+In order to fix this we have made some subset of the dataset with equal proportions of yes and no of heart disease varaible.
 
-According to the study and analysis, patients with early heart disease are more likely to smoke (63 percent versus 41 percent) and drink alcohol (32 percent vs 15 percent )
+From the graph between heartdisease and smoking we can say that people who smoke have a high tendency for getting heartdiseases which is true with real life scenarios.
+
+From the graph between heartdisease and drinking we can say the proposition of drinkers among people with heartdisease is less than the people without heartdisease. Ths is contory to real life assumption which assumes that people who drink are more prone to heartdisease.
+
+From the graph people with diabetics shows us that people with diabetics are more prone to heartdiseases.
+
+From the graph between diabetics and smoking we can conclude that the chances of people having diabetics is more among smokers.
+
+From the graph between diabetics and alcoholdrinking, there are less people with diabetics who drinks as compared to people with diabetics.
+
+We have observed the following trends between heartdisease and smoking, alcoholdrinking and diabetics from the premilinary analysis:
+
+The chances of people having heartdiseases is more when they have smoking habit as compared to drinking. people with diabetics are more prone to heartdiseases. Diabetics follows the same trend as heartdisease, where people who smoke are more prone to having diabetics than people who drink.
+
+After graphs we have done some statistical analysis of the variables. From the correlation coffections between heartdisease and smoking, drinking, diabetics are 0.184, -0.0609, 0.266 respectively. Heartdisease and diabetics are strongly correlated when compared to drinking and smoking. Drinking is least and negatively correalted with heartdisease. The correlation coefficients between diabetics, and smoking, alcoholdrinking are 0.0733, -0.0705 respectively. Diabetics and smoking are lightly correlated with a positive coeffection of 0.073 and from the coffection values we can say that smoking and drinking does not effect diabetic to a great extent.
+
+From the contengency table, approximetly 30% of people who has heartdiseases has an smoking habit, only 20% of people who does not smoke have heartdisease. 2% of drinkers have heartdisease whereas 3% of known drinkers have heartdisease. This is the reason for negative correaltion between heartdisease and drinking. Out of total heart patients 18% have diabetics and 7% of people have diabetics without any heartdisease. 
 
 
-```{r}
-barplot(table(heart$Smoking, heart$HeartDisease), legend= rownames(table(heart$Smoking, heart$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
-```
-0 represents No
-1 represents Yes
-Based on this barplot we can see that people who have heartdisease and smoke have more chances of getting heart disease than people who don't have heartdiseasse but have smoking habit.
+We built some models to see the statistical correlation between heartdisease and smoking, alcoholdrinking, and diabetic and try to predict the chances of having heartdisease with the above mentioned variables. Further, we checked the chances of having heartdisease has increased or decreased when diabetics is taken into consideration among smokers and drinkers.
 
-```{r}
-barplot(table(heart$AlcoholDrinking, heart$HeartDisease), legend= rownames(table(heart$AlcoholDrinking, heart$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
-```
+We used logistic regression model to predict the chances of having heartdisease based on the variables as this is a classification problem. We built 2 models, model_lr and model_lr2.
 
-0 represents No
-1 represents Yes
-Based on this barplot we can see that people who have heartdisease and drink have chances but are very less when compared to people who don't have heart disease and drink.
+model_lr has smoking and alcoholdrinking as independent variables and heartdisese as dependent variable with interaction between smoking and alocoholdrinking. In model_lr2 smoking, alcoholdrinking, diabetics are independent variables with interaction between diabetics and alcoholdrinking and diabetics and smoking. 
 
-```{r}
-barplot(table(heart$HeartDisease, heart$Diabetic), legend= rownames(table(heart$HeartDisease, heart$Diabetic)), col =(c("green", "brown")),xlab="Diabetic",ylab="HeartDisease", main = "Barplot for Heartdisease and Diabetic")
-```
+From p-values both smoking and alcoholdrinking are statistically significant. For every one percent increase in smoking there is an increase of 0.7891% in heartdisease. For every one percent increase in alcoholdrinking there is a decrease of 0.7844% in heartdisease. The high z-value 39.31 of smoking tells us that smoking and heardisease are strongly correaltion. The high p-value between smoking and alcoholdrinking signifies no statistical correlation between the two-variable.
 
-```{r}
-lm1 <- lm(HeartDisease ~ AlcoholDrinking + Smoking , data = heart)
-xkabledply(lm1, title = paste("Model :", format(formula(lm1)) ) )
-xkablevif(lm1)
-summary(lm1)
-```
-Based on this model we can see that the p-values are small indicating that there is a correlation between alcoholdrinking, smoking and heartdisease. 
-For example for every one percent increase in smoking there is 0.064 % increase in heart disease.
-When we look at t-value for smoking we can see that 63.8% which indicates that smoking is dependent on the heart disease than in Alcohol Drinking.
+We have got an accuaracy of 58.9 for this model_lr which is not good because of the fact that we have a equal distribution of heartdisease patients in the dataset.
 
-```{r}
-lm2 <- lm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Smoking : Diabetic + Diabetic: AlcoholDrinking,data = heart)
-xkabledply(lm2, title = paste("Model :", format(formula(lm2)) ) )
-xkablevif(lm2)
-summary(lm2)
+Odd's ratio is the proprobility of having heartdiseases to having no heartdiseases for a person with smoking habit. For every one unit increase in smoking the chance of getting heartdisease is 2.2. For every one unit increase in alcoholdrinking the chance of getting heartdisease is 0.45.
 
-```
+From confusion matrix we can see that our model has predicted true positive only 12157 times and 7867 times false positive. Despite having an close to 55% accuracy false positive rate is very high when compared with true positive. So, the model is not good.
 
-In this model we can see that for the interaction term for alcoholdrinking and diabetic there is high p-value which indicates that there is no correlation between these varaibles and heart disease. 
-For people who have diabetics and smoke have high chance of getting heart disease based on the p-value.
-Based on the t-value we can see that 60.06% for diabetics, which says that diabetics is correlated to heart disease.
+From the roc-curve we can conclude that the accuracy is not good as it is close to diagnal.
 
-```{r}
-library(dyn)
-anovaRes = aov(HeartDisease ~ AlcoholDrinking, data=heart)
-xkabledply(anovaRes, title = "ANOVA result summary")
+model_lr2 hasall the 3 variables(smoking,drinking,diabetics) are statistically significant. The effect of diabetics on heartdisease with people having smoking habit is statistically significant. There is no strong relation between diabetics and alcoholdrinking in heartdisease patients. 
 
-anovaRes1 = aov(HeartDisease ~ Smoking, data=heart)
-xkabledply(anovaRes1, title = "ANOVA result summary")
+The accuracy of the model_lr2 has increased when diabetics is added this shows the significances of diabetics in heartdisease patients.
 
-```
+For model_lr2 from the expontential coffectients, or every one unit increase in diabetics and smoking there is a 0.8 increase in heartdisease.
+
+From the confusion matrix, true positive is 15421 and false negative is 9483 which is slightly better than model one but can not say but the accuracy is good as there is a lot of false negatives.
+
+Roc curve is slightly better than model_lr.
+
+To conclude, model_lr2 performs slightly better than model_lr which signifies the a strong correlation between diabetics and heartdisease which is inturn strongly correlated in smoking. The correaltions predicted by the model between heartdisease and smoking, diabetics are similar to real life scenarios. Drinking is not significantly related with the heartdisease which is not true in real life situations. This arises from the fact that there are very few observations of true positives cases in alcoholdrinking. Accuracy of 58 and 63% are decent for the number of false positives are too high which makes the model unrealiable.
 
 
 ```{r}
-cor_ad_smoke <- cor(heart$AlcoholDrinking, heart$Smoking)
-summary(cor_ad_smoke)
-cor_as_hd <- cor(heart$AlcoholDrinking, heart$HeartDisease)
-summary(cor_as_hd)
-cor_hd_smoke <- cor(heart$HeartDisease, heart$Smoking)
-summary(cor_hd_smoke)
 
-
+barplot(table(total$Smoking, total$HeartDisease), legend= rownames(table(total$Smoking, total$HeartDisease)), col =(c("orange", "blue")), xlab="heartdisease", ylab="smoking",main = "Barplot for Heartdisease and Smoking")
 ```
 
 ```{r}
-contable  <- table(heart$HeartDisease, heart$Smoking)
-summary(contable ) 
+
+barplot(table(total$AlcoholDrinking, total$HeartDisease), legend= rownames(table(total$AlcoholDrinking, total$HeartDisease)), col =(c("red", "darkblue")), xlab="Heartdisease", ylab="Alcoholdrinking", main = "Barplot for Heartdisease and Alcoholdrinking")
+
+```
+
+
+
+```{r}
+barplot(table(total$Diabetic, total$HeartDisease), legend= rownames(table(total$Diabetic, total$HeartDisease)), col =(c("green", "brown")),xlab="HeartDisease",ylab="Diabetics", main = "Barplot for Heartdisease and Diabetic")
+```
+
+```{r}
+barplot(table(total$Diabetic, total$Smoking), legend= rownames(table(total$Diabetic, total$Smoking)), col =(c("red", "green")),xlab="Smoking",ylab="Diabetics", main = "Barplot for Smoking and Diabetic")
+```
+
+```{r}
+barplot(table(total$Diabetic, total$AlcoholDrinking), legend= rownames(table(total$Diabetic, total$AlcoholDrinking)), col =(c("red", "blue")),xlab="AlcoholDrinking",ylab="Diabetics", main = "Barplot for AlcoholDrinking and Diabetic")
+```
+
+
+```{r}
+total$HeartDisease <- as.numeric(total$HeartDisease)
+
+cor_as_hd <- cor(total$HeartDisease, total$AlcoholDrinking)
+cor_as_hd
+cor_hd_smoke <- cor(total$HeartDisease, total$Smoking)
+cor_hd_smoke
+cor_hd_dia <- cor(total$HeartDisease, total$Diabetic)
+cor_hd_dia
+cor_dia_smoke <- cor(total$Diabetic, total$Smoking)
+cor_dia_smoke
+cor_dia_drink <- cor(total$Diabetic, total$AlcoholDrinking)
+cor_dia_drink
+
+
+
+```
+
+```{r}
+contable  <- table(total$HeartDisease, total$Smoking)
 prop <-prop.table(contable)
 percent <- round(prop*100, 2)
 xkabledply(percent, title="Contingency Table for heart Disease and Smoking in Percentage")
 ```
 
-0 represents No
-1 represents yes
-So, in this contingency table we can see that we got 5% for people who have heartdisease and who smoke which indicates that smoke is more correlated to heartdisease.
+
 
 ```{r}
-contable2 <- table(heart$HeartDisease, heart$AlcoholDrinking)
-summary(contable2) 
+contable2 <- table(total$HeartDisease, total$AlcoholDrinking)
 prop <-prop.table(contable2)
 percent <- round(prop*100, 2)
 xkabledply(percent, title="Contingency Table for heart Disease and AlcoholDrinking in Percentage")
 ```
-0 represents No
-1 represents yes
-So, in this contingency table we can see that we got 6.45% for people who don't have heartdisease and who drink which indicates that drink is not that more correlated to heartdisease.
 
-```{r chisq}
-
-chitest1 = chisq.test(contable)
-chitest1
-chitest2 = chisq.test(contable2)
-chitest2
+```{r}
+contable3 <- table(total$HeartDisease, total$Diabetic)
+prop <-prop.table(contable3)
+percent <- round(prop*100, 2)
+xkabledply(percent, title="Contingency Table for heart Disease and Diabetics in Percentage")
 ```
 
-Based on the Chi-square test we can say that the variables are dependent on the heartdisease.
+
 
 ```{r}
 
-model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking , data = train , family = "binomial")
+model_lr <- glm(HeartDisease ~ Smoking + AlcoholDrinking + AlcoholDrinking:Smoking, data = train , family = "binomial")
 summary(model_lr)
 xkabledply(model_lr, title = paste("Logistic Regression :", format(formula(model_lr))))
 ```
-For this model we can see that the p-values are very small indicating that smoking and alcoholdrinking is related to heartdisease.
-
-
-```{r}
-anova(model_lr, test="Chisq")
-```
+From p-values both smoking and alcoholdrinking are statistically significant. For every one percent increase in smoking there is an increase of 0.7891% in heartdisease. For every one percent increase in alcoholdrinking there is a decrease of 0.7844% in heartdisease. The high z-value 39.31 of smoking tells us that smoking and heardisease are strongly correaltion. The high p-value between smoking and alcoholdrinking signifies no statistical correlation between the two-variable.
 
 ```{r}
 fitted.results <- predict(model_lr,newdata = test, type='response')
@@ -789,13 +802,14 @@ print(paste('Accuracy',1-misClasificError))
 
 ```
 
-We have got an accuaracy of 0.589 which indicates that the model is pretty decent.
+We have got an accuaracy of 58.9 for this model_lr which is not good because of the fact that we have a equal distribution of heartdisease patients in the dataset.
 
 ```{r}
 expcoeff = exp(coef(model_lr))
 xkabledply( as.table(expcoeff), title = "Exponential of coefficients in Logit Reg" )
 knitr::kable(expcoeff,caption='Odds Ratio & Confidence Interval of Model')
 ```
+Odd's ratio is the proprobility of having heartdiseases to having no heartdiseases for a person with smoking habit. For every one unit increase in smoking the chance of getting heartdisease is 2.2. For every one unit increase in alcoholdrinking the chance of getting heartdisease is 0.45.
 
 ### Using Confidence Intervals
 
@@ -824,10 +838,12 @@ model.matrix(~0+., data=new_heart) %>%
 Based on the correlation matrix we can see that smoking is more correlated to heartdisease than alcoholdrinking.
 
 ```{r, results='markup'}
-#loadPkg("regclass")
-xkabledply( confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
+loadPkg("regclass")
+xkabledply(confusion_matrix(model_lr), title = "Confusion matrix from Logit Model" )
 
 ```
+From confusion matrix we can see that our model has predicted true positive only 12157 times and 7867 times false positive. Despite having an close to 55% accuracy false positive rate is very high when compared with true positive. So, the model is not good.
+
 #### Receiver-Operator-Characteristic (ROC) curve and Area-Under-Curve (AUC)
 
 ```{r}
@@ -845,6 +861,7 @@ auc
 
 #area of curve is 0.593
 ```
+From the roc-curve we can conclude that the accuracy is not good as it is close to diagnal.
 
 ```{r}
 
@@ -852,7 +869,7 @@ model_lr2 <- glm(HeartDisease ~ Smoking + AlcoholDrinking + Diabetic + Diabetic:
 summary(model_lr2)
 xkabledply(model_lr2, title = paste("Logistic Regression :", format(formula(model_lr2))))
 ```
-For this model we can see that the p-values are very small indicating that smoking and alcoholdrinking, diabetics and smoking:Diabetic is related to heartdisease.
+All the 3 variables are statistically significant. The effect of diabetics on heartdisease with people having smoking habit is statistically significant. There is no strong relation between diabetics and alcoholdrinking in heartdisease patients. 
 
 ```{r}
 fitted.results <- predict(model_lr2,newdata = test, type='response')
@@ -861,6 +878,15 @@ misClasificError <- mean(fitted.results != test$HeartDisease)
 print(paste('Accuracy',1-misClasificError))
 
 ```
+
+The accuracy of the model has increased when diabetics is added this shows the significances of diabetics in heartdisease patients.
+
+```{r}
+expcoeff2 = exp(coef(model_lr2))
+xkabledply( as.table(expcoeff2), title = "Exponential of coefficients in Logit Reg" )
+knitr::kable(expcoeff2,caption='Odds Ratio & Confidence Interval of Model')
+```
+For model_lr2 from the expontential coffectients, or every one unit increase in diabetics and smoking there is a 0.8 increase in heartdisease.
 
 ```{r, results='hold'}
 
@@ -876,7 +902,7 @@ xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
 #loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
-
+From the confusion matrix, true positive is 15421 and false negative is 9483 which is slightly better than model one but can not say but the accuracy is good as there is a lot of false negatives.
 
 
 ```{r}
@@ -895,39 +921,8 @@ auc
 
 ```
 
+Roc curve is slightly better than model_lr.
 
-
-
-# What is the effect of Smoking and Drinking?
-
-The interaction between the tobacco(smoking) and alcohol can lead to heart problems and it depends on some factors in which we can find out.
-Initially, It might depend upon quantity of dose the person is consuming it.
-And based on some research I found that consuming alcohol in range of  3 to 14 drinks per week is prone to lower risk of heart attack but there are other risks factors that lead to complex issues like blockage in artery and deficiency in blood flow or it can lead to heart failure.
-
-When looked at the cause for smoking there is a high change of risk leading to heart problems.  Some heart failures caused by smoking are stroke, bleeding from brain and congestion in chest.
-
-# Does people who Drink smoke?
-
-Some researchers have found that among people who drink have  high changes of smoking most of the times. 
-
-
-# What is the relation between smoking and heart disease ?
-
-So, basically people who tend to smoke have issues related to cardiovascular disease(CVD). CVD occurs when chemicals in cigarettes release then the blood becomes thick and starts forming clots inside veins and arteries. When the blood vessel are completely blocked then it can lead to heart attack and sudden death. Which can lead to death of the person. In the United States, there were reportedly 800,000 people who faced cardiovascular disease and was the mere cause of death in which 8million died of heart attack and other 7 million died of stroke.
-
-When measured on how many cigarettes people consume leads to health issues there is 100 percent chance that people’s health will be damaged no matter if they consumed one or two per day. The fact that when people consume one to two cigarettes may show signs of CVD but gradually they might face problems. Another risk factor is that if people consume more than 5 cigarettes a day they may show signs of early CVD. Based on this we can imagine that the risk of CVD increases based on the number of cigarettes consumed per day. 
-
-# How is smoking effecting?
-
-When a person smoke the chemicals substances in the cigarette cause the cells of boodle vessels stolen and inflamed which leads to blood vessels becoming narrow. 
-
-What is the relation between Drinking and heart disease ?
-
-When a person has a habit to drink than to indicate that his health is getting damaged then we have to understand what is the percentage of alcohol being consumed per day and we can weight it in grams/units. On an average the standard practice of people who drink consume 12 to 15grams off alcohol. Based on this practice there are most often low and high risks. Low risk or moderate risk has an average of 1 to 2 drinks per day and high risk can be measured on consuming more than 4 drinks per day.
-
-
-For both the chi^2 tests we performed above, the p-value<0.05. So all the above rejects null hypothesis. 
-Both drinking and smoking have a relationship with heart Disease. 
 
 
 ### Limitations
