@@ -699,7 +699,7 @@ From the confusion matrix, true positive is 15421 and false negative is 9483 whi
 ##### roc curve
 Roc curve is slightly better than model_lr.
 
-##### Conclusion
+
 To conclude, model_lr2 performs slightly better than model_lr which signifies the a strong correlation between diabetics and heartdisease which is inturn strongly correlated in smoking. The correaltions predicted by the model between heartdisease and smoking, diabetics are similar to real life scenarios. Drinking is not significantly related with the heartdisease which is not true in real life situations. This arises from the fact that there are very few observations of true positives cases in alcoholdrinking. Accuracy of 58 and 63% are decent for the number of false positives are too high which makes the model unrealiable.
 
 
@@ -884,7 +884,6 @@ xkabledply(confint.default(model_lr2), title = "CIs using standard errors" )
 #loadPkg("regclass")
 xkabledply( confusion_matrix(model_lr2), title = "Confusion matrix from Logit Model" )
 ```
-From the confusion matrix, true positive is 15421 and false negative is 9483 which is slightly better than model one but can not say but the accuracy is good as there is a lot of false negatives.
 
 
 ```{r}
@@ -1034,8 +1033,8 @@ summary(totaldata)
 
 set.seed(100)
 sample_train_rows <- sample(1:nrow(total), 0.7*nrow(totaldata))
-train <- total[sample_train_rows, ]
-test <- total[-sample_train_rows, ]
+train <- totaldata[sample_train_rows, ]
+test <- totaldata[-sample_train_rows, ]
 
 ```
 
@@ -1113,10 +1112,6 @@ Liars - We are uncertain about the responses because we found that the responses
 During the year 2021, the covid was at its peak and most people got affected by covid. Post covid, people’s immune systems got broken down and they became prone to several illnesses like diabetes, Asthma. The death rates with covid were very high and this led to the increase in death rates of heart disease because most of the people got infected with key indicators like high BMI and high cholesterol. Not only did the older people got affected by covid it was the younger people who got affected by covid their death rates were also high. From the noted survey, people tend to develop more secondary illnesses which in turn caused them primary disease which is Heart Disease, And got affected with higher death rates.
 
 
-### Conclusions:
-
-To conclude, we found strong evidence from our EDA that people with higher BMI, high cholesterol, and age affect Heart Disease. Moreover, the variables were Sex, BMI, Physical Health, Mental Health, sleep time, Secondary Illnesses, alcohol, and Drinking.
-
 # Analysis of SMART Questions:
  From the first question one Which gender tends to have more diseases based on BMI, smoking, drinking, and mental health in the year 2020? We concluded that On average, people with heart disease have a slightly higher BMI than those who don't have heart disease. However, the biggest difference is the number of days that a respondent feels physically unwell. Respondents who have heart disease reported feeling physically unwell about 8 days per month, while healthy people felt unwell for only 3. Poor mental health in 30 days is slightly higher for people with heart disease than for people without. we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease However, we are then forced to ask why do men have more heart disease in our sample? Are they doing more or less of a certain activity than their female counterparts? we compared the different lifestyle variables between men and women and then further compared those same variables between those with and without heart disease allowing us to reject the null hypothesis and conclude that the overall average BMI is different between the male and female populations. From the mean values, we see that men have a mean BMI of 28.50 while women have a BMI of 28.16. A difference of 0.34.  From the T-test output, we see that the p-value is 0.604, which is greater than 0.05. This means that we fail to reject the null and conclude that there is no significant difference in the average BMI between men and women who do have heart disease. Since the p-value is less than 5%, there is a difference in the number of days that men and women feel unwell. On average, women reported feeling sick for about 9 days while men reported just over 6 days.  
 
@@ -1131,6 +1126,13 @@ From all the smart questions we can come to conclude that smokers, drinkers, and
 
 Next Steps:
 Next steps are to use what we learned in our dataset and develop a linear model. And try to create a model which is helpful for everyone. As we all know Health is Wealth and without health, we can't achieve heights so we tend to develop a model which we can use to know which variables are developing heart disease and with that, we can try to decrease the effect on Heart Disease.
+
+
+
+
+### Conclusions:
+
+To conclude, we found strong evidence from our EDA that people with higher BMI, high cholesterol, and age affect Heart Disease. Moreover, the variables were Sex, BMI, Physical Health, Mental Health, sleep time, Secondary Illnesses, alcohol, and Drinking.
 
 
 ## References 
