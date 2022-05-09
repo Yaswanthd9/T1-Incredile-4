@@ -679,15 +679,15 @@ Accuarcy-66.7
 
 Our problem statement is "Does smoking or drinking increase the risk of heartdisease?, Does having diabetics increase the risk of heartdiseases among smokers or drinkers?
 
-We performed some basic EDA through visualizing the dataset by plotting graphs. After priliminary analysis the following obsevations are made:
+We performed some basic EDA through visualizing the dataset by plotting graphs. After preliminary analysis the following observations are made:
 
-Heartdisease varaible is heavily skewed. The percentage of people with no heartdiseases is very high as compared to people with heartdisease. As heartdisease is the target variable this might effect the prediction of the model.
+Heartdisease variable is heavily skewed. The percentage of people with no heartdiseases is very high as compared to people with heartdisease. As heartdisease is the target variable this might effect the prediction of the model.
 
-In order to fix this we have made some subset of the dataset with equal proportions of yes and no of heart disease varaible.
+In order to fix this we have made some subset of the dataset with equal proportions of yes and no of heart disease variable.
 
 From the graph between heartdisease and smoking we can say that people who smoke have a high tendency for getting heartdiseases which is true with real life scenarios.
 
-From the graph between heartdisease and drinking we can say the proposition of drinkers among people with heartdisease is less than the people without heartdisease. Ths is contory to real life assumption which assumes that people who drink are more prone to heartdisease.
+From the graph between heartdisease and drinking we can say the proposition of drinkers among people with heartdisease is less than the people without heartdisease. Ths is contrary to real life assumption which assumes that people who drink are more prone to heartdisease.
 
 From the graph people with diabetics shows us that people with diabetics are more prone to heartdiseases.
 
@@ -695,11 +695,11 @@ From the graph between diabetics and smoking we can conclude that the chances of
 
 From the graph between diabetics and alcoholdrinking, there are less people with diabetics who drinks as compared to people with diabetics.
 
-We have observed the following trends between heartdisease and smoking, alcoholdrinking and diabetics from the premilinary analysis:
+We have observed the following trends between heartdisease and smoking, alcoholdrinking and diabetics from the preliminary analysis:
 
 The chances of people having heartdiseases is more when they have smoking habit as compared to drinking. people with diabetics are more prone to heartdiseases. Diabetics follows the same trend as heartdisease, where people who smoke are more prone to having diabetics than people who drink.
 
-After graphs we have done some statistical analysis of the variables. From the correlation coffections between heartdisease and smoking, drinking, diabetics are 0.184, -0.0609, 0.266 respectively. Heartdisease and diabetics are strongly correlated when compared to drinking and smoking. Drinking is least and negatively correalted with heartdisease. The correlation coefficients between diabetics, and smoking, alcoholdrinking are 0.0733, -0.0705 respectively. Diabetics and smoking are lightly correlated with a positive coeffection of 0.073 and from the coffection values we can say that smoking and drinking does not effect diabetic to a great extent.
+After graphs we have done some statistical analysis of the variables. From the correlation coefficients between heartdisease and smoking, drinking, diabetics are 0.184, -0.0609, 0.266 respectively. Heartdisease and diabetics are strongly correlated when compared to drinking and smoking. Drinking is least and negatively corealted with heartdisease. The corelation coefficients between diabetics, and smoking, alcoholdrinking are 0.0733, -0.0705 respectively. Diabetics and smoking are lightly correlated with a positive coefficients of 0.073 and from the coefficient values we can say that smoking and drinking does not effect diabetic to a great extent.
 
 From the contengency table, approximetly 30% of people who has heartdiseases has an smoking habit, only 20% of people who does not smoke have heartdisease. 2% of drinkers have heartdisease whereas 3% of known drinkers have heartdisease. This is the reason for negative correaltion between heartdisease and drinking. Out of total heart patients 18% have diabetics and 7% of people have diabetics without any heartdisease. 
 
@@ -716,11 +716,11 @@ We have got an accuaracy of 58.9 for this model_lr which is not good because of 
 
 Odd's ratio is the proprobility of having heartdiseases to having no heartdiseases for a person with smoking habit. For every one unit increase in smoking the chance of getting heartdisease is 2.2. For every one unit increase in alcoholdrinking the chance of getting heartdisease is 0.45.
 
-From confusion matrix we can see that our model has predicted true positive only 12157 times and 7867 times false positive. Despite having an close to 55% accuracy false positive rate is very high when compared with true positive. So, the model is not good.
+From confusion matrix we can see that our model has predicted true positive only 12157 times and 7867 times false positive. Despite having an close to 60% accuracy false positive rate is very high when compared with true positive. So, the model is not good.
 
 From the roc-curve we can conclude that the accuracy is not good as it is close to diagnal.
 
-model_lr2 hasall the 3 variables(smoking,drinking,diabetics) are statistically significant. The effect of diabetics on heartdisease with people having smoking habit is statistically significant. There is no strong relation between diabetics and alcoholdrinking in heartdisease patients. 
+Now for model_lr2 all the 3 variables(smoking,drinking,diabetics) are statistically significant. The effect of diabetics on heartdisease with people having smoking habit is statistically significant. There is no strong relation between diabetics and alcoholdrinking in heartdisease patients. 
 
 The accuracy of the model_lr2 has increased when diabetics is added this shows the significances of diabetics in heartdisease patients.
 
