@@ -558,7 +558,7 @@ summary(total)
 
 
 ```{r}
-barplot(table(total$PhysicalActivity, total$HeartDisease), legend= rownames(table(total$HeartDisease, total$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
+barplot(table(heart$PhysicalActivity, heart$HeartDisease), legend= rownames(table(heart$HeartDisease, heart$PhysicalActivity)), col =(c("orange", "blue")), xlab="PhysicalActivity", ylab="heartdisease",main = "Barplot for Heartdisease and PhysicalActivity")
 ```
 
 ```{r}
@@ -657,4 +657,9 @@ TestTPR=45/(45+10)
 TestFPR=1-52/(52+7) ## expressed as 1-true negative rate
 
 print(cbind(TestAccuracy, TestTPR, TestFPR))
+```
+
+
+```{r}
+barplot(table(total$HeartDisease, total$GenHealth), legend= rownames(table(total$HeartDisease, total$GenHealth)), col =(c("blue", "red")), xlab="GeneralHealth", ylab="heartdisease",main = "Barplot for Heartdisease and GeneralHealth")
 ```
