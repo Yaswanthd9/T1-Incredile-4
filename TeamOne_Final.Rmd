@@ -966,9 +966,7 @@ heart$GeneralHealth<-sapply(heart$GenHealth,unclass)
 
 #5-Very good,4-poor,3-Good,2-fair,1-excellent
 
-```{r}
-freq(heart)
-```
+General Health is a categorical variable having very good, poor, fair, good, excellent. Converted categorical variable into numerical dummies for our simple analysis. General Health with very good as 5,General Health with poor as 4, General Health with good as 3, General Health with fair as 2, General Health with excellent as 1.
 
 
 # Changing race variable to numerical variable
@@ -976,34 +974,28 @@ freq(heart)
 heart$Race<-as.factor(heart$Race)
 heart$Ethnicity<-sapply(heart$Race,unclass)
 ```
-
-
 # Converting white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1
+
+
+Race is a categorical variable having all the race. Converted Race into numerical dummies for EDA .Converted white as 6, Hispanic as 5,Black as 4, Other as 3, Asian as 2, American Indian as 1.
+
+
+
 ```{r}
 freq(heart$Ethnicity)
 ```
-
-```{r, results = 'markup' }
-# Finding the mean of numerical variables grouped by heart disease
-plot_num(heart)
-
-heart %>%
-  group_by(HD) %>%
-  summarise_at(vars("GeneralHealth", 
-                    "PhysicalActivity", 
-                    "Ethnicity"), mean)
-```
+In our dataset most of people are White, next highest percentage is black, next people are others,least are indians.
 
 ```{r}
 loadPkg("corrplot")
 cor(heart$HeartDisease,heart$GeneralHealth)
-
 ```
 
-```{r}
-hist(heart$GeneralHealth)
-hist(heart$Ethnicity)
-```
+
+As a rule of thumb, a correlation coefficient between 0.25 and 0.5 is considered to be a “weak” correlation between two variables.
+As Heart Disease increase General Health Decreases. It means chances of getting heart disease are high when general health decreases it means going bad.
+
+
 
 ```{r}
 
