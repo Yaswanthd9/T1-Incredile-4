@@ -924,6 +924,11 @@ auc
 Roc curve is slightly better than model_lr.
 
 
+<<<<<<< Updated upstream
+=======
+********************************************************END OF SECTION**************************
+
+>>>>>>> Stashed changes
 ##GENERALHEALTH, PHYSICAL ACTIVITY, ETHNICITY AFFECTS HEART DISEASE
 
 
