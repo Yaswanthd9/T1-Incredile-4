@@ -1041,11 +1041,11 @@ test <- totaldata[-sample_train_rows, ]
 
 Since most of the data is unbiased. Converted data into equal number of yes(1) and no so that data is biased and we are traing the modified data to 70% and testing data as 30%
 ```{r}
-model <- glm(HeartDisease ~ GenHealth+PhysicalActivity+SleepTime,data=train,family = "binomial")
+model <- glm(HeartDisease ~ GenHealth+SleepTime+Race,data=train,family = "binomial")
 summary(model)
 ```
 
-A model is built on Gen Health, Physical Activity, Sleeptime, Race. All the p-values are less than 0.05 except the RaceAsian remaining all the stastically significant.
+A model is built on Gen Health, Sleeptime, Race. All the p-values are less than 0.05 except the RaceAsian remaining all the stastically significant.
 
 ```{r}
 xkabledply(model, title = paste("Logistic Regression :", format(formula(model)) ))
@@ -1080,6 +1080,8 @@ test_prob <- predict(model, newdata = test, type = "response")
 train_prob <-predict(model, newdata = train, type = "response")
 test_roc <- roc(test$HeartDisease ~ test_prob, plot = TRUE, print.auc = TRUE)
 ```
+
+The area under curve is 73.9% 
 
 ```{r}
 fittedheartTrain=ifelse(train_prob<0.5,0,1 )
